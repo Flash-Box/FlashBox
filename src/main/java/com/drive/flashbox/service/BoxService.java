@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -13,12 +14,14 @@ import org.springframework.stereotype.Service;
 import com.drive.flashbox.dto.request.BoxRequest;
 import com.drive.flashbox.dto.response.BoxResponse;
 import com.drive.flashbox.entity.Box;
+import com.drive.flashbox.entity.BoxUser;
 import com.drive.flashbox.entity.Picture;
 import com.drive.flashbox.entity.User;
 import com.drive.flashbox.entity.enums.RoleType;
 import com.drive.flashbox.repository.BoxRepository;
 import com.drive.flashbox.repository.PictureRepository;
 import com.drive.flashbox.repository.UserRepository;
+import com.drive.flashbox.repository.BoxUserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class BoxService {
 	final private BoxRepository boxRepository;
+	final private BoxUserRepository boxUserRepository;
 	final private UserRepository userRepository;
 	private final PictureRepository pictureRepository;
 	private final S3Service s3Service;
@@ -130,6 +134,27 @@ public class BoxService {
 		
 	}
 
-	
+    public void inviteUserToBox(Long boxId, Long userId) {
+        // 1. 박스와 유저를 조회
+        Box box = boxRepository.findById(boxId)
+                .orElseThrow(() -> new NoSuchElementException("해당 박스를 찾을 수 없습니다. ID: " + boxId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
+
+        // 2. 이미 초대된 유저인지 검사 (옵션)
+        boolean alreadyMember = boxUserRepository.existsByBoxAndUser(box, user);
+        if (alreadyMember) {
+            throw new IllegalStateException("이미 초대된 유저입니다.");
+        }
+
+        // 3. 중간 엔티티(예: BoxUser) 생성
+        BoxUser boxUser = new BoxUser();
+        boxUser.setBox(box);
+        boxUser.setUser(user);
+        boxUser.setRole(RoleType.MEMBER); // 예: MEMBER / OWNER
+
+        // 4. DB에 저장
+        boxUserRepository.save(boxUser);
+    }
 
 }
