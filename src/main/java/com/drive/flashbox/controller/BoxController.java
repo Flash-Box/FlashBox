@@ -106,7 +106,20 @@ public class BoxController {
 	    return ResponseEntity.ok().build();  // 리디렉션 대신 상태 코드 반환
 	}
 	
-	// box 삭제 기능
+	// box에 다른 User 초대
+	@PostMapping("/box/{bid}/members")
+	public ResponseEntity<?> inviteUserToBox(
+	    @PathVariable("bid") Long boxId,
+	    @RequestParam("uid") Long userId
+	) {
+	    // Service 호출
+	    boxService.inviteUserToBox(boxId, userId);
+
+	    // 필요하다면 결과 DTO나 메시지를 담아서 반환
+	    return ResponseEntity.ok("유저 초대가 완료되었습니다.");
+  }
+	
+  // box 삭제 기능
 	@DeleteMapping("/box/{bid}")
 	public ResponseEntity<Void> deleteBox(@PathVariable("bid") Long bid) {
 	    boxService.deleteBox(bid);

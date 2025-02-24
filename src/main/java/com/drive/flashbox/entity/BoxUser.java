@@ -50,4 +50,16 @@ public class BoxUser {
         this.participateDate = participateDate;
         this.role = role;
     }
+    
+    public void setBox(Box box) {
+        this.box = box;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setRole(RoleType role) {
+        this.role = role;
+    }
 }
