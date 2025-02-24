@@ -1,6 +1,6 @@
 package com.drive.flashbox.service;
 
-import com.drive.flashbox.dto.UserDTO;
+import com.drive.flashbox.dto.UserDto;
 import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
 import com.drive.flashbox.entity.User;
@@ -19,7 +19,7 @@ public class UserService {
 
     public SignupResponseDTO registerUser(SignupRequestDTO signupRequestDTO) {
 
-        Optional<UserDTO> found = searchUser(signupRequestDTO.getEmail());
+        Optional<UserDto> found = searchUser(signupRequestDTO.getEmail());
         if(found.isPresent()) {
             throw new IllegalStateException("동일한 email의 유저가 이미 존재합니다.");
         }
@@ -29,9 +29,9 @@ public class UserService {
         return SignupResponseDTO.of(userRepository.save(user));
     }
 
-    public Optional<UserDTO> searchUser(String email) {
+    public Optional<UserDto> searchUser(String email) {
         return Optional.ofNullable(userRepository.findByEmail(email))
-                .map(UserDTO::from);
+                .map(UserDto::from);
     }
 
 }
