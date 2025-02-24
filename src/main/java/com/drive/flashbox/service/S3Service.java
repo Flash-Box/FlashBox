@@ -86,30 +86,24 @@ public class S3Service {
         return fileUrl;
     }
     
- // 박스 생성 시 S3에 폴더 생성하는 메서드
-    public void createS3Folder(Long userId, Long boxId) {
-	    // 유저 ID와 박스 이름을 결합한 경로 (폴더 경로 생성)
-	    String folderPath = userId + "/" + boxId + "/";
-	    
-	    // 빈 객체를 S3에 업로드하여 폴더를 생성
-	    ObjectMetadata metadata = new ObjectMetadata();
-	    metadata.setContentLength(0);  // 폴더는 빈 객체로 처리됨
+    // 박스 생성 시 S3에 폴더 생성하는 메서드
+    public void createS3Folder(Long boxId) {
+        String folderPath = boxId + "/";
 
-	    try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[0])) {
-	        // S3의 지정된 경로에 빈 객체를 업로드하여 폴더를 생성
-	        PutObjectRequest putObjectRequest = new PutObjectRequest(
-	        		bucketName,
-	                folderPath,          // 폴더 경로 (실제로 파일이 아니라 폴더처럼 취급)
-	                byteArrayInputStream, 
-	                metadata);
-	        amazonS3.putObject(putObjectRequest);
-	    } catch (IOException e) {
-	        throw new RuntimeException("S3 폴더 생성 중 오류가 발생했습니다.", e);
-	    }
-	}
-    
-    public void deleteS3Folder(Long userId, Long boxId) {
-        String folderPath = userId + "/" + boxId + "/";
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(0);
+
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(new byte[0])) {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(
+                    bucketName, folderPath, byteArrayInputStream, metadata);
+            amazonS3.putObject(putObjectRequest);
+        } catch (IOException e) {
+            throw new IllegalStateException("S3 폴더 생성 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    public void deleteS3Folder(Long boxId) {
+        String folderPath = boxId + "/";
 
         // S3에서 해당 폴더 내의 객체 목록을 가져옴
         ListObjectsV2Request listObjectsRequest = new ListObjectsV2Request()
@@ -124,17 +118,16 @@ public class S3Service {
             amazonS3.deleteObject(bucketName, objectSummary.getKey());
         }
 
-        // 🔹 유저 폴더 삭제 가능 여부 체크 (하위 폴더까지 고려)
-        String userFolderPath = userId + "/";
-        ListObjectsV2Request userFolderRequest = new ListObjectsV2Request()
+        // 🔹 box 폴더 삭제 가능 여부 체크
+        ListObjectsV2Request boxFolderRequest = new ListObjectsV2Request()
                 .withBucketName(bucketName)
-                .withPrefix(userFolderPath);  // 🔹 하위 모든 객체 확인
+                .withPrefix("");  // 모든 객체 확인
 
-        ListObjectsV2Result userFolderResult = amazonS3.listObjectsV2(userFolderRequest);
+        ListObjectsV2Result boxFolderResult = amazonS3.listObjectsV2(boxFolderRequest);
 
-        // 유저 폴더에 남아있는 객체가 없으면 삭제
-        if (userFolderResult.getObjectSummaries().isEmpty() && userFolderResult.getCommonPrefixes().isEmpty()) {
-            amazonS3.deleteObject(bucketName, userFolderPath);
+        // box 폴더에 남아있는 객체가 없으면 삭제
+        if (boxFolderResult.getObjectSummaries().isEmpty() && boxFolderResult.getCommonPrefixes().isEmpty()) {
+            amazonS3.deleteObject(bucketName, folderPath);
         }
     }
 }
