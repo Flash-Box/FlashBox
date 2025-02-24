@@ -112,14 +112,12 @@ public class BoxService {
 	}
 	
 	public BoxResponse getBox(Long bid) {
-		// 없을 시 에러 처리 필요
-		return boxRepository.findById(bid).map(BoxResponse::from).orElseThrow();
+		return boxRepository.findById(bid).map(BoxResponse::from).orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 	}
 	
 	@Transactional
 	public void updateBox(Long bid, BoxRequest boxDto) {
-		// 없을 시 에러 처리 필요
-		Box box = boxRepository.findById(bid).orElseThrow();
+		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 		box.editBox(boxDto.getName(),
 					boxDto.getEventStartDate().atStartOfDay(),
 					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));

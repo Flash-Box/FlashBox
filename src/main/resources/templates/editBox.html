@@ -19,26 +19,59 @@
                 startDate.max = endDate.value;
             }
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+		    const form = document.getElementById("updateForm");
+		    const bid = form.getAttribute("data-bid");
+		
+		    form.addEventListener("submit", function (event) {
+		        event.preventDefault();
+		
+		        const formData = {
+		            name: document.getElementById("name").value,
+		            eventStartDate: document.getElementById("eventStartDate").value,
+		            eventEndDate: document.getElementById("eventEndDate").value
+		        };
+		
+		        fetch(`/box/${bid}`, {
+		            method: "PUT",
+		            headers: {
+		                "Content-Type": "application/json"
+		            },
+		            body: JSON.stringify(formData)
+		        })
+		        .then(response => {
+		            if (response.ok) {
+		                window.location.href = `/box/${bid}`;
+		            } else {
+		                alert("수정 실패!");
+		            }
+		        })
+		        .catch(error => console.error("Error:", error));
+		    });
+		});
     </script>
 </head>
 <body>
     <h2>Box 수정</h2>
-    <form th:action="@{/box/{bid}(bid=${box.bid})}" th:method="post" onsubmit="validateDates()">
-		<input type="hidden" name="_method" value="put">
+    <form id="updateForm" th:data-bid="${box.bid}">
         <label for="name">이름</label>
         <input type="text" id="name" name="name" 
-       		th:value="${box?.name != null ? box.name : ''}" placeholder="Box 이름을 입력해주세요." required>
+               th:value="${box?.name != null ? box.name : ''}" 
+               placeholder="Box 이름을 입력해주세요." required>
         <br><br>
 
         <label>모임 날짜</label>
         <br>
         <label for="eventStartDate">시작 날짜</label>
         <input type="date" id="eventStartDate" name="eventStartDate"
-               th:value="${box?.eventStartDate != null ? box.eventStartDate : ''}" required onchange="validateDates()">
+               th:value="${box?.eventStartDate != null ? box.eventStartDate : ''}" 
+               required onchange="validateDates()">
 
         <label for="eventEndDate">끝 날짜</label>
         <input type="date" id="eventEndDate" name="eventEndDate"
-               th:value="${box?.eventEndDate != null ? box.eventEndDate : ''}" required onchange="validateDates()">
+               th:value="${box?.eventEndDate != null ? box.eventEndDate : ''}" 
+               required onchange="validateDates()">
         <br><br>
 
         <button type="submit">수정</button>
