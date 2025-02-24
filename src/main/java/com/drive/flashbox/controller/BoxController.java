@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -116,5 +117,12 @@ public class BoxController {
 
 	    // 필요하다면 결과 DTO나 메시지를 담아서 반환
 	    return ResponseEntity.ok("유저 초대가 완료되었습니다.");
+  }
+	
+  // box 삭제 기능
+	@DeleteMapping("/box/{bid}")
+	public ResponseEntity<Void> deleteBox(@PathVariable("bid") Long bid) {
+	    boxService.deleteBox(bid);
+	    return ResponseEntity.ok().build(); // 204 No Content 대신 200 OK 반환
 	}
 }

@@ -112,7 +112,12 @@ public class BoxService {
 		// BoxUser에 생성한 유저와 OWNER role 등록하는 메서드
 		box.addBoxUser(user, RoleType.OWNER);
 		
-		return boxRepository.save(box);
+		Box newBox =  boxRepository.save(box);
+		
+		// 박스 생성 전에 호출되면 bid 가 없어서 null값이 입력됨
+		s3Service.createS3Folder(user.getId(), newBox.getBid());
+		
+		return newBox;
 	}
 	
     // 박스 전체 조회
@@ -133,28 +138,36 @@ public class BoxService {
 		
 		
 	}
+ 
+  public void inviteUserToBox(Long boxId, Long userId) {
+      // 1. 박스와 유저를 조회
+      Box box = boxRepository.findById(boxId)
+              .orElseThrow(() -> new NoSuchElementException("해당 박스를 찾을 수 없습니다. ID: " + boxId));
+      User user = userRepository.findById(userId)
+              .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
 
-    public void inviteUserToBox(Long boxId, Long userId) {
-        // 1. 박스와 유저를 조회
-        Box box = boxRepository.findById(boxId)
-                .orElseThrow(() -> new NoSuchElementException("해당 박스를 찾을 수 없습니다. ID: " + boxId));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
+      // 2. 이미 초대된 유저인지 검사 (옵션)
+      boolean alreadyMember = boxUserRepository.existsByBoxAndUser(box, user);
+      if (alreadyMember) {
+          throw new IllegalStateException("이미 초대된 유저입니다.");
+      }
 
-        // 2. 이미 초대된 유저인지 검사 (옵션)
-        boolean alreadyMember = boxUserRepository.existsByBoxAndUser(box, user);
-        if (alreadyMember) {
-            throw new IllegalStateException("이미 초대된 유저입니다.");
-        }
+      // 3. 중간 엔티티(예: BoxUser) 생성
+      BoxUser boxUser = new BoxUser();
+      boxUser.setBox(box);
+      boxUser.setUser(user);
+      boxUser.setRole(RoleType.MEMBER); // 예: MEMBER / OWNER
 
-        // 3. 중간 엔티티(예: BoxUser) 생성
-        BoxUser boxUser = new BoxUser();
-        boxUser.setBox(box);
-        boxUser.setUser(user);
-        boxUser.setRole(RoleType.MEMBER); // 예: MEMBER / OWNER
+      // 4. DB에 저장
+      boxUserRepository.save(boxUser);
+  }
 
-        // 4. DB에 저장
-        boxUserRepository.save(boxUser);
-    }
-
+	@Transactional
+	public void deleteBox(Long bid) {
+		// 임의로 1번 유저의 박스를 삭제했다고 가정
+		User user = userRepository.getReferenceById(1L);
+		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다."));
+		boxRepository.deleteById(bid);
+		s3Service.deleteS3Folder(user.getId(), box.getBid());
+	}
 }
