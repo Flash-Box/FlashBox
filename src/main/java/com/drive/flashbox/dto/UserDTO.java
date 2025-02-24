@@ -24,7 +24,7 @@ public class UserDTO{
     }
 
     public static UserDTO from(User user) {
-        return new UserDTO(
+        return UserDTO.of(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
@@ -32,6 +32,8 @@ public class UserDTO{
                 user.getCreatedDate()
         );
     }
+
+
 
 //    public User toEntity() {
 //        return User.of(
