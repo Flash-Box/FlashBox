@@ -90,6 +90,37 @@ public class PictureService {
         return pictureIds;
     }
 
+    // 이미지 다운로드
+    @Transactional(readOnly = true)
+    public List<String> generateDownloadUrls(Long bid, List<Long> pids) {
+        // 1) Box가 존재하는지 확인 (권한 체크가 필요하다면 여기서 추가)
+        Box box = boxRepository.findById(bid)
+                .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+
+        // 2) (Optional) 사용자 권한 체크 - 필요시 구현
+        // 예: User user = userRepository.findById(1L).orElseThrow(...);
+
+        List<String> downloadUrls = new ArrayList<>();
+
+        for (Long pid : pids) {
+            // 3) Picture 조회
+            Picture picture = pictureRepository.findByPidAndBoxBid(pid, bid)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이미지입니다. pid=" + pid));
+
+            // 4) S3에 저장된 객체 키 (현재 picture.getImageUrl()가 전체 URL인지, 키인지 확인)
+            // 만약 DB에 전체 URL을 저장하고 있다면, 곧바로 사용 가능
+            // 여기서는 s3Key = picture.getImageUrl() 라고 가정
+            String s3Key = picture.getImageUrl();
+
+            // 5) Pre-signed URL 생성
+            String presignedUrl = s3Service.generatePresignedUrl(s3Key);
+
+            downloadUrls.add(presignedUrl);
+        }
+
+        return downloadUrls;
+    }
+
     
     @Transactional
     public void deletePicture(Long bid, Long pid) {

@@ -2,6 +2,7 @@ package com.drive.flashbox.controller;
 
 import com.drive.flashbox.dto.PictureDto;
 import com.drive.flashbox.dto.request.PictureUploadRequest;
+import com.drive.flashbox.dto.response.PictureDownloadResponse;
 import com.drive.flashbox.dto.response.PictureUploadResponse;
 import com.drive.flashbox.service.PictureService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,25 @@ public class PictureController {
     public ResponseEntity<PictureDto> getPictureDetails(@PathVariable Long bid, @PathVariable Long pid) {
         PictureDto pictureDTO = pictureService.getPictureDetails(bid, pid);
         return ResponseEntity.ok(pictureDTO);
+    }
+
+    // 이미지 여러 장 다운로드 링크 생성
+    @GetMapping("/{bid}/picture/download")
+    @ResponseBody
+    public ResponseEntity<PictureDownloadResponse> getPictureDownloadUrls(
+            @PathVariable Long bid,
+            @RequestParam(name = "pid") List<Long> pids
+    ) {
+        // PictureService에서 Pre-signed URL 목록 생성
+        List<String> downloadUrls = pictureService.generateDownloadUrls(bid, pids);
+
+        PictureDownloadResponse response = PictureDownloadResponse.builder()
+                .message("이미지 다운로드 링크입니다.")
+                .downloadUrls(downloadUrls)
+                .status(200)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     // 이미지 업로드
