@@ -4,6 +4,7 @@ import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -15,22 +16,25 @@ import java.util.Date;
 public class S3Service {
 
     private final AmazonS3 amazonS3;
-    private final String bucketName = "t5-flashbox"; // 실제 버킷명
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName; // 실제 버킷명
 
     // 파일을 바이트 배열로 받아 S3에 업로드
     public void uploadFileToS3(String s3Key, byte[] fileBytes) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(fileBytes.length);
 
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(fileBytes);
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(fileBytes)) {
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Key, byteArrayInputStream, metadata);
+            amazonS3.putObject(putObjectRequest);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+        }
+    }
 
-        PutObjectRequest putObjectRequest = new PutObjectRequest(
-                bucketName,
-                s3Key,
-                byteArrayInputStream,
-                metadata
-        );
-        amazonS3.putObject(putObjectRequest);
+    // S3 객체의 전체 URL 반환
+    public String getFileUrl(String s3Key) {
+        return amazonS3.getUrl(bucketName, s3Key).toString();
     }
 
     // S3에 있는 객체를 바이트 배열로 다운로드 (전체 URL인 경우 객체 키만 추출)
