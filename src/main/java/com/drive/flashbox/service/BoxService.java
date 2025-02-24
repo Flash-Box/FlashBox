@@ -108,7 +108,12 @@ public class BoxService {
 		// BoxUser에 생성한 유저와 OWNER role 등록하는 메서드
 		box.addBoxUser(user, RoleType.OWNER);
 		
-		return boxRepository.save(box);
+		Box newBox =  boxRepository.save(box);
+		
+		// 박스 생성 전에 호출되면 bid 가 없어서 null값이 입력됨
+		s3Service.createS3Folder(user.getId(), newBox.getBid());
+		
+		return newBox;
 	}
 	
     // 박스 전체 조회
@@ -130,6 +135,13 @@ public class BoxService {
 		
 	}
 
-	
+	@Transactional
+	public void deleteBox(Long bid) {
+		// 임의로 1번 유저의 박스를 삭제했다고 가정
+		User user = userRepository.getReferenceById(1L);
+		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다."));
+		boxRepository.deleteById(bid);
+		s3Service.deleteS3Folder(user.getId(), box.getBid());
+	}
 
 }
