@@ -111,6 +111,11 @@ public class BoxService {
 		return boxRepository.save(box);
 	}
 	
+    // 박스 전체 조회
+    public List<Box> getAllBoxes() {
+        return boxRepository.findAll();
+    }
+	
 	public BoxResponse getBox(Long bid) {
 		return boxRepository.findById(bid).map(BoxResponse::from).orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 	}
