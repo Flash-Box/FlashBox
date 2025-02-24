@@ -35,9 +35,9 @@ public class BoxService {
 	public String generateZipAndGetPresignedUrl(Long bid, Long uid) {
 		// 1) 권한 체크 (예: 박스 소유자 또는 멤버 여부)
 		User user = userRepository.findById(uid)
-				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. uid=" + uid));
 		Box box = boxRepository.findById(bid)
-				.orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+				.orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다. bid=" + bid));
 		// 실제 권한 체크 로직은 필요에 따라 추가하세요.
 
 		// 2) 박스 내 사진 조회
@@ -50,15 +50,17 @@ public class BoxService {
 		byte[] zipBytes = createZipFileInMemory(pictures);
 
 		// 4) ZIP 파일을 S3에 업로드 (예: "temp/박스이름.zip" 경로)
-		String safeBoxName = box.getName().trim().replaceAll("\\s+", "_");
-		String zipFileName = "temp/" + safeBoxName + ".zip";
-		s3Service.uploadFileToS3(zipFileName, zipBytes);
+//		String safeBoxName = box.getName().trim().replaceAll("\\s+", "_");
+		String zipFileName = "temp/" + box.getBid() + ".zip";
 
-		// 5) 업로드된 ZIP 파일의 Pre-signed URL 생성
-		String presignedUrl = s3Service.generatePresignedUrl(zipFileName);
+		try {
+			s3Service.uploadFileToS3(zipFileName, zipBytes);
+		} catch (Exception e) {
+			throw new IllegalStateException("ZIP 파일 업로드 중 오류가 발생했습니다. zipFileName=" + zipFileName, e);
+		}
 
-		// 6) URL 반환
-		return presignedUrl;
+		// 5) URL 반환
+		return s3Service.generatePresignedUrl(zipFileName);
 	}
 
 	private byte[] createZipFileInMemory(List<Picture> pictures) {
@@ -94,7 +96,7 @@ public class BoxService {
 			zos.finish();
 			return bos.toByteArray();
 		} catch (IOException e) {
-			throw new RuntimeException("ZIP 파일 생성 중 오류가 발생했습니다.", e);
+			throw new IllegalStateException("ZIP 파일 생성 중 오류가 발생했습니다.", e);
 		}
 	}
 	

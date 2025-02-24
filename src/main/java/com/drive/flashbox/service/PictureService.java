@@ -35,7 +35,7 @@ public class PictureService {
     public PictureDto getPictureDetails(Long bid, Long pid) {
         Picture picture = pictureRepository.findByPidAndBoxBid(pid, bid)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이미지 또는 박스를 찾을 수 없습니다."));
-        
+
         return PictureDto.builder()
                 .pid(picture.getPid())
                 .name(picture.getName())
@@ -46,7 +46,7 @@ public class PictureService {
                 .build();
     }
 
-    // 이미지 업로드
+    // 이미지 업로드 (하나 또는 여러 개의 파일 업로드)
     @Transactional
     public List<Long> uploadPictures(Long bid, MultipartFile[] files) {
         // 1. 박스 조회 (존재하지 않으면 예외 처리)
@@ -64,7 +64,7 @@ public class PictureService {
             // 2. 파일 형식 검증 (예: 이미지 파일인지 확인)
             String contentType = file.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
-                throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
+                throw new IllegalArgumentException("지원하지 않는 파일 형식입니다: " + file.getOriginalFilename());
             }
 
             try {
@@ -88,8 +88,10 @@ public class PictureService {
                         .build();
                 Picture savedPicture = pictureRepository.save(picture);
                 pictureIds.add(savedPicture.getPid());
+            } catch (IOException e) {
+                throw new IllegalStateException("파일 업로드 중 오류가 발생했습니다: " + file.getOriginalFilename(), e);
             } catch (Exception e) {
-                throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+                throw new IllegalStateException("파일 업로드 처리 중 예상치 못한 오류가 발생했습니다.", e);
             }
         }
 
@@ -166,17 +168,16 @@ public class PictureService {
             zos.finish();
             return bos.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException("ZIP 파일 생성 중 오류가 발생했습니다.", e);
+            throw new IllegalStateException("ZIP 파일 생성 중 오류가 발생했습니다.", e);
         }
     }
 
-    
+
     @Transactional
     public void deletePicture(Long bid, Long pid) {
         Picture picture = pictureRepository.findByPidAndBoxBid(pid, bid)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이미지 또는 박스를 찾을 수 없습니다."));
-        
+                .orElseThrow(() -> new IllegalArgumentException("해당 이미지 또는 박스를 찾을 수 없습니다. pid=" + pid));
         pictureRepository.delete(picture);
     }
-    
+
 }

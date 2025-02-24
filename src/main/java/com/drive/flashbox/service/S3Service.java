@@ -1,5 +1,6 @@
 package com.drive.flashbox.service;
 
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
@@ -28,13 +29,19 @@ public class S3Service {
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3Key, byteArrayInputStream, metadata);
             amazonS3.putObject(putObjectRequest);
         } catch (IOException e) {
-            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
+            throw new IllegalStateException("파일 업로드 중 오류가 발생했습니다.", e);
+        } catch (AmazonClientException e) {
+            throw new IllegalStateException("Error communicating with S3", e);
         }
     }
 
     // S3 객체의 전체 URL 반환
     public String getFileUrl(String s3Key) {
-        return amazonS3.getUrl(bucketName, s3Key).toString();
+        try {
+            return amazonS3.getUrl(bucketName, s3Key).toString();
+        } catch (Exception e) {
+            throw new IllegalStateException("파일 URL 생성 중 오류가 발생했습니다.", e);
+        }
     }
 
     // S3에 있는 객체를 바이트 배열로 다운로드 (전체 URL인 경우 객체 키만 추출)
@@ -45,7 +52,9 @@ public class S3Service {
         try (S3ObjectInputStream s3is = s3Object.getObjectContent()) {
             return s3is.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException("S3 파일 다운로드 중 오류가 발생했습니다.", e);
+            throw new IllegalStateException("S3 파일 다운로드 중 오류가 발생했습니다.", e);
+        } catch (Exception e) {
+            throw new IllegalStateException("S3 파일 다운로드 중 예상치 못한 오류가 발생했습니다. fileUrl=" + fileUrl, e);
         }
     }
 
@@ -54,13 +63,15 @@ public class S3Service {
         String key = extractKeyFromUrl(fileUrl);
         // 유효 기간 설정 (예: 1시간)
         Date expiration = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
-
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucketName, key)
-                        .withMethod(HttpMethod.GET)
-                        .withExpiration(expiration);
-
-        return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        try{
+            GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                    new GeneratePresignedUrlRequest(bucketName, key)
+                            .withMethod(HttpMethod.GET)
+                            .withExpiration(expiration);
+            return amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString();
+        } catch (Exception e) {
+            throw new IllegalStateException("Pre-signed URL 생성 중 오류가 발생했습니다." , e);
+        }
     }
 
     // 전체 URL에서 객체 키만 추출 (예: "https://t5-flashbox.s3.ap-northeast-2.amazonaws.com/box-1/3.png" -> "box-1/3.png")
