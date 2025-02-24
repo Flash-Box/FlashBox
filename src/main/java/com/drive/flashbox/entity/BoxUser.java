@@ -39,7 +39,6 @@ public class BoxUser {
     @Column(name = "role")
     private RoleType role;
 
-    @Builder
     public BoxUser(Long id,
                    User user,
                    Box box,

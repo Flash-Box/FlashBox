@@ -37,7 +37,6 @@ public class Picture {
     @JoinColumn(name = "bid", nullable = false)
     private Box box;
 
-    @Builder
     public Picture(String name,
                    LocalDateTime uploadDate,
                    String imageUrl,

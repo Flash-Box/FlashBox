@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated()
                 )
-//                .formLogin(withDefaults())
+                .formLogin(withDefaults())
                 .logout(logout -> logout.logoutSuccessUrl("/"));
 
         return http.build();

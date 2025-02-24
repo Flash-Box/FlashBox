@@ -2,6 +2,7 @@ package com.drive.flashbox.controller;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.drive.flashbox.dto.request.BoxRequest;
+import com.drive.flashbox.dto.response.BoxResponse;
+import com.drive.flashbox.entity.Box;
 import com.drive.flashbox.service.BoxService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,19 @@ public class BoxController {
 		return "newBox";
 	}
 
+    // 박스 전체 조회: GET /boxes
+    @GetMapping("/boxes")
+    public List<Box> getAllBoxes() {
+        return boxService.getAllBoxes();
+    }
+
+    // 박스 상세 조회: GET /box/{bid}
+    @GetMapping("/box/{bid}")
+    public BoxResponse getBoxById(@PathVariable("bid") Long boxId) {
+        return boxService.getBox(boxId);
+    }
+	
+	
 	// box 다운
 	@GetMapping("/box/{bid}/download")
 	@ResponseBody
@@ -68,7 +84,7 @@ public class BoxController {
 	}
 	
 	// box 수정 페이지
-	@GetMapping("/box/{bid}")
+	@GetMapping("/box/{bid}/edit")
 	public String editbox(@PathVariable("bid") Long bid, ModelMap modelMap) {
 		
 		// 박스 정보 담아서 수정 페이지 이동
