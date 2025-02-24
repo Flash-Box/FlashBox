@@ -1,35 +1,52 @@
 package com.drive.flashbox.dto;
 
-import com.drive.flashbox.entity.Box;
-import com.drive.flashbox.entity.BoxUser;
-import com.drive.flashbox.entity.Picture;
 import com.drive.flashbox.entity.User;
+import lombok.*;
 
-import lombok.Builder;
-import lombok.Getter;
+import java.time.LocalDateTime;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@AllArgsConstructor
+@ToString
 @Getter
+@Setter
 @Builder
-public class UserDto {
+public class UserDTO{
 
-    private Long id;
+    private Long uid;
     private String name;
     private String email;
     private String password;
-    private final List<Box> boxes = new ArrayList<>();
-    private final List<Picture> pictures = new ArrayList<>();
-    private final List<BoxUser> boxUsers = new ArrayList<>();
+    private LocalDateTime createdDate;
 
-    public static UserDto from(User user) {
-        return UserDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                // 필요한 경우 boxes, pictures, boxUsers 필드도 변환
-                .build();
+
+    public static UserDTO of(Long uid, String name, String email, String password, LocalDateTime createdDate) {
+        return new UserDTO(uid, name, email, password, createdDate);
     }
+
+    public static UserDTO from(User user) {
+        return UserDTO.of(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getCreatedDate()
+        );
+    }
+
+
+
+//    public User toEntity() {
+//        return User.of(
+//                name,
+//                email,
+//                password
+//        );
+//    }
+
+
+
+
 }
+
+
+

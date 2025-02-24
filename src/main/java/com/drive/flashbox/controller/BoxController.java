@@ -37,12 +37,14 @@ public class BoxController {
 
     // 박스 전체 조회: GET /boxes
     @GetMapping("/boxes")
+    @ResponseBody
     public List<Box> getAllBoxes() {
         return boxService.getAllBoxes();
     }
 
     // 박스 상세 조회: GET /box/{bid}
     @GetMapping("/box/{bid}")
+    @ResponseBody
     public BoxResponse getBoxById(@PathVariable("bid") Long boxId) {
         return boxService.getBox(boxId);
     }

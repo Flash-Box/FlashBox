@@ -26,11 +26,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
-                        .requestMatchers("/posts","/signup")
+                        .requestMatchers("/posts","/signup", "/boxes", "/box/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(withDefaults())
+//                .formLogin(withDefaults())
                 .logout(logout -> logout.logoutSuccessUrl("/"));
 
         return http.build();
