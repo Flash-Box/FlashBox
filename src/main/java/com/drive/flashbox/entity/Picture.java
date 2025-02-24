@@ -1,13 +1,12 @@
 package com.drive.flashbox.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
+@SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
