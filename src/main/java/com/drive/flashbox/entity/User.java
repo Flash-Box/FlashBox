@@ -2,15 +2,16 @@ package com.drive.flashbox.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@SuperBuilder
 @Getter
 @Entity
 @Table(name = "user")
-@NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)  // 자동으로 생성일자 저장
 public class User extends BaseTimeEntity {
@@ -39,5 +40,18 @@ public class User extends BaseTimeEntity {
     // 사용자 - 박스 중간 테이블 매핑 (1:N)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<BoxUser> boxUsers = new ArrayList<>();
+
+    protected User() {}
+//
+//    private User(String username, String email, String password) {
+//        this.name = username;
+//        this.password = password;
+//        this.email = email;
+//    }
+//
+//    public static User of(String username, String email, String password) {
+//        return new User(username, email, password);
+//    }
+
 
 }
