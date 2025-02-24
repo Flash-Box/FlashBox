@@ -69,11 +69,14 @@ public class PictureService {
                 byte[] fileBytes = file.getBytes();
                 s3Service.uploadFileToS3(s3Key, fileBytes);
 
-                // 4. Picture 엔티티 생성 및 DB 저장
+                // 4. 전체 URL 가져오기
+                String fileUrl = s3Service.getFileUrl(s3Key);
+
+                // 5. Picture 엔티티 생성 및 DB 저장
                 Picture picture = Picture.builder()
                         .name(file.getOriginalFilename())
                         .uploadDate(LocalDateTime.now())
-                        .imageUrl(s3Key) // S3에 업로드할 때 사용한 키를 저장 (또는 필요에 따라 전체 URL)
+                        .imageUrl(fileUrl) // 전체 URL 저장
                         .user(user)
                         .box(box)
                         .build();
