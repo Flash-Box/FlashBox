@@ -9,6 +9,6 @@ import java.util.List;
 @Builder
 public class PictureDownloadResponse {
     private String message;
-    private List<String> downloadUrls;
+    private String downloadUrl;
     private int status;
 }

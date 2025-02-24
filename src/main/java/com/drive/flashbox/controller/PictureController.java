@@ -27,25 +27,6 @@ public class PictureController {
         return ResponseEntity.ok(pictureDTO);
     }
 
-    // 이미지 여러 장 다운로드 링크 생성
-    @GetMapping("/{bid}/picture/download")
-    @ResponseBody
-    public ResponseEntity<PictureDownloadResponse> getPictureDownloadUrls(
-            @PathVariable Long bid,
-            @RequestParam(name = "pid") List<Long> pids
-    ) {
-        // PictureService에서 Pre-signed URL 목록 생성
-        List<String> downloadUrls = pictureService.generateDownloadUrls(bid, pids);
-
-        PictureDownloadResponse response = PictureDownloadResponse.builder()
-                .message("이미지 다운로드 링크입니다.")
-                .downloadUrls(downloadUrls)
-                .status(200)
-                .build();
-
-        return ResponseEntity.ok(response);
-    }
-
     // 이미지 업로드
     @PostMapping("/{bid}/picture")
     @ResponseBody
@@ -61,6 +42,22 @@ public class PictureController {
                 .status(HttpStatus.CREATED.value())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // 이미지 다운로드: pid가 1개면 단일 파일, 여러 개면 ZIP 파일로 다운로드
+    @GetMapping("/{bid}/picture/download")
+    @ResponseBody
+    public ResponseEntity<PictureDownloadResponse> downloadPictures(
+            @PathVariable Long bid,
+            @RequestParam("pid") List<Long> pids) {
+
+        String downloadUrl = pictureService.generateDownloadUrlForPictures(bid, pids);
+        PictureDownloadResponse response = PictureDownloadResponse.builder()
+                .message("이미지 다운로드 링크입니다.")
+                .downloadUrl(downloadUrl)
+                .status(200)
+                .build();
+        return ResponseEntity.ok(response);
     }
     
     @DeleteMapping("/{bid}/picture/{pid}")
