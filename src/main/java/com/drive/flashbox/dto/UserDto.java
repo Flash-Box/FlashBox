@@ -42,6 +42,3 @@ public class UserDto {
 
     private final List<BoxUser> boxUsers = new ArrayList<>();
 }
-
-
-

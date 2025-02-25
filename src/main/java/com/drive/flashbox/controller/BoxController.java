@@ -2,12 +2,14 @@ package com.drive.flashbox.controller;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.drive.flashbox.dto.request.BoxRequest;
+import com.drive.flashbox.dto.response.BoxResponse;
+import com.drive.flashbox.entity.Box;
 import com.drive.flashbox.service.BoxService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +36,21 @@ public class BoxController {
 		return "newBox";
 	}
 
+    // 박스 전체 조회: GET /boxes
+    @GetMapping("/boxes")
+    @ResponseBody
+    public List<Box> getAllBoxes() {
+        return boxService.getAllBoxes();
+    }
+
+    // 박스 상세 조회: GET /box/{bid}
+    @GetMapping("/box/{bid}")
+    @ResponseBody
+    public BoxResponse getBoxById(@PathVariable("bid") Long boxId) {
+        return boxService.getBox(boxId);
+    }
+	
+	
 	// box 다운
 	@GetMapping("/box/{bid}/download")
 	@ResponseBody
@@ -68,7 +87,7 @@ public class BoxController {
 	}
 	
 	// box 수정 페이지
-	@GetMapping("/box/{bid}")
+	@GetMapping("/box/{bid}/edit")
 	public String editbox(@PathVariable("bid") Long bid, ModelMap modelMap) {
 		
 		// 박스 정보 담아서 수정 페이지 이동
@@ -85,5 +104,25 @@ public class BoxController {
 	) {
 	    boxService.updateBox(bid, boxDto);
 	    return ResponseEntity.ok().build();  // 리디렉션 대신 상태 코드 반환
+	}
+	
+	// box에 다른 User 초대
+	@PostMapping("/box/{bid}/members")
+	public ResponseEntity<?> inviteUserToBox(
+	    @PathVariable("bid") Long boxId,
+	    @RequestParam("uid") Long userId
+	) {
+	    // Service 호출
+	    boxService.inviteUserToBox(boxId, userId);
+
+	    // 필요하다면 결과 DTO나 메시지를 담아서 반환
+	    return ResponseEntity.ok("유저 초대가 완료되었습니다.");
+  }
+	
+  // box 삭제 기능
+	@DeleteMapping("/box/{bid}")
+	public ResponseEntity<Void> deleteBox(@PathVariable("bid") Long bid) {
+	    boxService.deleteBox(bid);
+	    return ResponseEntity.ok().build(); // 204 No Content 대신 200 OK 반환
 	}
 }

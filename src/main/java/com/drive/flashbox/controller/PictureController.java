@@ -2,6 +2,7 @@ package com.drive.flashbox.controller;
 
 import com.drive.flashbox.dto.PictureDto;
 import com.drive.flashbox.dto.request.PictureUploadRequest;
+import com.drive.flashbox.dto.response.PictureDownloadResponse;
 import com.drive.flashbox.dto.response.PictureUploadResponse;
 import com.drive.flashbox.service.PictureService;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,22 @@ public class PictureController {
                 .status(HttpStatus.CREATED.value())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // 이미지 다운로드: pid가 1개면 단일 파일, 여러 개면 ZIP 파일로 다운로드
+    @GetMapping("/{bid}/picture/download")
+    @ResponseBody
+    public ResponseEntity<PictureDownloadResponse> downloadPictures(
+            @PathVariable Long bid,
+            @RequestParam("pid") List<Long> pids) {
+
+        String downloadUrl = pictureService.generateDownloadUrlForPictures(bid, pids);
+        PictureDownloadResponse response = PictureDownloadResponse.builder()
+                .message("이미지 다운로드 링크입니다.")
+                .downloadUrl(downloadUrl)
+                .status(200)
+                .build();
+        return ResponseEntity.ok(response);
     }
     
     @DeleteMapping("/{bid}/picture/{pid}")

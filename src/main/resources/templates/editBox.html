@@ -10,46 +10,80 @@
             var endDate = document.getElementById("eventEndDate");
 
             // 시작 날짜가 변경될 때 종료 날짜의 최소값을 시작 날짜로 설정
-            if (startDate.value) {
-                endDate.min = startDate.value;
-            }
-
-            // 종료 날짜가 변경될 때 시작 날짜의 최대값을 종료 날짜로 설정
-            if (endDate.value) {
-                startDate.max = endDate.value;
-            }
+		    if (startDate.value) {
+		        endDate.min = startDate.value;
+		    }
+		
+		    // 종료 날짜가 변경될 때 시작 날짜의 최대값을 종료 날짜로 설정
+		    if (endDate.value) {
+		        startDate.max = endDate.value;
+		    }
+		
+		    // 날짜가 변경될 때, 년도가 달라도 올바르게 처리
+		    if (startDate.value && endDate.value) {
+		        var start = new Date(startDate.value);
+		        var end = new Date(endDate.value);
+		
+		        if (start > end) {
+		            alert("시작 날짜가 종료 날짜보다 클 수 없습니다.");
+		        }
+		    }
         }
 
         document.addEventListener("DOMContentLoaded", function () {
-		    const form = document.getElementById("updateForm");
-		    const bid = form.getAttribute("data-bid");
-		
-		    form.addEventListener("submit", function (event) {
-		        event.preventDefault();
-		
-		        const formData = {
-		            name: document.getElementById("name").value,
-		            eventStartDate: document.getElementById("eventStartDate").value,
-		            eventEndDate: document.getElementById("eventEndDate").value
-		        };
-		
-		        fetch(`/box/${bid}`, {
-		            method: "PUT",
-		            headers: {
-		                "Content-Type": "application/json"
-		            },
-		            body: JSON.stringify(formData)
-		        })
-		        .then(response => {
-		            if (response.ok) {
-		                window.location.href = `/box/${bid}`;
-		            } else {
-		                alert("수정 실패!");
-		            }
-		        })
-		        .catch(error => console.error("Error:", error));
-		    });
-		});
+            const form = document.getElementById("updateForm");
+            const bid = form.getAttribute("data-bid");
+
+            // 🔹 수정 요청 (PUT)
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = {
+                    name: document.getElementById("name").value,
+                    eventStartDate: document.getElementById("eventStartDate").value,
+                    eventEndDate: document.getElementById("eventEndDate").value
+                };
+
+                fetch(`/box/${bid}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = `/box/${bid}`;
+                    } else {
+                        alert("수정 실패!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+
+            // 🔹 삭제 요청 (DELETE)
+            document.getElementById("deleteButton").addEventListener("click", function () {
+			    if (!confirm("정말 삭제하시겠습니까?")) {
+			        return;
+			    }
+			
+			    fetch(`/box/${bid}`, {
+			        method: "DELETE",
+			        headers: {
+			            "Accept": "application/json" // JSON 응답을 요청하여 서버가 올바른 응답을 하도록 유도
+			        }
+			    })
+			    .then(response => {
+			        if (response.ok) {
+			            alert("삭제 완료!");
+			            window.location.href = "/box"; // 삭제 후 메인 페이지로 이동, 일단 임의로 지정
+			        } else {
+			            alert("삭제 실패!");
+			        }
+			    })
+			    .catch(error => console.error("Error:", error));
+			});
+        });
     </script>
 </head>
 <body>
@@ -75,6 +109,7 @@
         <br><br>
 
         <button type="submit">수정</button>
+        <button type="button" id="deleteButton" style="background-color: red; color: white;">삭제</button>
     </form>
 </body>
 </html>
