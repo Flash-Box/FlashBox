@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+  <header>
+    Header
+    <hr>
+  </header>
+
+  <form th:action="@{/api/login}" method="post">
+
+    <label for="email">email</label>
+    <input id="email" name="email" type="text"  >
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required>
+
+    <button type="submit">Login</button>
+
+    <!-- 로그인 실패 시 오류 메시지 출력 -->
+    <div th:if="${param.error}">
+      <p style="color: red;">Invalid username or password.</p>
+    </div>
+
+  </form>
+
+  <footer>
+    <hr>
+    Footer
+  </footer>
+
+</body>
+
+<script>
+  document.querySelector("form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const formData = {
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value
+    };
+
+
+    await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    }).then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("로그인 성공!");
+
+          // Access Token 저장
+          sessionStorage.setItem("accessToken", data.data.accessToken);
+
+          console.log(data)
+          // 페이지 이동 (예: /dashboard)
+          window.location.href = "/box";
+        } else {
+          alert("로그인 실패");
+        }
+      })
+      .catch(error => console.error("Error:", error));
+
+  });
+</script>
+
+</html>
