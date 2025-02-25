@@ -34,4 +34,12 @@ public class UserService {
                 .map(UserDto::from);
     }
 
+    // 회원 탈퇴
+    public void deleteUser(Long uid) {
+        User user = userRepository.findById(uid)
+                .orElseThrow(() -> new IllegalStateException("User not found with id: " + uid));
+
+        userRepository.delete(user);
+    }
+
 }
