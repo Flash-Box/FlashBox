@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.drive.flashbox.dto.request.BoxRequest;
 import com.drive.flashbox.dto.response.BoxResponse;
+import com.drive.flashbox.dto.response.BoxUserResponse;
 import com.drive.flashbox.entity.Box;
 import com.drive.flashbox.entity.BoxUser;
 import com.drive.flashbox.entity.Picture;
@@ -105,9 +108,9 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public Box createBox(BoxRequest boxDto) {
+	public Box createBox(BoxRequest boxDto, User user) {	// User 매개변수 추가 ---- SCRUM-30-view-members 
 		// 유저가 없으면 생성이 안되서 임의로 1번 유저가 생성했다고 가정
-		User user = userRepository.getReferenceById(1L);
+//		User user = userRepository.getReferenceById(1L);	// uid를 요청에서 받기 위해 주석 처리 ---- SCRUM-30-view-members
 		
 		Box box = BoxRequest.toEntity(boxDto, user);
 		
@@ -127,8 +130,17 @@ public class BoxService {
         return boxRepository.findAll();
     }
 	
-	public BoxResponse getBox(Long bid) {
-		return boxRepository.findById(bid).map(BoxResponse::from).orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+    // 박스 조회, 수정 --------------------------------------------------------------------- SCRUM-30-view-members
+	public BoxResponse getBox(Long bid) {				
+		Box box = boxRepository.findById(bid)		
+				.orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다.")); 
+		
+		// 모임원 리스트 조회 추가 ------------------------------------------------------------ SCRUM-30-view-members
+        List<BoxUserResponse> members = boxUserRepository.findAllByBoxBid(bid).stream()
+                .map(BoxUserResponse::from)
+                .collect(Collectors.toList());
+
+        return BoxResponse.from(box, members); // 수정된 from 메서드 사용		
 	}
 	
 	@Transactional

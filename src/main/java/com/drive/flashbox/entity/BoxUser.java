@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import com.drive.flashbox.entity.enums.RoleType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
