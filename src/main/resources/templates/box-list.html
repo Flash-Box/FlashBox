@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Box List</title>
+</head>
+<body>
+    <h1>Box List</h1>
+    <ul>
+        <li th:each="box : ${boxes}">
+            <a th:href="@{/box/{bid}(bid=${box.bid})}" th:text="${box.name}">Box Name</a>
+        </li>
+    </ul>
+</body>
+</html>

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,18 +37,20 @@ public class BoxController {
 		return "newBox";
 	}
 
-    // 박스 전체 조회: GET /boxes
+    // 박스 전체 조회: HTML 페이지 반환
     @GetMapping("/boxes")
-    @ResponseBody
-    public List<Box> getAllBoxes() {
-        return boxService.getAllBoxes();
+    public String getAllBoxes(Model model) {
+        List<Box> boxes = boxService.getAllBoxes();
+        model.addAttribute("boxes", boxes);
+        return "box-list"; // templates/box-list.html 렌더링
     }
 
-    // 박스 상세 조회: GET /box/{bid}
+    // 박스 상세 조회: HTML 페이지 반환
     @GetMapping("/box/{bid}")
-    @ResponseBody
-    public BoxResponse getBoxById(@PathVariable("bid") Long boxId) {
-        return boxService.getBox(boxId);
+    public String getBoxById(@PathVariable("bid") Long boxId, Model model) {
+        BoxResponse box = boxService.getBox(boxId);
+        model.addAttribute("box", box);
+        return "box-detail"; // templates/box-detail.html 렌더링
     }
 	
 	
