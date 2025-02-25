@@ -18,6 +18,16 @@
             if (endDate.value) {
                 startDate.max = endDate.value;
             }
+            
+            // 날짜가 변경될 때, 년도가 달라도 올바르게 처리
+		    if (startDate.value && endDate.value) {
+		        var start = new Date(startDate.value);
+		        var end = new Date(endDate.value);
+		
+		        if (start > end) {
+		            alert("시작 날짜가 종료 날짜보다 클 수 없습니다.");
+		        }
+		    }
         }
     </script>
 </head>

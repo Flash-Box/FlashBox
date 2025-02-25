@@ -1,6 +1,6 @@
 package com.drive.flashbox.dto.request;
 
-import com.drive.flashbox.dto.UserDTO;
+import com.drive.flashbox.dto.UserDto;
 import com.drive.flashbox.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,5 +22,4 @@ public class SignupRequestDTO {
                 .build();
 
     }
-
 }
