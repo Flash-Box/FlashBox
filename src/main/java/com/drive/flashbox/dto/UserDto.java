@@ -36,6 +36,15 @@ public class UserDto {
         );
     }
 
+    public static UserDto from(User user, String encodedPassword) {
+        return UserDto.of(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                encodedPassword
+        );
+    }
+
     private final List<Box> boxes = new ArrayList<>();
 
     private final List<Picture> pictures = new ArrayList<>();
