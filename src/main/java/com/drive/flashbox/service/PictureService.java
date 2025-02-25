@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -68,19 +69,26 @@ public class PictureService {
             }
 
             try {
-                // 3. S3에 파일 업로드
-                // 파일 업로드 경로 예: "{boxId}/{originalFilename}"
-                // String safeBoxName = box.getName().trim().replaceAll("\\s+", "_");
-                String s3Key = box.getBid() + "/" + file.getOriginalFilename();
+            	// 3. UUID를 활용한 고유 파일명 생성
+                String originalFilename = file.getOriginalFilename();
+                String extension = "";
+                int dotIndex = originalFilename.lastIndexOf(".");
+                if (dotIndex != -1) {
+                    extension = originalFilename.substring(dotIndex); // 확장자 추출
+                }
+                String uniqueFilename = originalFilename + "_" + UUID.randomUUID().toString();
+                String s3Key = box.getBid() + "/" + uniqueFilename;
+
+                // 4. S3에 파일 업로드
                 byte[] fileBytes = file.getBytes();
                 s3Service.uploadFileToS3(s3Key, fileBytes);
 
-                // 4. 전체 URL 가져오기
+                // 5. 전체 URL 가져오기
                 String fileUrl = s3Service.getFileUrl(s3Key);
 
-                // 5. Picture 엔티티 생성 및 DB 저장
+                // 6. Picture 엔티티 생성 및 DB 저장
                 Picture picture = Picture.builder()
-                        .name(file.getOriginalFilename())
+                        .name(uniqueFilename)
                         .uploadDate(LocalDateTime.now())
                         .imageUrl(fileUrl) // 전체 URL 저장
                         .user(user)
