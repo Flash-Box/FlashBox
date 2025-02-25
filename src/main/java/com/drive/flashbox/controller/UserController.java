@@ -1,6 +1,7 @@
 package com.drive.flashbox.controller;
 
 import com.drive.flashbox.common.CustomResponse;
+import com.drive.flashbox.dto.request.LoginRequest;
 import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
 import com.drive.flashbox.service.UserService;
@@ -17,17 +18,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<CustomResponse<SignupResponseDTO>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
-        SignupResponseDTO user = userService.registerUser(signupRequestDTO);
-        CustomResponse<SignupResponseDTO> response = new CustomResponse<>(
-                HttpStatus.CREATED.value(),
-                true,
-                "회원가입 성공",
-                user
-        );
-        return ResponseEntity.ok(response);
-    }
+
 
 
 }

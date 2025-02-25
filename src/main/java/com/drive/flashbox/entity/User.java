@@ -26,7 +26,7 @@ public class User extends BaseTimeEntity {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 50)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     // 사용자 입장에서의 박스 리스트 (1:N)

@@ -15,23 +15,6 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
 
-    public SignupResponseDTO registerUser(SignupRequestDTO signupRequestDTO) {
-
-        Optional<UserDto> found = searchUser(signupRequestDTO.getEmail());
-        if(found.isPresent()) {
-            throw new IllegalStateException("동일한 email의 유저가 이미 존재합니다.");
-        }
-
-
-        User user = signupRequestDTO.toEntity();
-        return SignupResponseDTO.of(userRepository.save(user));
-    }
-
-    public Optional<UserDto> searchUser(String email) {
-        return Optional.ofNullable(userRepository.findByEmail(email))
-                .map(UserDto::from);
-    }
 
 }
