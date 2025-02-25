@@ -69,9 +69,9 @@ public class PictureService {
 
             try {
                 // 3. S3에 파일 업로드
-                // 파일 업로드 경로 예: "{boxName}/{originalFilename}"
-                String safeBoxName = box.getName().trim().replaceAll("\\s+", "_");
-                String s3Key = safeBoxName + "/" + file.getOriginalFilename();
+                // 파일 업로드 경로 예: "{boxId}/{originalFilename}"
+                // String safeBoxName = box.getName().trim().replaceAll("\\s+", "_");
+                String s3Key = box.getBid() + "/" + file.getOriginalFilename();
                 byte[] fileBytes = file.getBytes();
                 s3Service.uploadFileToS3(s3Key, fileBytes);
 

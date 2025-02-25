@@ -1,53 +1,121 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Box 생성</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin: 10px 0 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .date-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .date-group input {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
     <script>
         function validateDates() {
             var startDate = document.getElementById("eventStartDate");
             var endDate = document.getElementById("eventEndDate");
 
-            // 시작 날짜가 변경될 때 종료 날짜의 최소값을 시작 날짜로 설정
             if (startDate.value) {
                 endDate.min = startDate.value;
             }
-
-            // 종료 날짜가 변경될 때 시작 날짜의 최대값을 종료 날짜로 설정
             if (endDate.value) {
                 startDate.max = endDate.value;
             }
             
-            // 날짜가 변경될 때, 년도가 달라도 올바르게 처리
-		    if (startDate.value && endDate.value) {
-		        var start = new Date(startDate.value);
-		        var end = new Date(endDate.value);
-		
-		        if (start > end) {
-		            alert("시작 날짜가 종료 날짜보다 클 수 없습니다.");
-		        }
-		    }
+            if (startDate.value && endDate.value) {
+                var start = new Date(startDate.value);
+                var end = new Date(endDate.value);
+
+                if (start > end) {
+                    alert("시작 날짜가 종료 날짜보다 클 수 없습니다.");
+                    endDate.value = "";
+                }
+            }
         }
     </script>
 </head>
 <body>
-    <h2>Box</h2>
-    <form action="/box" method="post" onsubmit="validateDates()">
-        <label for="name">이름</label>
-        <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
-        <br><br>
+    <div class="container">
+        <h2>Box 생성</h2>
+        <form action="/box" method="post" onsubmit="return validateDates()">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
 
-        <label>모임 날짜</label>
-        <br>
-        <label for="eventStartDate">시작 날짜</label>
-        <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
+            <label>모임 날짜</label>
+            <div class="date-group">
+                <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
+                <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
+            </div>
 
-        <label for="eventEndDate">끝 날짜</label>
-        <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
-        <br><br>
-
-        <button type="submit">생성</button>
-    </form>
+            <button type="submit">생성</button>
+        </form>
+    </div>
 </body>
 </html>

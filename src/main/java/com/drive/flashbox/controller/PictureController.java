@@ -31,7 +31,7 @@ public class PictureController {
     @PostMapping("/{bid}/picture")
     @ResponseBody
     public ResponseEntity<PictureUploadResponse> uploadPictures(
-            @PathVariable Long bid,
+            @PathVariable("bid") Long bid,
             @ModelAttribute PictureUploadRequest request) {
             //@RequestHeader("Authorization") String token) {
         // (여기서 토큰 검증 로직 추가 가능)
@@ -48,7 +48,7 @@ public class PictureController {
     @GetMapping("/{bid}/picture/download")
     @ResponseBody
     public ResponseEntity<PictureDownloadResponse> downloadPictures(
-            @PathVariable Long bid,
+            @PathVariable("bid") Long bid,
             @RequestParam("pid") List<Long> pids) {
 
         String downloadUrl = pictureService.generateDownloadUrlForPictures(bid, pids);
@@ -62,7 +62,7 @@ public class PictureController {
     
     @DeleteMapping("/{bid}/picture/{pid}")
     @ResponseBody
-    public ResponseEntity<Void> deletePicture(@PathVariable Long bid, @PathVariable Long pid) {
+    public ResponseEntity<Void> deletePicture(@PathVariable("bid") Long bid, @PathVariable("pid") Long pid) {
         pictureService.deletePicture(bid, pid);
         return ResponseEntity.noContent().build(); 
     }
