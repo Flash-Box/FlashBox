@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.drive.flashbox.dto.request.BoxRequest;
 import com.drive.flashbox.dto.response.BoxResponse;
 import com.drive.flashbox.entity.Box;
+import com.drive.flashbox.entity.User;
+import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.service.BoxService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 public class BoxController {
 	private final BoxService boxService;
+	private final UserRepository userRepository; // 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --- SCRUM-30-view-members
 	
 	// box 생성 페이지
 	@GetMapping("/box")
@@ -73,20 +76,29 @@ public class BoxController {
 	
 	// box 생성 기능
 	@PostMapping("/box")
-	public String createBox(
+	@ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
+	public ResponseEntity<String> createBox(	// String -> ResponseEntity<String>, 특정 유저로 박스 생성하여 모임원 조회 작업 ----- SCRUM-30-view-members
             @RequestParam(name = "name") String name,
             @RequestParam(name = "eventStartDate") 
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventStartDate,
             @RequestParam(name = "eventEndDate") 
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventEndDate,
-            ModelMap modelMap
-    ) {
+            @RequestParam(name = "uid") Long uid // 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
+//            ModelMap modelMap		// 주석처리, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
+    ) {	
+		// 코드 추가, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
+		User user = userRepository.findById(uid)
+	            .orElseThrow(() -> new IllegalArgumentException("User를 찾을 수 없습니다: " + uid));
+	    BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
+	    boxService.createBox(boxRequest, user); // 수정된 메서드 호출
+	    return ResponseEntity.ok("Box 생성 성공");
 		
-		BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
-		boxService.createBox(boxRequest);
+	    // 아래 주석처리, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
+//		BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
+//		boxService.createBox(boxRequest);
 		
 		// 생성 후 box 목록 페이지로 가야하는 데 아직 없어서 임의로 지정
-		return "redirect:/box";
+//		return "redirect:/box";
 	}
 	
 	// box 수정 페이지
