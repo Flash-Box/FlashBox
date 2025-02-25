@@ -19,25 +19,57 @@
                 startDate.max = endDate.value;
             }
         }
+
+        async function createBox(event) {
+            event.preventDefault();  // 폼이 제출되지 않도록 막음
+
+            const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
+
+            const name = document.getElementById("name").value;
+            const startDate = document.getElementById("eventStartDate").value;
+            const endDate = document.getElementById("eventEndDate").value;
+
+            const data = {
+                name: name,
+                eventStartDate: startDate,
+                eventEndDate: endDate
+            };
+
+            const response = await fetch("/box", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)  // 데이터 전송
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log("응답 데이터:", result);
+            } else {
+                console.error("API 요청 실패");
+            }
+        }
     </script>
 </head>
 <body>
-    <h2>Box</h2>
-    <form action="/box" method="post" onsubmit="validateDates()">
-        <label for="name">이름</label>
-        <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
-        <br><br>
+<h2>Box</h2>
+<form onsubmit="createBox(event)">
+    <label for="name">이름</label>
+    <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
+    <br><br>
 
-        <label>모임 날짜</label>
-        <br>
-        <label for="eventStartDate">시작 날짜</label>
-        <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
+    <label>모임 날짜</label>
+    <br>
+    <label for="eventStartDate">시작 날짜</label>
+    <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
 
-        <label for="eventEndDate">끝 날짜</label>
-        <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
-        <br><br>
+    <label for="eventEndDate">끝 날짜</label>
+    <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
+    <br><br>
 
-        <button type="submit">생성</button>
-    </form>
+    <button type="submit">생성</button>
+</form>
 </body>
 </html>

@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.drive.flashbox.security.FBUserDetails;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,16 +54,18 @@ public class BoxController {
 	// box 생성 기능
 	@PostMapping("/box")
 	public String createBox(
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "eventStartDate") 
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventStartDate,
-            @RequestParam(name = "eventEndDate") 
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventEndDate,
-            ModelMap modelMap
+//            @RequestParam(name = "name") String name,
+//            @RequestParam(name = "eventStartDate")
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventStartDate,
+//            @RequestParam(name = "eventEndDate")
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventEndDate,
+			@RequestBody BoxRequest boxRequest,
+			@AuthenticationPrincipal FBUserDetails fbUserDetails
+//            ModelMap modelMap
     ) {
 		
-		BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
-		boxService.createBox(boxRequest);
+//		BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
+		boxService.createBox(boxRequest, fbUserDetails.getUid());
 		
 		// 생성 후 box 목록 페이지로 가야하는 데 아직 없어서 임의로 지정
 		return "redirect:/box";

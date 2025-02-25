@@ -99,9 +99,9 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public Box createBox(BoxRequest boxDto) {
+	public Box createBox(BoxRequest boxDto,Long userId) {
 		// 유저가 없으면 생성이 안되서 임의로 1번 유저가 생성했다고 가정
-		User user = userRepository.getReferenceById(1L);
+		User user = userRepository.getReferenceById(userId);
 
 		Box box = BoxRequest.toEntity(boxDto, user);
 		
