@@ -93,24 +93,22 @@ public class JwtTokenProvider {
                         .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new FBUserDetails((Long)claims.get(ID_KEY), "", "", claims.getSubject());
+        UserDetails principal = new FBUserDetails(((Integer) claims.get(ID_KEY)).longValue(), "", "", claims.getSubject());
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .verifyWith(key)  // ✅ setSigningKey() 대신 verifyWith() 사용
-                    .build()
-                    .parseSignedClaims(token);
-            System.out.println("토큰 내용: " + claimsJws.getPayload().toString());
+            Claims claims = parseClaims(token);
+            System.out.println("토큰 내용: " + claims.toString());
 
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
+            throw new IllegalStateException("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
@@ -122,10 +120,12 @@ public class JwtTokenProvider {
 
     private Claims parseClaims(String accessToken) {
         try {
-            return (Claims) Jwts.parser()  // ✅ parserBuilder() 대신 parser() 사용
-                    .verifyWith(key)  // ✅ setSigningKey() 대신 verifyWith() 사용
-                    .build()
-                    .parseSignedClaims(accessToken);
+
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()// secretKey 설정
+                    .parseSignedClaims(accessToken) // JWT 파싱
+                    .getPayload();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
