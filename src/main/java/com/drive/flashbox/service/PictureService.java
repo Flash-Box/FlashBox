@@ -76,7 +76,7 @@ public class PictureService {
                 if (dotIndex != -1) {
                     extension = originalFilename.substring(dotIndex); // 확장자 추출
                 }
-                String uniqueFilename = originalFilename + "_" + UUID.randomUUID().toString();
+                String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
                 String s3Key = box.getBid() + "/" + uniqueFilename;
 
                 // 4. S3에 파일 업로드
@@ -146,11 +146,12 @@ public class PictureService {
     private byte[] createZipFileInMemory(List<Picture> pictures) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
              ZipOutputStream zos = new ZipOutputStream(bos)) {
-
+        	
             // 중복 파일명 방지를 위한 Set
             Set<String> fileNameSet = new HashSet<>();
             for (Picture picture : pictures) {
-                String originalFileName = picture.getName();
+            	String storedFilename = picture.getName();  // 저장된 파일명 (UUID_원래파일명)
+                String originalFileName = storedFilename.replaceFirst("^[^_]+_", "");  // UUID 제거
                 String uniqueFileName = originalFileName;
                 int count = 1;
                 while (fileNameSet.contains(uniqueFileName)) {
