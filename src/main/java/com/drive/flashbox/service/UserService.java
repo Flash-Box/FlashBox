@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
+
 
 @RequiredArgsConstructor
 @Service
 public class UserService {
 
-
+    private final UserRepository userRepository;
 
     // 회원 탈퇴
     public void deleteUser(Long uid) {
