@@ -2,6 +2,7 @@ package com.drive.flashbox.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -152,8 +153,8 @@ public class BoxService {
 	}
  
 	public void inviteUserToBox(Long boxId, Long userId) {
-		// 1. 박스와 유저를 조회
-		Box box = boxRepository.findById(boxId)
+		  // 1. 박스와 유저를 조회
+		  Box box = boxRepository.findById(boxId)
 	              .orElseThrow(() -> new NoSuchElementException("해당 박스를 찾을 수 없습니다. ID: " + boxId));
 	      User user = userRepository.findById(userId)
 	              .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
@@ -168,6 +169,7 @@ public class BoxService {
 	      BoxUser boxUser = new BoxUser();
 	      boxUser.setBox(box);
 	      boxUser.setUser(user);
+	      boxUser.setParticipateDate(LocalDateTime.now()); // participateDate 추가 ✅
 	      boxUser.setRole(RoleType.MEMBER); // 예: MEMBER / OWNER
 	
 	      // 4. DB에 저장
