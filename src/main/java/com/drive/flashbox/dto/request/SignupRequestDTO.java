@@ -25,4 +25,18 @@ public class SignupRequestDTO {
                 .password(password)
                 .build();
     }
+
+
+    public User toEntity(String encodedPassword){
+        System.out.println(encodedPassword);
+
+        return User.builder()
+                .name(name)
+                .email(email)
+                .password(encodedPassword)
+                .build();
+
+    }
+
 }
+

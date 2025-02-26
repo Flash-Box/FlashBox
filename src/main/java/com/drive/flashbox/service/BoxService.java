@@ -108,10 +108,10 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public Box createBox(BoxRequest boxDto, User user) {	// User 매개변수 추가 ---- SCRUM-30-view-members 
-		// 유저가 없으면 생성이 안되서 임의로 1번 유저가 생성했다고 가정
-//		User user = userRepository.getReferenceById(1L);	// uid를 요청에서 받기 위해 주석 처리 ---- SCRUM-30-view-members
-		
+	public Box createBox(BoxRequest boxDto,Long userId) {
+		// 유저가 없으면 생성이 안돼서 임의로 1번 유저가 생성했다고 가정
+		User user = userRepository.getReferenceById(userId);
+    
 		Box box = BoxRequest.toEntity(boxDto, user);
 		
 		// BoxUser에 생성한 유저와 OWNER role 등록하는 메서드

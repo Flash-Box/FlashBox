@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.drive.flashbox.security.FBUserDetails;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -76,26 +78,30 @@ public class BoxController {
 	
 	// box 생성 기능
 	@PostMapping("/box")
-	@ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
-	public ResponseEntity<String> createBox(	// String -> ResponseEntity<String>, 특정 유저로 박스 생성하여 모임원 조회 작업 ----- SCRUM-30-view-members
-            @RequestParam(name = "name") String name,
-            @RequestParam(name = "eventStartDate") 
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventStartDate,
-            @RequestParam(name = "eventEndDate") 
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventEndDate,
-            @RequestParam(name = "uid") Long uid // 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
-//            ModelMap modelMap		// 주석처리, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
-    ) {	
-		// 코드 추가, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
-		User user = userRepository.findById(uid)
-	            .orElseThrow(() -> new IllegalArgumentException("User를 찾을 수 없습니다: " + uid));
-	    BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
-	    boxService.createBox(boxRequest, user); // 수정된 메서드 호출
+  @ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
+	public ResponseEntity<String> createBox( // String -> ResponseEntity<String>, 특정 유저로 박스 생성하여 모임원 조회 작업 ----- SCRUM-30-view-members
+//            @RequestParam(name = "name") String name,
+//            @RequestParam(name = "eventStartDate")
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventStartDate,
+//            @RequestParam(name = "eventEndDate")
+//            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventEndDate,
+			@RequestBody BoxRequest boxRequest,
+			@AuthenticationPrincipal FBUserDetails fbUserDetails
+//            ModelMap modelMap
+    ) {
+      Long uid = fbUserDetails.getUid();
+      // 코드 추가, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
+      User user = userRepository.findById(uid)
+                .orElseThrow(() -> new IllegalArgumentException("User를 찾을 수 없습니다: " + uid));
+
+      boxService.createBox(boxRequest, uid);
+
 	    return ResponseEntity.ok("Box 생성 성공");
 		
 	    // 아래 주석처리, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
 //		BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
 //		boxService.createBox(boxRequest);
+
 		
 		// 생성 후 box 목록 페이지로 가야하는 데 아직 없어서 임의로 지정
 //		return "redirect:/box";
