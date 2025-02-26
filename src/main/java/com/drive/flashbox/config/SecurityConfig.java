@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/box").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
-                        .requestMatchers("/posts","/signup", "/boxes", "/box/**","/api/login","/login")
+                        .requestMatchers("/posts","/signup", "/boxes","/api/login","/login")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

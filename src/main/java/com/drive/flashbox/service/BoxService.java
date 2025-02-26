@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.drive.flashbox.dto.response.BoxCreateResponse;
 import org.springframework.stereotype.Service;
 
 import com.drive.flashbox.dto.request.BoxRequest;
@@ -108,7 +109,7 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public Box createBox(BoxRequest boxDto,Long userId) {
+	public BoxCreateResponse createBox(BoxRequest boxDto,Long userId) {
 		// 유저가 없으면 생성이 안돼서 임의로 1번 유저가 생성했다고 가정
 		User user = userRepository.getReferenceById(userId);
     
@@ -122,7 +123,10 @@ public class BoxService {
 		// box 생성 후에 s3 폴더 생성해야 id 값 정상적으로 입력됨
 		s3Service.createS3Folder(newBox.getBid());
 
-		return newBox;
+		BoxCreateResponse boxCreateResponse = BoxCreateResponse.of(box, user);
+		System.out.println(boxCreateResponse);
+
+		return boxCreateResponse;
 	}
 	
     // 박스 전체 조회

@@ -94,4 +94,17 @@ public class AuthController {
 
         return ResponseEntity.ok(loginResponse);
     }
+
+
+//    @PostMapping("/token/refresh")
+//    public ResponseEntity<?> refreshToken(@CookieValue("refreshToken") String refreshToken) {
+//        String userId = jwtUtil.extractUserId(refreshToken);
+//
+//        if (refreshTokenService.validateRefreshToken(userId, refreshToken)) {
+//            String newAccessToken = jwtUtil.generateAccessToken(userId);
+//            return ResponseEntity.ok(newAccessToken);
+//        } else {
+//            return ResponseEntity.status(403).body("Invalid Refresh Token");
+//        }
+//    }
 }
