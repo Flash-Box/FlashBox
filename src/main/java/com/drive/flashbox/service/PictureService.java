@@ -182,11 +182,17 @@ public class PictureService {
     }
 
 
+    // 이미지 삭제 ---------------------------------------- SCRUM-21-delete-image
     @Transactional
     public void deletePicture(Long bid, Long pid) {
         Picture picture = pictureRepository.findByPidAndBoxBid(pid, bid)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이미지 또는 박스를 찾을 수 없습니다. pid=" + pid));
-        pictureRepository.delete(picture);
-    }
+        
+        // S3에서 파일 삭제 기능 추가 ---------------------------------------- SCRUM-37-delete-image-S3
+        s3Service.deleteFileFromS3(picture.getImageUrl());
+        
+        // DB에서 레코드 삭제
+        pictureRepository.delete(picture);       
+    }        
 
 }

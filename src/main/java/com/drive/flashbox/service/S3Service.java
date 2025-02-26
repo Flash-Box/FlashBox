@@ -128,4 +128,17 @@ public class S3Service {
             amazonS3.deleteObject(bucketName, folderPath);
         }
     }
+    
+    
+    // S3에서 단일 파일 삭제 --------------------------- SCRUM-37-delete-image-S3
+    public void deleteFileFromS3(String fileUrl) {
+        try {
+            String key = extractKeyFromUrl(fileUrl); // URL에서 S3 키 추출
+            amazonS3.deleteObject(bucketName, key);
+        } catch (AmazonClientException e) {
+            throw new IllegalStateException("S3에서 파일 삭제 중 오류 발생: " + fileUrl, e);
+        }
+    }
+        
+    
 }
