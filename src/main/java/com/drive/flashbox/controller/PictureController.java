@@ -4,10 +4,12 @@ import com.drive.flashbox.dto.PictureDto;
 import com.drive.flashbox.dto.request.PictureUploadRequest;
 import com.drive.flashbox.dto.response.PictureDownloadResponse;
 import com.drive.flashbox.dto.response.PictureUploadResponse;
+import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.PictureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,10 +34,10 @@ public class PictureController {
     @ResponseBody
     public ResponseEntity<PictureUploadResponse> uploadPictures(
             @PathVariable("bid") Long bid,
-            @ModelAttribute PictureUploadRequest request) {
-            //@RequestHeader("Authorization") String token) {
-        // (여기서 토큰 검증 로직 추가 가능)
-        List<Long> pictureIds = pictureService.uploadPictures(bid, request.getFiles());
+            @ModelAttribute PictureUploadRequest request,
+            @AuthenticationPrincipal FBUserDetails fbUserDetails ) {
+        Long uid = fbUserDetails.getUid();  // 인증된 사용자의 uid를 바로 얻음
+        List<Long> pictureIds = pictureService.uploadPictures(bid, uid,request.getFiles());
         PictureUploadResponse response = PictureUploadResponse.builder()
                 .message("이미지 업로드에 성공했습니다.")
                 .pictureIds(pictureIds)

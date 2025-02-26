@@ -49,15 +49,14 @@ public class PictureService {
 
     // 이미지 업로드 (하나 또는 여러 개의 파일 업로드)
     @Transactional
-    public List<Long> uploadPictures(Long bid, MultipartFile[] files) {
+    public List<Long> uploadPictures(Long bid, Long uid,MultipartFile[] files) {
         // 1. 박스 조회 (존재하지 않으면 예외 처리)
         Box box = boxRepository.findById(bid)
                 .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 
-        // (필요하다면) 인증된 사용자 정보도 가져오기
-        // 예시에서는 임의로 1번 사용자를 사용합니다.
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // 2. 사용자 조회 (uid는 컨트롤러에서 전달받은 값)
+        User user = userRepository.findById(uid)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. uid=" + uid));
 
         List<Long> pictureIds = new ArrayList<>();
 
