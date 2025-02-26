@@ -109,7 +109,6 @@ public class BoxService {
 	
 	@Transactional
 	public Box createBox(BoxRequest boxDto,Long userId) {
-		// 유저가 없으면 생성이 안돼서 임의로 1번 유저가 생성했다고 가정
 		User user = userRepository.getReferenceById(userId);
     
 		Box box = BoxRequest.toEntity(boxDto, user);
@@ -144,8 +143,17 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public void updateBox(Long bid, BoxRequest boxDto) {
-		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+	public void updateBox(Long bid, Long uid, BoxRequest boxDto) {
+	    Box box = boxRepository.findById(bid)
+	        .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+
+	    BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
+	        .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
+
+	    if (boxUser.getRole() != RoleType.OWNER && boxUser.getRole() != RoleType.MEMBER) {
+	        throw new IllegalStateException("박스의 소유자 또는 멤버만 수정할 수 있습니다.");
+	    }
+	    
 		box.editBox(boxDto.getName(),
 					boxDto.getEventStartDate().atStartOfDay(),
 					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));	
@@ -175,8 +183,16 @@ public class BoxService {
 	}
 
   	@Transactional
-	public void deleteBox(Long bid) {
-  		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다."));
+	public void deleteBox(Long bid, Long uid) {
+  			Box box = boxRepository.findById(bid)
+  		        .orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다."));
+
+  		    BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
+  		        .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
+
+  		    if (boxUser.getRole() != RoleType.OWNER) {
+  		        throw new IllegalStateException("박스의 소유자만 삭제할 수 있습니다.");
+  		    }
 		boxRepository.deleteById(bid);
 		s3Service.deleteS3Folder(box.getBid());
 	}
