@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import com.drive.flashbox.entity.enums.RoleType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -39,7 +37,6 @@ public class BoxUser {
     @Column(name = "role")
     private RoleType role;
 
-    @Builder
     public BoxUser(Long id,
                    User user,
                    Box box,
@@ -49,6 +46,18 @@ public class BoxUser {
         this.user = user;
         this.box = box;
         this.participateDate = participateDate;
+        this.role = role;
+    }
+    
+    public void setBox(Box box) {
+        this.box = box;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setRole(RoleType role) {
         this.role = role;
     }
 }
