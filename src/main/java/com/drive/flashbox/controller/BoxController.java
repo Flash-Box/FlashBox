@@ -8,6 +8,7 @@ import java.util.Map;
 import com.drive.flashbox.common.CustomResponse;
 import com.drive.flashbox.dto.response.BoxCreateResponse;
 import com.drive.flashbox.dto.response.LoginResponse;
+import com.drive.flashbox.entity.User;
 import com.drive.flashbox.security.FBUserDetails;
 import org.springframework.format.annotation.DateTimeFormat;
 
