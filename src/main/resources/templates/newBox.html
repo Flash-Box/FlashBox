@@ -77,7 +77,10 @@
             background: #0056b3;
         }
     </style>
+    <script src="/js/auth.js"></script>
     <script>
+        const JWT_ERROR_MSG = "jwt 토큰 인증 실패"
+
         function validateDates() {
             var startDate = document.getElementById("eventStartDate");
             var endDate = document.getElementById("eventEndDate");
@@ -101,39 +104,60 @@
         }
 
         async function createBox(event) {
-            event.preventDefault();  // 폼이 제출되지 않도록 막음
 
-            const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
+            try {
+                event.preventDefault();  // 폼이 제출되지 않도록 막음
 
-            const name = document.getElementById("name").value;
-            const startDate = document.getElementById("eventStartDate").value;
-            const endDate = document.getElementById("eventEndDate").value;
+                const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
 
-            const data = {
-                name: name,
-                eventStartDate: startDate,
-                eventEndDate: endDate
-            };
+                const name = document.getElementById("name").value;
+                const startDate = document.getElementById("eventStartDate").value;
+                const endDate = document.getElementById("eventEndDate").value;
 
-            await fetch("/box", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)  // 데이터 전송
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("DATA: ",data, " END")
-                if (data.success) {
-                    alert("✅박스 생성 성공!");
+                const data = {
+                    name: name,
+                    eventStartDate: startDate,
+                    eventEndDate: endDate
+                };
+
+                const response = await fetch("/box", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)  // 데이터 전송
+                })
+
+                if (!response.ok) {
+                    // 상태 코드 확인
+                    console.log(`HTTP Error: ${response.status}`);
                 }
-                else{
+                const responseData = await response.json();
+                console.log("서버 응답 데이터:", responseData);
+
+                if (responseData.success) {
+                    alert("✅박스 생성 성공!");
+                } else {
+
+                    if (responseData.message === JWT_ERROR_MSG) {
+                        // alert("😭JWT 토큰 만료");
+                        try {
+                            const newToken = await refreshToken();
+                            if (newToken) {
+                                await createBox(event); // 새로운 토큰으로 재시도
+                            }
+                        } catch (refreshError) {
+                            console.error("토큰 갱신 실패:", refreshError);
+                            alert("🔒재로그인이 필요합니다.");
+                        }
+                    }
                     alert("❌박스 생성 실패");
                 }
-            })
-            .catch(error => console.error("Error:", error));
+
+            }catch (error) {
+                console.error("Error:", error);
+            }
 
 
 

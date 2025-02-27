@@ -4,7 +4,9 @@ import com.drive.flashbox.common.CustomResponse;
 import com.drive.flashbox.dto.request.LoginRequest;
 import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
+import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
+import com.drive.flashbox.security.JwtTokenProvider;
 import com.drive.flashbox.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -96,15 +98,28 @@ public class AuthController {
     }
 
 
-//    @PostMapping("/token/refresh")
-//    public ResponseEntity<?> refreshToken(@CookieValue("refreshToken") String refreshToken) {
-//        String userId = jwtUtil.extractUserId(refreshToken);
-//
-//        if (refreshTokenService.validateRefreshToken(userId, refreshToken)) {
-//            String newAccessToken = jwtUtil.generateAccessToken(userId);
-//            return ResponseEntity.ok(newAccessToken);
-//        } else {
-//            return ResponseEntity.status(403).body("Invalid Refresh Token");
-//        }
-//    }
+    @PostMapping("/token/refresh")
+    public ResponseEntity<CustomResponse<RefreshTokenResponse>> refreshToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
+//        log.info("refreshToken: "+ refreshToken);
+
+        RefreshTokenResponse data = authService.refreshToken(refreshToken);
+        CustomResponse<RefreshTokenResponse> refreshTokenResponse = new CustomResponse<>(
+                HttpStatus.OK.value(),
+                true,
+                "토큰 재발급 성공",
+                data
+        );
+
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
+                .httpOnly(true) // JavaScript에서 접근 불가능
+                .secure(true) // HTTPS에서만 전송
+                .sameSite("Strict") // CSRF 방어
+                .path("/") // 모든 경로에서 사용 가능
+                .maxAge(1000 * 7 * 24 * 60 * 60) // 7일 동안 유효
+                .build();
+
+        response.setHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(refreshTokenResponse);
+    }
 }

@@ -6,7 +6,6 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import io.jsonwebtoken.security.SecurityException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +28,7 @@ public class JwtTokenProvider {
     private static final String ID_KEY = "id";
     private static final String ISSUER = "FlashBox";
     private static final String BEARER_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60;            // 30분
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 1;            // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
     private static final long THREE_DAYS = 1000 * 60 * 60 * 24 * 3;  // 3일
 
@@ -54,18 +53,21 @@ public class JwtTokenProvider {
         Long userId = userDetails.getUid();  // 사용자 ID
 
         // Access Token 생성
-        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         String accessToken = Jwts.builder()
                 .subject(authentication.getName())       // payload "sub": "name"
                 .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "USER"
                 .claim(ID_KEY, userId)
                 .issuer(ISSUER)
-                .expiration(accessTokenExpiresIn)        // payload "exp": 151621022 (ex)
+                .expiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME))        // payload "exp": 151621022 (ex)
                 .signWith(key)    // header "alg": "HS512"
                 .compact();
 
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
+                .subject(authentication.getName())       // payload "sub": "name"
+                .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "USER"
+                .claim(ID_KEY, userId)
+                .issuer(ISSUER)
                 .expiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
                 .signWith(key)
                 .compact();
@@ -80,7 +82,11 @@ public class JwtTokenProvider {
     // Jwt 토큰을 복호화하여 토큰에 들어있는 정보를 꺼내는 메서드
     public Authentication getAuthentication(String accessToken) {
         // 토큰 복호화
-        Claims claims = parseClaims(accessToken);
+        Claims claims = Jwts.parser()
+                            .verifyWith(key)
+                            .build()// secretKey 설정
+                            .parseSignedClaims(accessToken) // JWT 파싱
+                            .getPayload();;
 
         if (claims.get(AUTHORITIES_KEY) == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
@@ -98,36 +104,58 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
-    public boolean validateToken(String token) {
+    public Long validateAndParseIdFromToken(String token) {
         try {
-            Claims claims = parseClaims(token);
-            System.out.println("토큰 내용: " + claims.toString());
-
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
-            throw new IllegalStateException("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
-        }
-        return false;
-    }
-
-
-    private Claims parseClaims(String accessToken) {
-        try {
-
-            return Jwts.parser()
+            Claims claims = Jwts.parser()
                     .verifyWith(key)
                     .build()// secretKey 설정
-                    .parseSignedClaims(accessToken) // JWT 파싱
+                    .parseSignedClaims(token) // JWT 파싱
                     .getPayload();
+
+            System.out.println("토큰 내용: " + claims.toString());
+
+            return ((Integer) claims.get(ID_KEY)).longValue();
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            return e.getClaims();
+            log.error("만료된 JWT 토큰입니다.");
+        } catch (UnsupportedJwtException e) {
+            log.error("지원되지 않는 JWT 토큰입니다.");
+        } catch (IllegalArgumentException e) {
+            log.error("JWT 토큰이 잘못되었습니다.");
         }
+        return null;
     }
+
+    public TokenDto refreshTokens(Long userId, String name){
+
+        long now = (new Date()).getTime();
+
+        // Access Token 생성
+        String accessToken = Jwts.builder()
+                .subject(name)       // payload "sub": "name"
+                .claim(AUTHORITIES_KEY, "ROLE_USER")        // payload "auth": "USER"
+                .claim(ID_KEY, userId)
+                .issuer(ISSUER)
+                .expiration(new Date(now + ACCESS_TOKEN_EXPIRE_TIME))        // payload "exp": 151621022 (ex)
+                .signWith(key)    // header "alg": "HS512"
+                .compact();
+
+        // Refresh Token 생성
+        String refreshToken = Jwts.builder()
+                .subject(name)       // payload "sub": "name"
+                .claim(AUTHORITIES_KEY, "ROLE_USER")        // payload "auth": "USER"
+                .claim(ID_KEY, userId)
+                .issuer(ISSUER)
+                .expiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                .signWith(key)
+                .compact();
+
+        return TokenDto.builder()
+                .grantType(BEARER_TYPE)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
 }
