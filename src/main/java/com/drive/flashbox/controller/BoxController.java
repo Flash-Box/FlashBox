@@ -47,7 +47,7 @@ public class BoxController {
     public String getAllBoxes(Model model) {
         List<Box> boxes = boxService.getAllBoxes();
         model.addAttribute("boxes", boxes);
-        return "box-list"; // templates/box-list.html 렌더링
+        return "main"; // templates/main.html 렌더링
     }
 
     // 박스 상세 조회: HTML 페이지 반환
@@ -126,6 +126,7 @@ public class BoxController {
 	    boxService.updateBox(bid, boxDto);
 	    return ResponseEntity.ok().build();  // 리디렉션 대신 상태 코드 반환
 	}
+	
 	
 	// box에 다른 User 초대
 	@PostMapping("/box/{bid}/members")
