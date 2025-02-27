@@ -26,14 +26,16 @@
         </div>
 
         <!-- 메뉴 리스트 -->
-		<div class="row">
-		    <div class="col-md-6" th:each="box : ${boxes}">
-		        <div class="card shadow-sm border-primary mb-3 selectable-box"> <!-- 선택 가능 -->
-		            <div class="card-body">
-						<h5 class="card-title text-primary text-center" th:text="${box.name}">메뉴 제목</h5>
-		                <p class="card-text">📅 모임 날짜: <span th:text="${box.eventStartDate}"></span></p>
-		                <p class="card-text">🕑 최종 업로드: <span th:text="${box.modifiedDate}"></span></p>
-		                <p class="card-text">🔥 폭파 날짜: <span th:text="${box.boomDate}"></span></p>
+		<div class="container">
+		    <div class="row">
+		        <div class="col-12 col-sm-6 col-md-4 col-lg-2" th:each="box : ${boxes}">
+		            <div class="card">
+		                <div class="card-body">
+		                    <h5 class="card-title text-primary" th:text="${box.name}">메뉴 제목</h5>
+							<p>📅모임 날짜: <span th:text="${#temporals.format(box.eventStartDate, 'yyyy-MM-dd')}"></span></p>
+							<p>⏳최종 업로드: <span th:text="${#temporals.format(box.modifiedDate, 'yyyy-MM-dd')}"></span></p>
+							<p>🔥폭파 날짜: <span th:text="${#temporals.format(box.boomDate, 'yyyy-MM-dd')}"></span></p>
+		                </div>
 		            </div>
 		        </div>
 		    </div>
