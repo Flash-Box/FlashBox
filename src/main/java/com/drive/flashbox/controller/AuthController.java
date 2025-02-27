@@ -53,7 +53,7 @@ public class AuthController {
 
 
     @ResponseBody
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public ResponseEntity<CustomResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
 
         log.info("AuthController.login");

@@ -6,11 +6,14 @@ import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
 import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
+import com.drive.flashbox.entity.Token;
 import com.drive.flashbox.entity.User;
+import com.drive.flashbox.repository.TokenRepository;
 import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.security.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -25,6 +28,7 @@ import java.util.Optional;
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     @Lazy
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -52,6 +56,10 @@ public class AuthService {
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         TokenDto jwtToken = jwtTokenProvider.generateToken(authentication);
         FBUserDetails fbUserDetails = (FBUserDetails) authentication.getPrincipal();
+
+
+        // redis에 refreshToken 객체 저장
+        tokenRepository.save(new Token(fbUserDetails.getUid(), jwtToken.getRefreshToken()));
 
 
 
