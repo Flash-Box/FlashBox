@@ -15,13 +15,19 @@ async function refreshToken() {
             // 상태 코드 확인
             console.log(`HTTP Error: ${response.status}`);
         }
-        const responseData = response.json()
 
+        const responseData = await response.json()
         if (responseData.success) {
-            alert("✅박스 생성 성공!");
+            alert("✅토큰 재발급 성공!");
+            // Access Token -> session storage에 저장
+            sessionStorage.setItem("accessToken", responseData.data.accessToken);
+            return responseData
+
         } else {
-            alert("❌박스 생성 실패");
+            alert("❌토큰 재발급 실패");
         }
+
+
     }catch(error){
         console.error("Error:", error)
     }
