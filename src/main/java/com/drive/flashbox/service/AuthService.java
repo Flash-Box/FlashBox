@@ -84,6 +84,9 @@ public class AuthService {
 
         TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
 
+        // redis에 refreshToken 객체 저장
+        tokenRepository.save(new Token(id, tokenDto.getRefreshToken());
+
 
         RefreshTokenResponse tokenResponse = RefreshTokenResponse.builder()
                         .uid(id)
