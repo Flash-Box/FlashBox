@@ -24,4 +24,6 @@ public interface BoxUserRepository extends JpaRepository<BoxUser, Long> {
 
     // 필요한 경우, user uid로도 조회 가능
     List<BoxUser> findAllByUserId(Long id);
+
+    Optional<BoxUser> findByBox_BidAndUser_Id(Long bid, Long uid);
 }

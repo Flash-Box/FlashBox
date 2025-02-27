@@ -2,25 +2,23 @@ package com.drive.flashbox.service;
 
 import com.drive.flashbox.dto.TokenDto;
 import com.drive.flashbox.dto.UserDto;
-import com.drive.flashbox.dto.request.LoginRequest;
 import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
+import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
 import com.drive.flashbox.entity.User;
 import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.security.JwtTokenProvider;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -64,5 +62,29 @@ public class AuthService {
                 .build();
 
         return loginResponse;
+    }
+
+    @Transactional
+    public RefreshTokenResponse refreshToken(String token){
+        Long id = jwtTokenProvider.validateAndParseIdFromToken(token);
+
+        if(id == null){
+            throw new JwtException("jwt 토큰 예외");
+        }
+
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 id의 유저를 찾을 수 없습니다."));
+
+        TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
+
+
+        RefreshTokenResponse tokenResponse = RefreshTokenResponse.builder()
+                        .uid(id)
+                        .name(user.getName())
+                        .accessToken(tokenDto.getAccessToken())
+                        .refreshToken(tokenDto.getRefreshToken())
+                        .build();
+
+        return tokenResponse;
+
     }
 }
