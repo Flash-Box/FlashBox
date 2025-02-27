@@ -2,6 +2,7 @@ package com.drive.flashbox.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -110,9 +111,8 @@ public class BoxService {
 	
 	@Transactional
 	public BoxCreateResponse createBox(BoxRequest boxDto,Long userId) {
-		// 유저가 없으면 생성이 안돼서 임의로 1번 유저가 생성했다고 가정
-		User user = userRepository.getReferenceById(userId);
-    
+
+		User user = userRepository.getReferenceById(userId); 
 		Box box = BoxRequest.toEntity(boxDto, user);
 		
 		// BoxUser에 생성한 유저와 OWNER role 등록하는 메서드
@@ -148,16 +148,25 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public void updateBox(Long bid, BoxRequest boxDto) {
-		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+	public void updateBox(Long bid, Long uid, BoxRequest boxDto) {
+	    Box box = boxRepository.findById(bid)
+	        .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+
+	    BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
+	        .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
+
+	    if (boxUser.getRole() != RoleType.OWNER && boxUser.getRole() != RoleType.MEMBER) {
+	        throw new IllegalStateException("박스의 소유자 또는 멤버만 수정할 수 있습니다.");
+	    }
+	    
 		box.editBox(boxDto.getName(),
 					boxDto.getEventStartDate().atStartOfDay(),
 					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));	
 	}
  
 	public void inviteUserToBox(Long boxId, Long userId) {
-		// 1. 박스와 유저를 조회
-		Box box = boxRepository.findById(boxId)
+		  // 1. 박스와 유저를 조회
+		  Box box = boxRepository.findById(boxId)
 	              .orElseThrow(() -> new NoSuchElementException("해당 박스를 찾을 수 없습니다. ID: " + boxId));
 	      User user = userRepository.findById(userId)
 	              .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다. ID: " + userId));
@@ -172,6 +181,7 @@ public class BoxService {
 	      BoxUser boxUser = new BoxUser();
 	      boxUser.setBox(box);
 	      boxUser.setUser(user);
+	      boxUser.setParticipateDate(LocalDateTime.now()); // participateDate 추가 ✅
 	      boxUser.setRole(RoleType.MEMBER); // 예: MEMBER / OWNER
 	
 	      // 4. DB에 저장
@@ -179,8 +189,16 @@ public class BoxService {
 	}
 
   	@Transactional
-	public void deleteBox(Long bid) {
-  		Box box = boxRepository.findById(bid).orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다."));
+	public void deleteBox(Long bid, Long uid) {
+  			Box box = boxRepository.findById(bid)
+  		        .orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다."));
+
+  		    BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
+  		        .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
+
+  		    if (boxUser.getRole() != RoleType.OWNER) {
+  		        throw new IllegalStateException("박스의 소유자만 삭제할 수 있습니다.");
+  		    }
 		boxRepository.deleteById(bid);
 		s3Service.deleteS3Folder(box.getBid());
 	}

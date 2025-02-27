@@ -123,6 +123,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("updateForm");
             const bid = form.getAttribute("data-bid");
+            const token = sessionStorage.getItem("accessToken");
 
             // 🔹 수정 요청 (PUT)
             form.addEventListener("submit", function (event) {
@@ -137,16 +138,22 @@
                 fetch(`/box/${bid}`, {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json"
-                    },
+	                    "Authorization": `Bearer ${token}`,
+	                    "Content-Type": "application/json"
+                	},
                     body: JSON.stringify(formData)
                 })
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = `/box/${bid}`;
-                    } else {
-                        alert("수정 실패!");
-                    }
+				        return response.text().then(msg => {
+				            alert(msg);
+				            window.location.href = "/boxes";
+				        });
+				    } else {
+				        return response.text().then(errMsg => {
+				            alert("수정 실패: " + errMsg);
+				        });
+				    }
                 })
                 .catch(error => console.error("Error:", error));
             });
@@ -160,16 +167,21 @@
                 fetch(`/box/${bid}`, {
                     method: "DELETE",
                     headers: {
-                        "Accept": "application/json"
-                    }
+	                    "Authorization": `Bearer ${token}`,
+	                    "Content-Type": "application/json"
+                	},
                 })
                 .then(response => {
                     if (response.ok) {
-                        alert("삭제 완료!");
-                        window.location.href = "/box"; // 삭제 후 메인 페이지로 이동
-                    } else {
-                        alert("삭제 실패!");
-                    }
+				        return response.text().then(msg => {
+				            alert(msg);
+				            window.location.href = "/boxes";
+				        });
+				    } else {
+				        return response.text().then(errMsg => {
+				            alert("삭제 실패: " + errMsg);
+				        });
+				    }
                 })
                 .catch(error => console.error("Error:", error));
             });

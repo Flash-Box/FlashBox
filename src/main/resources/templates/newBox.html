@@ -34,9 +34,14 @@
             color: #333;
         }
 
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
         label {
-            display: block;
-            text-align: left;
+            align-self: flex-start;
             font-weight: bold;
             margin: 10px 0 5px;
         }
@@ -54,6 +59,7 @@
             display: flex;
             justify-content: space-between;
             gap: 10px;
+            width: 100%;
         }
 
         .date-group input {
@@ -104,7 +110,6 @@
         }
 
         async function createBox(event) {
-
             try {
                 event.preventDefault();  // 폼이 제출되지 않도록 막음
 
@@ -138,6 +143,8 @@
 
                 if (responseData.success) {
                     alert("✅박스 생성 성공!");
+                    window.location.href = '/boxes';
+                  
                 } else {
 
                     if (responseData.message === JWT_ERROR_MSG) {
@@ -159,29 +166,24 @@
                 console.error("Error:", error);
             }
 
-
-
-
         }
     </script>
 </head>
 <body>
-<h2>Box</h2>
-<form onsubmit="createBox(event)">
-    <label for="name">이름</label>
-    <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
-    <br><br>
+    <div class="container">
+        <h2>Box 생성</h2>
+        <form onsubmit="createBox(event)">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
 
-    <label>모임 날짜</label>
-    <br>
-    <label for="eventStartDate">시작 날짜</label>
-    <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
+            <label>모임 날짜</label>
+            <div class="date-group">
+                <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
+                <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
+            </div>
 
-    <label for="eventEndDate">끝 날짜</label>
-    <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
-    <br><br>
-
-    <button type="submit">생성</button>
-</form>
+            <button type="submit">생성</button>
+        </form>
+    </div>
 </body>
 </html>

@@ -10,5 +10,6 @@ import java.util.List;
 public class PictureUploadResponse {
     private String message;
     private List<Long> pictureIds;
+    private Long uid;
     private int status;
 }

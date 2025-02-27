@@ -6,12 +6,14 @@ import com.drive.flashbox.entity.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 
 @SuperBuilder
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
 @Table(name = "box_user")
 public class BoxUser {

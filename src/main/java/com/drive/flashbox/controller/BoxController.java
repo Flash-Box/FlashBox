@@ -1,15 +1,16 @@
 package com.drive.flashbox.controller;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 import com.drive.flashbox.common.CustomResponse;
 import com.drive.flashbox.dto.response.BoxCreateResponse;
 import com.drive.flashbox.dto.response.LoginResponse;
 import com.drive.flashbox.security.FBUserDetails;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,8 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.drive.flashbox.dto.request.BoxRequest;
 import com.drive.flashbox.dto.response.BoxResponse;
 import com.drive.flashbox.entity.Box;
-import com.drive.flashbox.entity.User;
 import com.drive.flashbox.repository.UserRepository;
+import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.BoxService;
 
 import lombok.RequiredArgsConstructor;
@@ -82,18 +83,13 @@ public class BoxController {
 	
 	// box 생성 기능
 	@PostMapping("/box")
-    @ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
+  @ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
 	public ResponseEntity<CustomResponse<BoxCreateResponse>> createBox( // String -> ResponseEntity<String>, 특정 유저로 박스 생성하여 모임원 조회 작업 ----- SCRUM-30-view-members
-//            @RequestParam(name = "name") String name,
-//            @RequestParam(name = "eventStartDate")
-//            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventStartDate,
-//            @RequestParam(name = "eventEndDate")
-//            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate eventEndDate,
 			@RequestBody BoxRequest boxRequest,
 			@AuthenticationPrincipal FBUserDetails fbUserDetails
-//            ModelMap modelMap
     ) {
 		Long uid = fbUserDetails.getUid();
+
 		// 코드 추가, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
 		User user = userRepository.findById(uid)
 				.orElseThrow(() -> new IllegalArgumentException("User를 찾을 수 없습니다: " + uid));
@@ -108,14 +104,6 @@ public class BoxController {
 		);
 
 		return ResponseEntity.ok(response);
-
-		// 아래 주석처리, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
-		//		BoxRequest boxRequest = new BoxRequest(name, eventStartDate, eventEndDate);
-		//		boxService.createBox(boxRequest);
-
-		
-		// 생성 후 box 목록 페이지로 가야하는 데 아직 없어서 임의로 지정
-//		return "redirect:/box";
 	}
 	
 	// box 수정 페이지
@@ -130,12 +118,18 @@ public class BoxController {
 	
 	// box 수정 기능
 	@PutMapping("/box/{bid}")
-	public ResponseEntity<Void> updateBox(
+	public ResponseEntity<String> updateBox(
 	    @PathVariable("bid") Long bid,
-	    @RequestBody BoxRequest boxDto  // JSON을 받을 수 있도록 변경
+	    @RequestBody BoxRequest boxDto,  // JSON을 받을 수 있도록 변경
+	    @AuthenticationPrincipal FBUserDetails fbUserDetails
 	) {
-	    boxService.updateBox(bid, boxDto);
-	    return ResponseEntity.ok().build();  // 리디렉션 대신 상태 코드 반환
+		Long uid = fbUserDetails.getUid();
+		try {
+			boxService.updateBox(bid, uid, boxDto);
+			return ResponseEntity.ok("수정 완료!");
+		} catch (IllegalStateException e) {	
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    }
 	}
 	
 	// box에 다른 User 초대
@@ -153,8 +147,16 @@ public class BoxController {
 	
   // box 삭제 기능
 	@DeleteMapping("/box/{bid}")
-	public ResponseEntity<Void> deleteBox(@PathVariable("bid") Long bid) {
-	    boxService.deleteBox(bid);
-	    return ResponseEntity.ok().build(); // 204 No Content 대신 200 OK 반환
+	public ResponseEntity<String> deleteBox(
+			@PathVariable("bid") Long bid,
+			@AuthenticationPrincipal FBUserDetails fbUserDetails
+	) {
+		Long uid = fbUserDetails.getUid();
+		try {
+	        boxService.deleteBox(bid, uid);
+	        return ResponseEntity.ok("삭제 완료!");
+	    } catch (IllegalStateException e) {	
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    }
 	}
 }
