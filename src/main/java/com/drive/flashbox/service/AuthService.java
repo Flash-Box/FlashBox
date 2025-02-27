@@ -76,6 +76,14 @@ public class AuthService {
     public RefreshTokenResponse refreshToken(String token){
         Long id = jwtTokenProvider.validateAndParseIdFromToken(token);
 
+        // redis에 저장된 refresh token 값과 일치하는지 확인
+        Token redisToken = tokenRepository.findById(id).orElseThrow(() -> new NoSuchElementException("refresh token값을 찾을 수 없습니다"));
+
+        System.out.println("redis 에 저장된 : "+redisToken.getRefreshToken());
+        if(!redisToken.getRefreshToken().equals(token)){
+            throw new IllegalStateException("유효하지 않은 refresh token 값 입니다.");
+        }
+
         if(id == null){
             throw new JwtException("jwt 토큰 예외");
         }
@@ -85,7 +93,7 @@ public class AuthService {
         TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
 
         // redis에 refreshToken 객체 저장
-        tokenRepository.save(new Token(id, tokenDto.getRefreshToken());
+        tokenRepository.save(new Token(id, tokenDto.getRefreshToken()));
 
 
         RefreshTokenResponse tokenResponse = RefreshTokenResponse.builder()
