@@ -146,9 +146,9 @@
                     window.location.href = '/boxes';
                   
                 } else {
-
+                    alert("❌박스 생성 실패");
                     if (responseData.message === JWT_ERROR_MSG) {
-                        // alert("😭JWT 토큰 만료");
+                        alert("😭JWT 토큰 만료");
                         try {
                             const newToken = await refreshToken();
                             if (newToken) {
@@ -159,7 +159,7 @@
                             alert("🔒재로그인이 필요합니다.");
                         }
                     }
-                    alert("❌박스 생성 실패");
+
                 }
 
             }catch (error) {
