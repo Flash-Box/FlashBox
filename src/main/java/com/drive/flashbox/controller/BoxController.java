@@ -4,6 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import com.drive.flashbox.common.CustomResponse;
+import com.drive.flashbox.dto.response.BoxCreateResponse;
+import com.drive.flashbox.dto.response.LoginResponse;
+import com.drive.flashbox.security.FBUserDetails;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -76,17 +83,27 @@ public class BoxController {
 	
 	// box 생성 기능
 	@PostMapping("/box")
-
-	public ResponseEntity<String> createBox( 
+  @ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
+	public ResponseEntity<CustomResponse<BoxCreateResponse>> createBox( // String -> ResponseEntity<String>, 특정 유저로 박스 생성하여 모임원 조회 작업 ----- SCRUM-30-view-members
 			@RequestBody BoxRequest boxRequest,
 			@AuthenticationPrincipal FBUserDetails fbUserDetails
-
     ) {
 		Long uid = fbUserDetails.getUid();
 
-      	boxService.createBox(boxRequest, uid);
+		// 코드 추가, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 ----- SCRUM-30-view-members
+		User user = userRepository.findById(uid)
+				.orElseThrow(() -> new IllegalArgumentException("User를 찾을 수 없습니다: " + uid));
 
-	    return ResponseEntity.ok("Box 생성 성공");
+		BoxCreateResponse data = boxService.createBox(boxRequest, uid);
+
+		CustomResponse<BoxCreateResponse> response = new CustomResponse<>(
+				HttpStatus.OK.value(),
+				true,
+				"Box 생성 성공",
+				data
+		);
+
+		return ResponseEntity.ok(response);
 	}
 	
 	// box 수정 페이지

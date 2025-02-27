@@ -16,8 +16,12 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+import com.drive.flashbox.dto.response.BoxCreateResponse;
+
 import org.springframework.stereotype.Service;
 
 import com.drive.flashbox.dto.request.BoxRequest;
@@ -120,9 +124,9 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public Box createBox(BoxRequest boxDto,Long userId) {
-		User user = userRepository.getReferenceById(userId);
-    
+	public BoxCreateResponse createBox(BoxRequest boxDto,Long userId) {
+
+		User user = userRepository.getReferenceById(userId); 
 		Box box = BoxRequest.toEntity(boxDto, user);
 		
 		// BoxUser에 생성한 유저와 OWNER role 등록하는 메서드
@@ -133,7 +137,10 @@ public class BoxService {
 		// box 생성 후에 s3 폴더 생성해야 id 값 정상적으로 입력됨
 		s3Service.createS3Folder(newBox.getBid());
 
-		return newBox;
+		BoxCreateResponse boxCreateResponse = BoxCreateResponse.of(box, user);
+		System.out.println(boxCreateResponse);
+
+		return boxCreateResponse;
 	}
 	
     // 박스 전체 조회
