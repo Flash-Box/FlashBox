@@ -10,7 +10,7 @@
     <hr>
   </header>
 
-  <form th:action="@{/api/login}" method="post">
+  <form th:action="@{/login}" method="post">
 
     <label for="email">email</label>
     <input id="email" name="email" type="text"  >
@@ -43,7 +43,7 @@
     };
 
 
-    await fetch("/api/login", {
+    await fetch("/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -52,7 +52,7 @@
     }).then(response => response.json())
       .then(data => {
         if (data.success) {
-          alert("로그인 성공!");
+          alert("✅로그인 성공!");
 
           // Access Token 저장
           sessionStorage.setItem("accessToken", data.data.accessToken);
@@ -61,7 +61,7 @@
           // 페이지 이동 (예: /dashboard)
           window.location.href = "/box";
         } else {
-          alert("로그인 실패");
+          alert("❌로그인 실패");
         }
       })
       .catch(error => console.error("Error:", error));

@@ -134,10 +134,6 @@
                     body: JSON.stringify(data)  // 데이터 전송
                 })
 
-                if (!response.ok) {
-                    // 상태 코드 확인
-                    console.log(`HTTP Error: ${response.status}`);
-                }
                 const responseData = await response.json();
                 console.log("서버 응답 데이터:", responseData);
 
@@ -154,8 +150,8 @@
                             if (newToken) {
                                 await createBox(event); // 새로운 토큰으로 재시도
                             }
-                        } catch (refreshError) {
-                            console.error("토큰 갱신 실패:", refreshError);
+                        } catch (error) {
+                            console.error("토큰 갱신 실패:", error);
                             alert("🔒재로그인이 필요합니다.");
                         }
                     }
