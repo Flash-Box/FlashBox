@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/box").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/signup", "/boxes","/api/login","/login","/token/refresh").permitAll()
+                        .requestMatchers("/signup", "/boxes","/api/login","/login","/token/refresh", "box/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

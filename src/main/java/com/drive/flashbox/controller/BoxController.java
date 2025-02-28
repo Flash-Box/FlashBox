@@ -3,13 +3,15 @@ package com.drive.flashbox.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Optional;
 
 import com.drive.flashbox.common.CustomResponse;
 import com.drive.flashbox.dto.response.BoxCreateResponse;
 import com.drive.flashbox.dto.response.LoginResponse;
 import com.drive.flashbox.entity.User;
 import com.drive.flashbox.security.FBUserDetails;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import org.springframework.http.HttpStatus;
@@ -30,9 +32,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.drive.flashbox.dto.request.BoxRequest;
 import com.drive.flashbox.dto.response.BoxResponse;
 import com.drive.flashbox.entity.Box;
+import com.drive.flashbox.entity.Picture;
 import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.BoxService;
+import com.drive.flashbox.service.PictureService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +45,8 @@ import lombok.RequiredArgsConstructor;
 public class BoxController {
 	private final BoxService boxService;
 	private final UserRepository userRepository; // 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --- SCRUM-30-view-members
+    private final PictureService pictureService; // ✅ PictureService 주입
+	
 	
 	// box 생성 페이지
 	@GetMapping("/box")
@@ -53,18 +59,22 @@ public class BoxController {
     public String getAllBoxes(Model model) {
         List<Box> boxes = boxService.getAllBoxes();
         model.addAttribute("boxes", boxes);
-        return "box-list"; // templates/box-list.html 렌더링
+        return "main"; // templates/main.html 렌더링
     }
-
+    
     // 박스 상세 조회: HTML 페이지 반환
     @GetMapping("/box/{bid}")
     public String getBoxById(@PathVariable("bid") Long boxId, Model model) {
-        BoxResponse box = boxService.getBox(boxId);
+        BoxResponse box = boxService.getBox(boxId); // ✅ 박스 정보 가져오기
+        List<Picture> images = pictureService.findByBoxId(boxId); // ✅ 객체를 통해 호출
+
         model.addAttribute("box", box);
+        model.addAttribute("images", images); // ✅ 이미지 리스트도 추가
+
         return "box-detail"; // templates/box-detail.html 렌더링
     }
-	
-	
+
+		
 	// box 다운
 	@GetMapping("/box/{bid}/download")
 	@ResponseBody
@@ -133,18 +143,39 @@ public class BoxController {
 	    }
 	}
 	
-	// box에 다른 User 초대
+	// box에 다른 User 초대 페이지 표시
+	@GetMapping("/box/{bid}/members")
+	public String showInvitePage(@PathVariable("bid") Long boxId, Model model) {
+	    List<User> users = userRepository.findUsersByBoxId(boxId);
+	    model.addAttribute("boxId", boxId); // 박스 ID 전달
+	    model.addAttribute("users", users); // 기존 참여 유저 리스트 전달
+	    return "user_invite"; // invite.html 템플릿 반환
+	}
+	
+	// box에 다른 User 초대하는 동작 API
 	@PostMapping("/box/{bid}/members")
-	public ResponseEntity<?> inviteUserToBox(
+	public ResponseEntity<Map<String, Object>> inviteUserToBox(
 	    @PathVariable("bid") Long boxId,
-	    @RequestParam("uid") Long userId
+	    @RequestParam("email") String email // ✅ email을 받아 userId 찾기
 	) {
-	    // Service 호출
-	    boxService.inviteUserToBox(boxId, userId);
+	    Map<String, Object> response = new HashMap<>();
 
-	    // 필요하다면 결과 DTO나 메시지를 담아서 반환
-	    return ResponseEntity.ok("유저 초대가 완료되었습니다.");
-  }
+	    // email로 user 조회
+	    Optional<User> userOptional = userRepository.findByEmail(email);
+	    if (userOptional.isEmpty()) {
+	        response.put("success", false);
+	        response.put("message", "해당 이메일의 유저가 존재하지 않습니다.");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	    }
+
+	    User user = userOptional.get();
+	    boxService.inviteUserToBox(boxId, user.getId());
+
+	    response.put("success", true);
+	    response.put("message", "초대가 완료되었습니다.");
+	    return ResponseEntity.ok(response);
+	}
+
 	
 	// box 삭제 기능
 	@DeleteMapping("/box/{bid}")

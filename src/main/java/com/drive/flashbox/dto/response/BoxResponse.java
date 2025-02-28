@@ -27,7 +27,7 @@ public class BoxResponse {
     
     private List<BoxUserResponse> members; // 모임원 리스트 추가 ------------------- SCRUM-30-view-members
     
- // entity -> dto	코드 추가 ----------------------------------------------- SCRUM-30-view-members
+    // entity -> dto	코드 추가 ----------------------------------------------- SCRUM-30-view-members
     public static BoxResponse from(Box box, List<BoxUserResponse> members) {
     	return new BoxResponse(box.getBid(),
     							box.getName(),
