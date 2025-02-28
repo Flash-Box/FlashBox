@@ -6,7 +6,6 @@ import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
 import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
-import com.drive.flashbox.security.JwtTokenProvider;
 import com.drive.flashbox.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -27,18 +27,37 @@ public class AuthController {
     private final AuthService authService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    @PostMapping("/signup")
-    public ResponseEntity<CustomResponse<SignupResponseDTO>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
-        SignupResponseDTO data = authService.registerUser(signupRequestDTO);
-        CustomResponse<SignupResponseDTO> response = new CustomResponse<>(
-                HttpStatus.CREATED.value(),
-                true,
-                "회원가입 성공",
-                data
-        );
-        return ResponseEntity.ok(response);
+    // SCRUM-43-signup-page -------- signup.html 웹에 연결 
+    @GetMapping("/signup")
+    public String showSignupPage() {
+        return "signup"; // signup.html 반환
     }
+    
+	// SCRUM-43-signup-page ----- form 데이터 처리 코드로 교체하기 위해 기존 코드 주석처리	    
+//    @PostMapping("/signup")
+//    public ResponseEntity<CustomResponse<SignupResponseDTO>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
+//        SignupResponseDTO data = authService.registerUser(signupRequestDTO);
+//        CustomResponse<SignupResponseDTO> response = new CustomResponse<>(
+//                HttpStatus.CREATED.value(),
+//                true,
+//                "회원가입 성공",
+//                data
+//        );
+//        return ResponseEntity.ok(response);
+//    }
 
+    // SCRUM-43-signup-page ----------- form 데이터 처리하도록 위 코드 교체
+    @PostMapping("/signup")
+    public String signup(@ModelAttribute SignupRequestDTO signupRequestDTO, Model model) {
+        try {
+            SignupResponseDTO data = authService.registerUser(signupRequestDTO);
+            return "redirect:/login"; // 성공 시 리디렉션
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", e.getMessage()); // 에러 메시지 전달
+            return "signup"; // 실패 시 signup.html로 돌아감
+        }
+    }    
+        
 
     @GetMapping("/login")
     public String loginPage() {
@@ -53,7 +72,7 @@ public class AuthController {
 
 
     @ResponseBody
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public ResponseEntity<CustomResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
 
         log.info("AuthController.login");
