@@ -28,9 +28,11 @@ public class JwtTokenProvider {
     private static final String ID_KEY = "id";
     private static final String ISSUER = "FlashBox";
     private static final String BEARER_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 1;            // 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
-    private static final long THREE_DAYS = 1000 * 60 * 60 * 24 * 3;  // 3일
+
+    @Value("${jwt.access.exp-time}")
+    private long ACCESS_TOKEN_EXPIRE_TIME;            // 30분
+    @Value("${jwt.refresh.exp-time}")
+    private long REFRESH_TOKEN_EXPIRE_TIME;  // 7일
 
     private final SecretKey key;
 
