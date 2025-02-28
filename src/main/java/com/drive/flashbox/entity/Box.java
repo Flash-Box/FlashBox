@@ -61,6 +61,7 @@ public class Box extends BaseTimeEntity {
         this.eventEndDate = eventEndDate;
         this.user = user;
         this.boomDate = LocalDateTime.now().plusDays(7);
+        this.count = 3;
     }
     
     // BoxUser 추가 편의 메서드
