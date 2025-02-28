@@ -8,8 +8,8 @@ body {
 
 /* 컨테이너 스타일 */
 .container {
-    max-width: 100%; /* 컨테이너 너비 확장 */
-    min-height: 100%; /* 컨테이너 높이 확장 */
+    max-width: 1920px; /* 컨테이너 너비 확장 */
+    min-height: 1080px; /* 컨테이너 높이 확장 */
     background: white;
     padding: 20px;
     border-radius: 10px;
@@ -81,13 +81,8 @@ body {
     gap: 15px; /* 박스 간 간격 */
 }
 
-/* 반응형: 화면 크기에 따라 조정 */
-@media (max-width: 100%) {
-    .card {
-        max-width: 180px;
-    }
-}
 
+/* 반응형: 화면 크기에 따라 조정 */
 @media (max-width: 992px) {
     .card {
         max-width: 160px;

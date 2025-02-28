@@ -28,24 +28,27 @@
         <!-- 메뉴 리스트 -->
 		<div class="container">
 		    <div class="row">
-		        <div class="col-12 col-sm-6 col-md-4 col-lg-2" th:each="box : ${boxes}">
-		            <div class="card">
-		                <div class="card-body">
-		                    <h5 class="card-title text-primary" th:text="${box.name}">메뉴 제목</h5>
-							<p>📅모임 날짜: <span th:text="${#temporals.format(box.eventStartDate, 'yyyy-MM-dd')}"></span></p>
-							<p>⏳최종 업로드: <span th:text="${#temporals.format(box.modifiedDate, 'yyyy-MM-dd')}"></span></p>
-							<p>🔥폭파 날짜: <span th:text="${#temporals.format(box.boomDate, 'yyyy-MM-dd')}"></span></p>
-		                </div>
-		            </div>
-		        </div>
+				<div class="selectable-box col-12 col-sm-6 col-md-4 col-lg-2" th:each="box : ${boxes}" th:data-bid="${box.bid}">
+				    <div class="card">
+				        <div class="card-body">
+				            <h5 class="card-title text-primary" th:text="${box.name}">메뉴 제목</h5>
+				            <p>📅모임 날짜: <span th:text="${#temporals.format(box.eventStartDate, 'yyyy-MM-dd')}"></span></p>
+				            <p>⏳최종 업로드: <span th:text="${#temporals.format(box.modifiedDate, 'yyyy-MM-dd')}"></span></p>
+				            <p>🔥폭파 날짜: <span th:text="${#temporals.format(box.boomDate, 'yyyy-MM-dd')}"></span></p>
+				        </div>
+				    </div>
+				    <button class="btn btn-danger deselect-btn" style="display: none;">선택 해제</button>
+				</div>
 		    </div>
 		</div>
 
-        <!-- 다운로드 / 삭제 버튼 -->
-        <div class="d-flex justify-content-between mt-4">
-            <button class="btn btn-primary">⬇ 다운로드</button>
-            <button class="btn btn-danger">🗑 삭제</button>
-        </div>
+		<!-- 다운로드 / 삭제 버튼 (처음에는 숨김) -->
+		<div id="action-buttons-container" style="display: none;">
+		    <div class="d-flex justify-content-between mt-4">
+		        <button id="download-btn" class="btn btn-primary">⬇</button>
+		        <button id="delete-btn" class="btn btn-danger">🗑</button>
+		    </div>
+		</div>
     </div>
 
     <!-- Bootstrap JS -->

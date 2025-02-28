@@ -1,0 +1,23 @@
+.gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+.image-box {
+    width: 100px;
+    height: 100px;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+.selected {
+    border: 2px solid blue;
+}
+.member-list {
+    background-color: #f0f0f0;
+    padding: 10px;
+    min-height: 200px;
+}

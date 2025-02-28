@@ -31,7 +31,7 @@ public class PictureService {
     private final BoxRepository boxRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
-
+    
     @Transactional(readOnly = true)
     public PictureDto getPictureDetails(Long bid, Long pid) {
         Picture picture = pictureRepository.findByPidAndBoxBid(pid, bid)
@@ -47,6 +47,13 @@ public class PictureService {
                 .build();
     }
 
+    
+    
+    public List<Picture> findByBoxId(Long boxId) {
+        return pictureRepository.findAllByBoxBid(boxId); // ✅ Repository 호출
+    }
+    
+    
     // 이미지 업로드 (하나 또는 여러 개의 파일 업로드)
     @Transactional
     public List<Long> uploadPictures(Long bid, Long uid,MultipartFile[] files) {
