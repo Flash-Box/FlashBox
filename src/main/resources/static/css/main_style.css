@@ -1,0 +1,99 @@
+/* 기본 설정 */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* 컨테이너 스타일 */
+.container {
+    max-width: 1920px; /* 컨테이너 너비 확장 */
+    min-height: 1080px; /* 컨테이너 높이 확장 */
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 카드 스타일 */
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border: 1px solid #007bff;
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    min-height: 250px; /* 🔹 최소 높이 조정 */
+    max-width: 300px; /* 🔹 최대 너비 설정 */
+    margin: 10px; /* 🔹 간격 추가 */
+}
+
+.card h3, 
+.card p {
+    white-space: nowrap; /* 줄바꿈 방지 */
+    overflow: hidden; /* 넘치는 부분 숨기기 */
+    text-overflow: ellipsis; /* 넘치면 '...' 표시 */
+}
+
+/* 카드 내부 */
+.card-body {
+    padding: 15px;
+    background: #f9f9f9;
+}
+
+/* 카드 hover 효과 */
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* 선택된 카드 스타일 */
+.selected-box {
+    border: 3px solid #28a745 !important; /* 선택된 경우 초록색 테두리 */
+    cursor: pointer;
+}
+
+/* 선택 가능 카드 */
+.selectable-box {
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.selectable-box:hover {
+    transform: scale(1.02);
+}
+
+/* 버튼 스타일 */
+.btn-select {
+    font-weight: bold;
+    font-size: 14px;
+    width: 100%; /* 버튼 가득 차게 */
+    margin-top: 10px;
+}
+
+/* 박스 정렬 (5개씩) */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px; /* 박스 간 간격 */
+}
+
+
+/* 반응형: 화면 크기에 따라 조정 */
+@media (max-width: 992px) {
+    .card {
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+    .row {
+        justify-content: space-between;
+    }
+    .card {
+        max-width: 100%;
+    }
+}
