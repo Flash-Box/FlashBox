@@ -301,4 +301,27 @@ public class BoxService {
             System.out.println("박스 ID: " + box.getBid() + " | BoomDate가 연장되어 예약되지 않았습니다.");
         }
     }
+    
+    @Transactional
+	public void extendBoomDate(Long bid, Long uid) {
+		Box box = boxRepository.findById(bid)
+		        .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+
+	    BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
+	        .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
+
+	    if (boxUser.getRole() != RoleType.OWNER && boxUser.getRole() != RoleType.MEMBER) {
+	        throw new IllegalStateException("박스의 소유자 또는 멤버만 수정할 수 있습니다.");
+	    }
+		
+	    if(box.getCount() <= 0) {
+	    	throw new IllegalStateException("더 이상 연장할 수 없습니다.");
+	    }
+	    
+	    box.extendBoomDate();
+	    
+	    // 폭파 예정 목록에 포함되어 있었다면 취소 
+	    handleBoomDateChange(box);
+	    
+	}
 }

@@ -20,8 +20,6 @@ public class UserController {
 
     private final UserService userService;
 
-
-
     // 회원 탈퇴
     @DeleteMapping("/unregister/{uid}")
     public ResponseEntity<String> deleteUser(@PathVariable("uid") Long uid) {

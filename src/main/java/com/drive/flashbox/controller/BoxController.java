@@ -177,7 +177,7 @@ public class BoxController {
 	}
 
 	
-  // box 삭제 기능
+	// box 삭제 기능
 	@DeleteMapping("/box/{bid}")
 	public ResponseEntity<String> deleteBox(
 			@PathVariable("bid") Long bid,
@@ -187,6 +187,21 @@ public class BoxController {
 		try {
 	        boxService.deleteBox(bid, uid);
 	        return ResponseEntity.ok("삭제 완료!");
+	    } catch (IllegalStateException e) {	
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    }
+	}
+	
+	// box 폭파 기한 연장
+	@PostMapping("/box/{bid}/extend")
+	public ResponseEntity<String> extendBoomDate(
+			@PathVariable("bid") Long bid,
+			@AuthenticationPrincipal FBUserDetails fbUserDetails
+	){
+		Long uid = fbUserDetails.getUid();
+		try {
+	        boxService.extendBoomDate(bid, uid);
+	        return ResponseEntity.ok("연장 완료!");
 	    } catch (IllegalStateException e) {	
 	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 	    }
