@@ -48,7 +48,7 @@ public class BoxService {
 	final private UserRepository userRepository;
 	private final PictureRepository pictureRepository;
 	private final S3Service s3Service;
-	private Map<Long, ScheduledFuture<?>> scheduledTasks = new HashMap<>();
+	private final Map<Long, ScheduledTaskInfo> scheduledTasks = new HashMap<>();
 	private final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
     {
         scheduler.initialize(); // 🔹 필드 초기화와 동시에 스케줄러 설정
@@ -223,8 +223,15 @@ public class BoxService {
     public void scheduleExpirationTasks() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneDayLater = now.plusDays(1); // 하루 뒤
-
+        
+        // 현재로부터 24시간 이내에 폭파하는 박스 조회
         List<Box> nearExpiredBoxes = boxRepository.findAllByBoomDateBetween(now, oneDayLater);
+        
+        // 이미 기한이 지난 박스들은 삭제
+        List<Box> expiredBoxes = boxRepository.findAllByBoomDateBefore(now);
+        for (Box box : expiredBoxes) {
+            deleteBoxAndS3Folder(box); // 즉시 삭제
+        }
 
         System.out.println("예약 작업 실행: " + LocalDateTime.now());
         System.out.println("하루 남은 박스 개수: " + nearExpiredBoxes.size());
@@ -232,11 +239,13 @@ public class BoxService {
         for (Box box : nearExpiredBoxes) {
             scheduleDeletionTask(box);
         }
+        
+        printScheduledTasks();
     }
 
     // boomDate에 맞춰 자동 삭제 예약
-    public void scheduleDeletionTask(Box box) {
-    	LocalDateTime boomDate = box.getBoomDate();
+  	public void scheduleDeletionTask(Box box) {
+        LocalDateTime boomDate = box.getBoomDate();
         long delay = Duration.between(LocalDateTime.now(), boomDate).toMillis();
 
         // 이미 예약된 작업이 있으면 중복 예약 방지
@@ -251,8 +260,8 @@ public class BoxService {
                     Instant.now().plusMillis(delay)
             );
 
-            // 예약된 작업을 map에 저장
-            scheduledTasks.put(box.getBid(), scheduledTask);
+            // 예약된 작업을 map에 저장 (ScheduledTaskInfo 객체로 저장)
+            scheduledTasks.put(box.getBid(), new ScheduledTaskInfo(scheduledTask, boomDate));
 
             System.out.println("박스 ID: " + box.getBid() +
                     " | 삭제 예약 시간: " + boomDate);
@@ -267,18 +276,18 @@ public class BoxService {
         s3Service.deleteS3Folder(box.getBid());
     }
     
-    // boomDate를 연장하게 된다면 호출되어 예약 상태를 다시 확인하는 메서드 / 안쓰게 되면 지워도 됨
+    // boomDate를 예약 상태를 다시 확인하는 메서드
     public void handleBoomDateChange(Box box) {
         LocalDateTime boomDate = box.getBoomDate();
         long delay = Duration.between(LocalDateTime.now(), boomDate).toMillis();
 
         // 예약된 작업 목록에 있고, boomDate가 변경되었으면 기존 예약 취소
         if (scheduledTasks.containsKey(box.getBid())) {
-            ScheduledFuture<?> existingTask = scheduledTasks.get(box.getBid());
-            LocalDateTime existingBoomDate = boxRepository.findById(box.getBid())
-            										.orElseThrow(() -> new IllegalStateException("Box를 찾을 수 없습니다.")).getBoomDate();
-            
-            if (!existingBoomDate.equals(boomDate)) {
+            ScheduledTaskInfo existingTaskInfo = scheduledTasks.get(box.getBid());
+            LocalDateTime existingBoomDate = existingTaskInfo.getBoomDate();
+            ScheduledFuture<?> existingTask = existingTaskInfo.getScheduledTask();
+
+            if (!existingBoomDate.isEqual(boomDate)) {
                 System.out.println("박스 ID: " + box.getBid() + " 의 BoomDate 변경 - 기존 예약 취소");
                 existingTask.cancel(true); // 기존 예약 취소
                 scheduledTasks.remove(box.getBid()); // 예약 목록에서 제거
@@ -293,7 +302,7 @@ public class BoxService {
             );
 
             // 예약된 작업을 map에 저장
-            scheduledTasks.put(box.getBid(), scheduledTask);
+            scheduledTasks.put(box.getBid(), new ScheduledTaskInfo(scheduledTask, boomDate));
 
             System.out.println("박스 ID: " + box.getBid() +
                     " | 삭제 예약 시간: " + boomDate);
@@ -303,25 +312,69 @@ public class BoxService {
     }
     
     @Transactional
-	public void extendBoomDate(Long bid, Long uid) {
-		Box box = boxRepository.findById(bid)
-		        .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
+    public void extendBoomDate(Long bid, Long uid) {
+        Box box = boxRepository.findById(bid)
+                .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 
-	    BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
-	        .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
+        BoxUser boxUser = boxUserRepository.findByBox_BidAndUser_Id(bid, uid)
+                .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
 
-	    if (boxUser.getRole() != RoleType.OWNER && boxUser.getRole() != RoleType.MEMBER) {
-	        throw new IllegalStateException("박스의 소유자 또는 멤버만 수정할 수 있습니다.");
-	    }
-		
-	    if(box.getCount() <= 0) {
-	    	throw new IllegalStateException("더 이상 연장할 수 없습니다.");
-	    }
-	    
-	    box.extendBoomDate();
-	    
-	    // 폭파 예정 목록에 포함되어 있었다면 취소 
-	    handleBoomDateChange(box);
-	    
-	}
+        if (boxUser.getRole() != RoleType.OWNER && boxUser.getRole() != RoleType.MEMBER) {
+            throw new IllegalStateException("박스의 소유자 또는 멤버만 수정할 수 있습니다.");
+        }
+
+        if (box.getCount() <= 0) {
+            throw new IllegalStateException("더 이상 연장할 수 없습니다.");
+        }
+
+        box.extendBoomDate();
+        
+        // 바로 반영 안되서 추가
+        boxRepository.flush();
+
+        // 폭파 예정 목록에 포함되어 있었다면 취소 
+        handleBoomDateChange(box);
+    }
+
+    // 예약된 작업 목록 출력
+    private void printScheduledTasks() {
+        System.out.println("현재 예약된 삭제 작업 목록:");
+        if (scheduledTasks.isEmpty()) {
+            System.out.println("예약된 작업이 없습니다.");
+        } else {
+            for (Map.Entry<Long, ScheduledTaskInfo> entry : scheduledTasks.entrySet()) {
+                System.out.println("박스 ID: " + entry.getKey() + " | 작업 상태: " +
+                        (entry.getValue().getScheduledTask().isDone() ? "완료됨" : "진행 중") +
+                        " | 예약된 BoomDate: " + entry.getValue().getBoomDate());
+            }
+        }
+    }
+
+    // 예약 작업 정보 클래스
+    public static class ScheduledTaskInfo {
+        private ScheduledFuture<?> scheduledTask;
+        private LocalDateTime boomDate;
+
+        // 생성자
+        public ScheduledTaskInfo(ScheduledFuture<?> scheduledTask, LocalDateTime boomDate) {
+            this.scheduledTask = scheduledTask;
+            this.boomDate = boomDate;
+        }
+
+        public ScheduledFuture<?> getScheduledTask() {
+            return scheduledTask;
+        }
+
+        public void setScheduledTask(ScheduledFuture<?> scheduledTask) {
+            this.scheduledTask = scheduledTask;
+        }
+
+        public LocalDateTime getBoomDate() {
+            return boomDate;
+        }
+ 
+        public void setBoomDate(LocalDateTime boomDate) {
+            this.boomDate = boomDate;
+        }
+    }
 }
