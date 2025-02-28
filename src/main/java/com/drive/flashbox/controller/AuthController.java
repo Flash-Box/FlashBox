@@ -33,6 +33,7 @@ public class AuthController {
         return "signup"; // signup.html 반환
     }
     
+    
 	// SCRUM-43-signup-page ----- form 데이터 처리 코드로 교체하기 위해 기존 코드 주석처리	    
 //    @PostMapping("/signup")
 //    public ResponseEntity<CustomResponse<SignupResponseDTO>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
@@ -46,6 +47,7 @@ public class AuthController {
 //        return ResponseEntity.ok(response);
 //    }
 
+    
     // SCRUM-43-signup-page ----------- form 데이터 처리하도록 위 코드 교체
     @PostMapping("/signup")
     public String signup(@ModelAttribute SignupRequestDTO signupRequestDTO, Model model) {
