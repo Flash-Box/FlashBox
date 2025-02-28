@@ -38,6 +38,9 @@ public class Box extends BaseTimeEntity {
 
     @Column(name = "boom_date")
     private LocalDateTime boomDate;
+    
+    @Column(name = "count")
+    private Integer count;
 
     // Box를 만든(혹은 소유한) User
     @ManyToOne
@@ -77,4 +80,9 @@ public class Box extends BaseTimeEntity {
     	this.eventEndDate = eventEndDate;
     }
     
+    // 기간 연장 + 횟수 감소
+    public void extendBoomDate() {
+    	this.boomDate = this.boomDate.plusDays(7);
+        this.count -= 1;
+    }
 }
