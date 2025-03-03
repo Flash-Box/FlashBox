@@ -219,7 +219,7 @@ public class BoxService {
   	
   	// 6시간마다 실행 -> boomDate가 하루 남은 박스를 찾아 삭제 예약
     //@Scheduled(fixedRate = 6 * 60 * 60 * 1000)
-  	@Scheduled(fixedRate = 60000) // 테스트를 위해 1분마다 실행
+//  	@Scheduled(fixedRate = 60000) // 테스트를 위해 1분마다 실행
     public void scheduleExpirationTasks() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneDayLater = now.plusDays(1); // 하루 뒤

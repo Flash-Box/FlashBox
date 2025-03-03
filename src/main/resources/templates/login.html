@@ -35,38 +35,54 @@
 
 <script>
   document.querySelector("form").addEventListener("submit", async function (event) {
-    event.preventDefault();
+    try {
+      event.preventDefault();
 
-    const formData = {
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value
-    };
+      const formData = {
+        email: document.getElementById("email").value,
+        password: document.getElementById("password").value
+      };
 
 
-    await fetch("/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
-    }).then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert("✅로그인 성공!");
-
-          // Access Token 저장
-          sessionStorage.setItem("accessToken", data.data.accessToken);
-
-          console.log(data)
-          // 페이지 이동 (예: /dashboard)
-          window.location.href = "/box";
-        } else {
-          alert("❌로그인 실패");
-        }
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
       })
-      .catch(error => console.error("Error:", error));
+      const responseData = response.json()
+
+      if (responseData.success) {
+        alert("✅로그인 성공!");
+        const accessToken = data.data.accessToken
+        // Access Token 저장
+        sessionStorage.setItem("accessToken", accessToken);
+
+        console.log(data)
+
+        // 메인 페이지 이동
+        await getMainPage(accessToken)
+      } else {
+        alert("❌로그인 실패");
+      }
+
+    }catch (error) {
+      console.error("Error:", error);
+    }
 
   });
+
+  async function getMainPage(token){
+    await fetch("/", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    })
+
+  }
 </script>
 
 </html>
