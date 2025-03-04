@@ -11,13 +11,16 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/main_style.css">
+    <link rel="stylesheet" type="text/css" href="/css/navBar.css">
 </head>
 <body>
-    <div class="container mt-4">
-        <header class="d-flex justify-content-between align-items-center mb-3">
-            <h1>메인 페이지</h1>
+    <div class="wrapper-container mt-4">
+        <header class="d-flex justify-content-between align-items-center mb-3" th:replace="~{layout/navBar :: headerLayout}">
+<!--            <div ></div>-->
+<!--            <h1>메인 페이지</h1>-->
 
-            <span>안녕하세요, <span  >OOO</span>님</span>
+<!--            <span>안녕하세요, <span  >OOO</span>님</span>-->
+
         </header>
 
         <!-- 검색창 -->
@@ -67,25 +70,12 @@
 
                 return;
             }
-            console.log("token: ",token)
 
+            //
             try {
-            // 사용자 정보 가져오기
-            const userResponse = await fetch("/api/user-info", {
-                method: "GET",
-                headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/json"
-                }
-            });
-            console.log("userResponse: ",userResponse)
-
-            if (!userResponse.ok) {
-            throw new Error("Unauthorized");
-            }
-            const userData = await userResponse.json();
-            console.log("userData: ",userData)
-            document.querySelector("header span span").textContent = userData.name;
+            // // 사용자 정보 가져오기
+            const nickname = sessionStorage.getItem("nickname")
+            document.querySelector(".nickname").textContent = nickname;
 
             // 박스 데이터 가져오기
             const boxResponse = await fetch("/api/boxes", {

@@ -65,6 +65,7 @@ public class AuthService {
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .uid(fbUserDetails.getUid())
+                .name(fbUserDetails.getName())
                 .accessToken(jwtToken.getAccessToken())
                 .refreshToken(jwtToken.getRefreshToken())
                 .build();

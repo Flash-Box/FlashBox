@@ -31,3 +31,25 @@ async function refreshToken() {
 
 
 }
+
+async function logout(){
+    const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
+
+    const response = await fetch("/logout", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+
+    const responseData = await response.json();
+    console.log("서버 응답 데이터:", responseData);
+
+    if (responseData.success) {
+        alert("✅로그아웃 성공!");
+        window.location.href = '/login';
+        sessionStorage.clear(); // 저장된 값들 전부 삭제
+    }
+
+
+}

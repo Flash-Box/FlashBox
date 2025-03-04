@@ -62,6 +62,7 @@
         const accessToken = responseData.data.accessToken
         // Access Token 저장
         sessionStorage.setItem("accessToken", accessToken);
+        sessionStorage.setItem("nickname", responseData.data.name);
 
         console.log(accessToken)
 

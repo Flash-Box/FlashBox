@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/navBar.css">
+    <script src="/js/auth.js"></script>
+</head>
+<body>
+
+<div class="header" th:fragment="headerLayout">
+    <!-- 왼쪽 로고 -->
+    <div class="left-header">
+        <a href="/boxes" class="logo">FlashBox</a>
+    </div>
+
+    <!-- 오른쪽 별명과 로그아웃 버튼 -->
+    <div class="right-header">
+        <div class="nickname">안녕하세요, oo 님!</div>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function(){
+        const token = sessionStorage.getItem("accessToken");
+        if (!token) {
+            alert("로그인이 필요합니다.");
+
+            return;
+        }
+        console.log("token?????: ",token)
+
+        try {
+            // 사용자 정보 가져오기
+            const userResponse = await fetch("/api/user-info", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                }
+            });
+            console.log("userResponse: ", userResponse)
+
+            if (!userResponse.ok) {
+                throw new Error("Unauthorized");
+            }
+            const userData = await userResponse.json();
+            console.log("userData: ", userData)
+            document.querySelector(".nickname").textContent = userData.name;
+
+        }catch (error) {
+            console.error("Error:", error);
+        }
+    })
+
+
+</script>
+</body>
+</html>
