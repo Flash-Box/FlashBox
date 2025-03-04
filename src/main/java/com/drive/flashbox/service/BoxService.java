@@ -206,6 +206,13 @@ public class BoxService {
 	      // 4. DB에 저장
 	      boxUserRepository.save(boxUser);
 	}
+	
+	@Transactional
+	public void deleteBoxes(List<Long> bidList, Long uid) {
+	    for (Long bid : bidList) {
+	        deleteBox(bid, uid);
+	    }
+	}
 
   	@Transactional
 	public void deleteBox(Long bid, Long uid) {
