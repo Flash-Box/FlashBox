@@ -39,16 +39,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/box").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/signup", "/boxes","/api/login","/login","/token/refresh", "box/**").permitAll()
+                        .requestMatchers("/signup", "/boxes","/login","/main","/token/refresh", "/box/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안 함
                 .formLogin(AbstractHttpConfigurer::disable) // 기본 로그인 비활성화
+//                .formLogin(form -> form
+//                        .loginPage("/login")   // 커스텀 로그인 페이지
+//                        .defaultSuccessUrl("/main", true) // 로그인 성공 시 "/"로 이동
+//
+//                )
 
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-                .logout(logout -> logout.logoutSuccessUrl("/"));
+                .logout(logout -> logout.logoutSuccessUrl("/login"));
 
         return http.build();
     }

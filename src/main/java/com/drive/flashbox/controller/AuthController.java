@@ -6,6 +6,7 @@ import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
 import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
+import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -66,7 +69,7 @@ public class AuthController {
         return "login";
     }
 
-    @GetMapping("/")
+    @GetMapping("/main")
     public String mainPage() {
         return "main";
     }
@@ -111,9 +114,6 @@ public class AuthController {
                 "로그인 성공",
                 data
         );
-
-//        res.addHeader("Set-Cookie", data.getRefreshToken());
-
 
         return ResponseEntity.ok(loginResponse);
     }

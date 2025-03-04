@@ -13,4 +13,6 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
 	List<Box> findAllByBoomDateBetween(LocalDateTime start, LocalDateTime end);
 
 	List<Box> findAllByBoomDateBefore(LocalDateTime now);
+
+    List<Box> findBoxesByUser_Id(Long uid);
 }
