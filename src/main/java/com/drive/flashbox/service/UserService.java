@@ -25,4 +25,9 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    public User getUser(Long uid) {
+        return userRepository.findById(uid)
+                .orElseThrow(() -> new IllegalStateException("User not found with id: " + uid));
+
+    }
 }

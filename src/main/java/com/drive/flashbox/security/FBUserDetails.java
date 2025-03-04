@@ -18,7 +18,7 @@ import java.util.Collections;
 public class FBUserDetails implements UserDetails {
 
     private Long uid;
-    private String username;
+    private String name;
     private String password;
     private String email;
 
@@ -42,7 +42,7 @@ public class FBUserDetails implements UserDetails {
 
     public UserDto toDto() {
         return UserDto.of(uid,
-                username,
+                name,
                 password,
                 email);
     }
@@ -53,15 +53,15 @@ public class FBUserDetails implements UserDetails {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-//    @Override
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    @Override
-//    public String getUsername() {
-//        return username;
-//    }
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
 
 }

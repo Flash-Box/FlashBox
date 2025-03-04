@@ -1,9 +1,6 @@
 package com.drive.flashbox.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import com.drive.flashbox.common.CustomResponse;
 import com.drive.flashbox.dto.response.BoxCreateResponse;
@@ -61,6 +58,31 @@ public class BoxController {
         model.addAttribute("boxes", boxes);
         return "main"; // templates/main.html 렌더링
     }
+
+	@GetMapping("/api/boxes")
+	public ResponseEntity<CustomResponse<?>> getAllUserBoxes(@AuthenticationPrincipal FBUserDetails fbUserDetails) {
+		List<BoxResponse> boxes = boxService.getAllUserBoxes(fbUserDetails.getUid());
+
+		if (boxes == null) {
+			CustomResponse<Object> response = new CustomResponse<Object>(
+					HttpStatus.BAD_REQUEST.value(),
+					false,
+					"유저 박스 전체조회 실패",
+					null
+			);
+
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+
+		CustomResponse<Object> response = new CustomResponse<>(
+				HttpStatus.OK.value(),
+				true,
+				"유저 박스 전체조회 성공",
+				boxes
+		);
+		System.out.println(boxes);
+		return ResponseEntity.ok(response);
+	}
     
     // 박스 상세 조회: HTML 페이지 반환
     @GetMapping("/box/{bid}")

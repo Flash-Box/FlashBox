@@ -37,4 +37,14 @@ public class BoxResponse {
     							box.getModifiedDate().toLocalDate(),
     							members);
     }
+
+	public static BoxResponse from(Box box) {
+		return new BoxResponse(box.getBid(),
+				box.getName(),
+				box.getEventStartDate().toLocalDate(),
+				box.getEventEndDate().toLocalDate(),
+				box.getBoomDate() != null ? box.getBoomDate().toLocalDate() : null,	//수정 -- SCRUM-30-view-members
+				box.getModifiedDate().toLocalDate(),
+				null);
+	}
 }

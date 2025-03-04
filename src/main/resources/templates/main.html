@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>메뉴 조회</title>
-    
+    <title>메인 화면</title>
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" 
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -16,7 +16,8 @@
     <div class="container mt-4">
         <header class="d-flex justify-content-between align-items-center mb-3">
             <h1>메인 페이지</h1>
-            <span>안녕하세요, <span th:text="${user.name}">OOO</span>님</span>
+
+            <span>안녕하세요, <span  >OOO</span>님</span>
         </header>
 
         <!-- 검색창 -->
@@ -25,20 +26,20 @@
             <button class="btn btn-primary">🔍 검색</button>
         </div>
 
-        <!-- 메뉴 리스트 -->
+        <!-- 박스 리스트 -->
 		<div class="container">
 		    <div class="row">
-				<div class="selectable-box col-12 col-sm-6 col-md-4 col-lg-2" th:each="box : ${boxes}" th:data-bid="${box.bid}">
-				    <div class="card">
-				        <div class="card-body">
-				            <h5 class="card-title text-primary" th:text="${box.name}">메뉴 제목</h5>
-				            <p>📅모임 날짜: <span th:text="${#temporals.format(box.eventStartDate, 'yyyy-MM-dd')}"></span></p>
-				            <p>⏳최종 업로드: <span th:text="${#temporals.format(box.modifiedDate, 'yyyy-MM-dd')}"></span></p>
-				            <p>🔥폭파 날짜: <span th:text="${#temporals.format(box.boomDate, 'yyyy-MM-dd')}"></span></p>
-				        </div>
-				    </div>
-				    <button class="btn btn-danger deselect-btn" style="display: none;">선택 해제</button>
-				</div>
+<!--				<div class="selectable-box col-12 col-sm-6 col-md-4 col-lg-2" th:each="box : ${boxes}" th:data-bid="${box.bid}">-->
+<!--				    <div class="card">-->
+<!--				        <div class="card-body">-->
+<!--				            <h5 class="card-title text-primary" th:text="${box.name}">메뉴 제목</h5>-->
+<!--				            <p>📅모임 날짜: <span th:text="${#temporals.format(box.eventStartDate, 'yyyy-MM-dd')}"></span></p>-->
+<!--				            <p>⏳최종 업로드: <span th:text="${#temporals.format(box.modifiedDate, 'yyyy-MM-dd')}"></span></p>-->
+<!--				            <p>🔥폭파 날짜: <span th:text="${#temporals.format(box.boomDate, 'yyyy-MM-dd')}"></span></p>-->
+<!--				        </div>-->
+<!--				    </div>-->
+<!--				    <button class="btn btn-danger deselect-btn" style="display: none;">선택 해제</button>-->
+<!--				</div>-->
 		    </div>
 		</div>
 
@@ -55,6 +56,84 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JS -->
-    <script src="/js/main_script.js"></script>
+<!--    <script src="/js/main_script.js"></script>-->
+
+	<script>
+		document.addEventListener("DOMContentLoaded", async function () {
+
+            const token = sessionStorage.getItem("accessToken");
+            if (!token) {
+                alert("로그인이 필요합니다.");
+
+                return;
+            }
+            console.log("token: ",token)
+
+            try {
+            // 사용자 정보 가져오기
+            const userResponse = await fetch("/api/user-info", {
+                method: "GET",
+                headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+                }
+            });
+            console.log("userResponse: ",userResponse)
+
+            if (!userResponse.ok) {
+            throw new Error("Unauthorized");
+            }
+            const userData = await userResponse.json();
+            console.log("userData: ",userData)
+            document.querySelector("header span span").textContent = userData.name;
+
+            // 박스 데이터 가져오기
+            const boxResponse = await fetch("/api/boxes", {
+                method: "GET",
+                headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+                }
+            });
+
+            console.log("boxResponse: ",boxResponse)
+
+            if (!boxResponse.ok) {
+                throw new Error("Failed to fetch boxes");
+            }
+
+            const boxes = await boxResponse.json();
+            console.log("boxes: ",boxes)
+            await renderBoxes(boxes);
+
+            } catch (error) {
+            console.error("Error:", error);
+
+            }
+		});
+
+		async function renderBoxes(boxes) {
+            const container = document.querySelector(".row");
+            container.innerHTML = ""; // 기존 내용 삭제
+
+            boxes.data.forEach(box => {
+            const boxHTML = `
+                <div class="selectable-box col-12 col-sm-6 col-md-4 col-lg-2" data-bid="${box.bid}">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">${box.name}</h5>
+                            <p>📅모임 날짜: ${box.eventStartDate}</p>
+                            <p>⏳최종 업로드: ${box.modifiedDate}</p>
+                            <p>🔥폭파 날짜: ${box.boomDate}</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger deselect-btn" style="display: none;">선택 해제</button>
+                </div>
+                `;
+            container.innerHTML += boxHTML;
+            });
+		}
+	</script>
+
 </body>
 </html>

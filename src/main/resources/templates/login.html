@@ -12,8 +12,9 @@
 
   <form th:action="@{/login}" method="post">
 
-    <label for="email">email</label>
-    <input id="email" name="email" type="text"  >
+<!-- Spring Security의 기본 로그인 폼에서는 name="username" -->
+    <label for="username">email</label>
+    <input id="username" name="username" type="text"  >
     <label for="password">Password</label>
     <input id="password" name="password" type="password" required>
 
@@ -21,7 +22,7 @@
 
     <!-- 로그인 실패 시 오류 메시지 출력 -->
     <div th:if="${param.error}">
-      <p style="color: red;">Invalid username or password.</p>
+      <p style="color: red;" th:text="${param.error}">Invalid username or password.</p>
     </div>
 
   </form>
@@ -39,7 +40,7 @@
       event.preventDefault();
 
       const formData = {
-        email: document.getElementById("email").value,
+        email: document.getElementById("username").value,
         password: document.getElementById("password").value
       };
 
@@ -51,18 +52,22 @@
         },
         body: JSON.stringify(formData)
       })
-      const responseData = response.json()
+      console.log("response: ",response)
+      const responseData = await response.json()
+
+      console.log("responseData: ",responseData)
 
       if (responseData.success) {
         alert("✅로그인 성공!");
-        const accessToken = data.data.accessToken
+        const accessToken = responseData.data.accessToken
         // Access Token 저장
         sessionStorage.setItem("accessToken", accessToken);
 
-        console.log(data)
+        console.log(accessToken)
 
-        // 메인 페이지 이동
-        await getMainPage(accessToken)
+          // 메인 페이지 이동
+        window.location.href = "/main";
+
       } else {
         alert("❌로그인 실패");
       }
@@ -74,13 +79,19 @@
   });
 
   async function getMainPage(token){
-    await fetch("/", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    })
+    try {
+      console.log("get main page")
+      await fetch("/", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "text/html"
+        }
+      })
+
+    }catch (error) {
+      console.error("Error:", error);
+    }
 
   }
 </script>

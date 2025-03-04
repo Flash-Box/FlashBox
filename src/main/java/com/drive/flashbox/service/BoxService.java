@@ -147,6 +147,11 @@ public class BoxService {
     public List<Box> getAllBoxes() {
         return boxRepository.findAll();
     }
+
+    public List<BoxResponse> getAllUserBoxes(Long uid) {
+        List<Box> boxes = boxRepository.findBoxesByUser_Id(uid);
+        return boxes.stream().map(box -> BoxResponse.from(box)).toList();
+    }
 	
     // 박스 조회, 수정 --------------------------------------------------------------------- SCRUM-30-view-members
 	public BoxResponse getBox(Long bid) {				

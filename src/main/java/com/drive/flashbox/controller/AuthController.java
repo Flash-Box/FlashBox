@@ -69,11 +69,8 @@ public class AuthController {
         return "login";
     }
 
-    @GetMapping("/")
-    public String mainPage(@AuthenticationPrincipal FBUserDetails fbUserDetails, ModelMap map) {
-        System.out.println("AuthController.mainPage");
-        map.addAttribute("user", fbUserDetails);
-        System.out.println(fbUserDetails);
+    @GetMapping("/main")
+    public String mainPage() {
         return "main";
     }
 
@@ -117,9 +114,6 @@ public class AuthController {
                 "로그인 성공",
                 data
         );
-
-//        res.addHeader("Set-Cookie", data.getRefreshToken());
-
 
         return ResponseEntity.ok(loginResponse);
     }
