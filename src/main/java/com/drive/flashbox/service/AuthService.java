@@ -93,7 +93,7 @@ public class AuthService {
 
         TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
 
-        // redis에 refreshToken 객체 저장
+        // redis에 새로운 refreshToken 객체 저장
         tokenRepository.save(new Token(id, tokenDto.getRefreshToken()));
 
 
@@ -107,4 +107,14 @@ public class AuthService {
         return tokenResponse;
 
     }
+
+    @Transactional
+    public void deleteRefreshToken(Long uid) {
+        // redis에서 해당 uid 유저의 refreshToken 삭제
+        tokenRepository.deleteById(uid);
+
+    }
+
+
+
 }

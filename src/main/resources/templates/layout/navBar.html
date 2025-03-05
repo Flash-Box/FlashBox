@@ -17,44 +17,9 @@
     <!-- 오른쪽 별명과 로그아웃 버튼 -->
     <div class="right-header">
         <div class="nickname">안녕하세요, oo 님!</div>
-        <button class="logout-button" onclick="logout()">Logout</button>
+        <button class="logout-button" onclick="FBlogout()">Logout</button>
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", async function(){
-        const token = sessionStorage.getItem("accessToken");
-        if (!token) {
-            alert("로그인이 필요합니다.");
-
-            return;
-        }
-        console.log("token?????: ",token)
-
-        try {
-            // 사용자 정보 가져오기
-            const userResponse = await fetch("/api/user-info", {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Accept": "application/json"
-                }
-            });
-            console.log("userResponse: ", userResponse)
-
-            if (!userResponse.ok) {
-                throw new Error("Unauthorized");
-            }
-            const userData = await userResponse.json();
-            console.log("userData: ", userData)
-            document.querySelector(".nickname").textContent = userData.name;
-
-        }catch (error) {
-            console.error("Error:", error);
-        }
-    })
-
-
-</script>
 </body>
 </html>

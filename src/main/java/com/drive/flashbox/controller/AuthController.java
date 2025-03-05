@@ -36,25 +36,15 @@ public class AuthController {
         return "signup"; // signup.html 반환
     }
     
-    
-	// SCRUM-43-signup-page ----- form 데이터 처리 코드로 교체하기 위해 기존 코드 주석처리	    
-//    @PostMapping("/signup")
-//    public ResponseEntity<CustomResponse<SignupResponseDTO>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
-//        SignupResponseDTO data = authService.registerUser(signupRequestDTO);
-//        CustomResponse<SignupResponseDTO> response = new CustomResponse<>(
-//                HttpStatus.CREATED.value(),
-//                true,
-//                "회원가입 성공",
-//                data
-//        );
-//        return ResponseEntity.ok(response);
-//    }
+
+
 
     
     // SCRUM-43-signup-page ----------- form 데이터 처리하도록 위 코드 교체
     @PostMapping("/signup")
-    public String signup(@ModelAttribute SignupRequestDTO signupRequestDTO, Model model) {
+    public String signup(SignupRequestDTO signupRequestDTO, Model model) {
         try {
+            System.out.println(signupRequestDTO.toString());
             SignupResponseDTO data = authService.registerUser(signupRequestDTO);
             return "redirect:/login"; // 성공 시 리디렉션
         } catch (IllegalStateException e) {
@@ -113,6 +103,25 @@ public class AuthController {
                 true,
                 "로그인 성공",
                 data
+        );
+
+        return ResponseEntity.ok(loginResponse);
+    }
+
+    @ResponseBody
+    @PostMapping("/api/logout")
+    public ResponseEntity<CustomResponse<?>> logout(@AuthenticationPrincipal FBUserDetails fbUserDetails, HttpServletResponse response) {
+        Long uid = fbUserDetails.getUid();
+
+        // redis에 저장된 refresh token 삭제
+        authService.deleteRefreshToken(uid);
+
+
+        CustomResponse<Object> loginResponse = new CustomResponse<>(
+                HttpStatus.OK.value(),
+                true,
+                "토큰 삭제 성공",
+                null
         );
 
         return ResponseEntity.ok(loginResponse);

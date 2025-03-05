@@ -32,24 +32,60 @@ async function refreshToken() {
 
 }
 
+// spring security에서 기본적으로 제공하는 /logout API 호출
 async function logout(){
-    const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
+    try {
 
-    const response = await fetch("/logout", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
+        const response = await fetch("/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        const responseData = await response.json();
+        console.log("서버 응답 데이터:", responseData);
+
+        if (responseData.success) {
+            sessionStorage.clear(); // 저장된 값들 전부 삭제
+            alert("✅로그아웃 성공!");
+            window.location.href = '/login';
+
+        }else {
+            alert("❌로그아웃 실패");
         }
-    })
 
-    const responseData = await response.json();
-    console.log("서버 응답 데이터:", responseData);
-
-    if (responseData.success) {
+    }catch (e) {
         alert("✅로그아웃 성공!");
-        window.location.href = '/login';
-        sessionStorage.clear(); // 저장된 값들 전부 삭제
+        console.error("Error:", e)
     }
+
+}
+
+// 우리 서비스 로그아웃 API 호출 (위의 것과 구분을 위해 앞에 /api 추가)
+async function FBlogout(){
+    try {
+        const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
+
+        const response = await fetch("/api/logout", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        })
+
+        const responseData = await response.json();
+        console.log("서버 응답 데이터:", responseData);
+
+        if (responseData.success) {
+            sessionStorage.clear(); // 저장된 값들 전부 삭제
+            await logout();
+        }
+    }catch (e) {
+        console.error("Error:", e)
+    }
+
 
 
 }
