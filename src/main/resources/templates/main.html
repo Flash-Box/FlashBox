@@ -76,9 +76,10 @@
             try {
             // // 사용자 정보 가져오기
             const nickname = sessionStorage.getItem("nickname")
-            document.querySelector(".nickname").textContent = nickname;
+            document.querySelector(".nickname").innerHTML = `안녕하세요, <span style="color: black;">${nickname}</span>님`;
 
-            // 박스 데이터 가져오기
+
+                // 박스 데이터 가져오기
             const boxResponse = await fetch("/api/boxes", {
                 method: "GET",
                 headers: {
