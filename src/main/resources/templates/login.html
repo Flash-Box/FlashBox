@@ -1,100 +1,170 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <style>
+        /* 전체 화면 스타일 */
+        body {
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+
+        /* 큰 사각형 테두리 */
+        .login-container {
+            width: 500px;
+            padding: 30px 100px;
+            border: 1px solid black;
+            border-radius: 20px; /* 곡선 모서리 */
+            text-align: center;
+        }
+
+
+        /* 제목 */
+        h1 {
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: black;
+        }
+
+        /* 입력창 레이블과 입력 필드 */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            color: black;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            background-color: #f0f0f0; /* 회색 바탕 */
+            border: 1px solid #ccc;
+            border-radius: 10px; /* 곡선 모서리 */
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        /* 구분선 */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background-color: gray;
+            margin: 20px 0;
+        }
+
+        /* 버튼 */
+        .login-button, .signup-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #808080;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px; /* 버튼 간 간격 */
+        }
+
+        .login-button:hover, .signup-button:hover {
+            background-color: #666666;
+        }
+
+        /* 에러 메시지 */
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    Header
-    <hr>
-  </header>
-
-  <form th:action="@{/login}" method="post">
-
-<!-- Spring Security의 기본 로그인 폼에서는 name="username" -->
-    <label for="username">email</label>
-    <input id="username" name="username" type="text"  >
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" required>
-
-    <button type="submit">Login</button>
-
-    <!-- 로그인 실패 시 오류 메시지 출력 -->
-    <div th:if="${param.error}">
-      <p style="color: red;" th:text="${param.error}">Invalid username or password.</p>
+    <div class="login-container">
+        <h1>로그인</h1>
+        <form th:action="@{/login}" method="post">
+            <div class="input-group">
+                <label for="username">이메일</label>
+                <input type="email" id="username" name="username" placeholder="이메일을 입력해주세요." required>
+            </div>
+            <div class="input-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력해주세요." required>
+            </div>
+            <div th:if="${param.error}" class="error-message">
+                <p th:text="${param.error}">Invalid username or password.</p>
+            </div>
+            <div class="divider"></div>
+            <br/><br/>
+            <button type="submit" class="login-button">로그인</button>
+            <br/><br/>
+            <a href="/signup"><button type="button" class="signup-button">회원 가입</button></a>
+            <br/><br/><br/>
+        </form>
     </div>
 
-  </form>
+    <script>
+        document.querySelector("form").addEventListener("submit", async function (event) {
+            try {
+                event.preventDefault();
 
-  <footer>
-    <hr>
-    Footer
-  </footer>
+                const formData = {
+                    email: document.getElementById("username").value,
+                    password: document.getElementById("password").value
+                };
 
-</body>
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+                console.log("response: ", response);
+                const responseData = await response.json();
 
-<script>
-  document.querySelector("form").addEventListener("submit", async function (event) {
-    try {
-      event.preventDefault();
+                console.log("responseData: ", responseData);
 
-      const formData = {
-        email: document.getElementById("username").value,
-        password: document.getElementById("password").value
-      };
+                if (responseData.success) {
+                    alert("✅로그인 성공!");
+                    const accessToken = responseData.data.accessToken;
+                    sessionStorage.setItem("accessToken", accessToken);
+                    sessionStorage.setItem("nickname", responseData.data.name);
+                    
+                    window.location.href = "/main";
+                } else {
+                    alert("❌로그인 실패");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        });
 
-
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      })
-      console.log("response: ",response)
-      const responseData = await response.json()
-
-      console.log("responseData: ",responseData)
-
-      if (responseData.success) {
-        alert("✅로그인 성공!");
-        const accessToken = responseData.data.accessToken
-        // Access Token 저장
-        sessionStorage.setItem("accessToken", accessToken);
-        sessionStorage.setItem("nickname", responseData.data.name);
-
-        console.log(accessToken)
-
-          // 메인 페이지 이동
-        window.location.href = "/main";
-
-      } else {
-        alert("❌로그인 실패");
-      }
-
-    }catch (error) {
-      console.error("Error:", error);
-    }
-
-  });
-
-  async function getMainPage(token){
-    try {
-      console.log("get main page")
-      await fetch("/", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "text/html"
+        async function getMainPage(token) {
+            try {
+                console.log("get main page");
+                await fetch("/", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Accept": "text/html"
+                    }
+                });
+            } catch (error) {
+                console.error("Error:", error);
+            }
         }
-      })
-
-    }catch (error) {
-      console.error("Error:", error);
-    }
-
-  }
-</script>
-
+    </script>
+</body>
 </html>
