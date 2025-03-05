@@ -67,7 +67,7 @@ jobs:
           path: ./build/libs
           
       - name: Display structure of downloaded files
-        run: ls -R path/to/artifacts
+        run: ls -R ./build/libs
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -97,7 +97,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git config --local user.email "sky3nlq@gmail.com"
+          git config --local user.email "${{ secrets.EMAIL }}"
           git config --local user.name "leGit-y"
           git add .
           git commit -m "Update image version to ${{ env.date }}"
