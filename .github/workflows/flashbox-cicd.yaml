@@ -36,12 +36,17 @@ jobs:
       - name: Check jar file
         run: ls ./build/libs
 
+      - name: Change jar file name
+        run: mv ./build/libs/FlashBox-0.0.1-SNAPSHOT.jar ./build/libs/app.jar
+
+      - name: Check changed name
+        run: ls ./build/libs
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: build/libs
+          path: build/libs/*.jar
 
 
   cd:
