@@ -1,12 +1,15 @@
 package com.drive.flashbox.security;
 
 import com.drive.flashbox.dto.TokenDto;
+import com.drive.flashbox.entity.User;
+import com.drive.flashbox.service.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import io.jsonwebtoken.security.SecurityException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,7 +39,11 @@ public class JwtTokenProvider {
 
     private final SecretKey key;
 
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+    private final UserService userService;
+
+
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, UserService userService) {
+        this.userService = userService;
         // application.properties 에서 secret 값 가져와서 key에 저장
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -100,8 +107,11 @@ public class JwtTokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
+        Long uid = ((Integer) claims.get(ID_KEY)).longValue();
+        User user = userService.getUser(uid);
+
         // UserDetails 객체를 만들어서 Authentication 리턴
-        UserDetails principal = new FBUserDetails(((Integer) claims.get(ID_KEY)).longValue(), "", "", claims.getSubject());
+        UserDetails principal = new FBUserDetails(uid, user.getName(), "", claims.getSubject());
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }

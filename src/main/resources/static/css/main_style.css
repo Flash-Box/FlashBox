@@ -7,7 +7,7 @@ body {
 }
 
 /* 컨테이너 스타일 */
-.container {
+.wrapper-container {
     max-width: 1920px; /* 컨테이너 너비 확장 */
     min-height: 1080px; /* 컨테이너 높이 확장 */
     background: white;

@@ -1,0 +1,36 @@
+.header {
+    width: 100%;
+    max-width: 1920px;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: lightslategray;
+    padding: 8px 0px 8px 0px;
+}
+
+.right-header {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* 요소 사이 간격 */  /* 별명과 로그아웃 버튼 사이 간격 */
+    font-family: "Gothic A1", sans-serif;
+    font-size: 16px;
+    color: white;
+}
+
+.logout-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 40px;
+    font-family: "Gothic A1", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+
+}

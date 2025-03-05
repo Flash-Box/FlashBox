@@ -80,7 +80,7 @@ public class BoxController {
 				"유저 박스 전체조회 성공",
 				boxes
 		);
-		System.out.println(boxes);
+//		System.out.println(boxes);
 		return ResponseEntity.ok(response);
 	}
     

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/navBar.css">
+    <script src="/js/auth.js"></script>
+</head>
+<body>
+
+<div class="header" th:fragment="headerLayout">
+    <!-- 왼쪽 로고 -->
+    <div class="left-header">
+        <a href="/boxes" class="logo">FlashBox</a>
+    </div>
+
+    <!-- 오른쪽 별명과 로그아웃 버튼 -->
+    <div class="right-header">
+        <div class="nickname">안녕하세요, oo 님!</div>
+        <button class="logout-button" onclick="FBlogout()">Logout</button>
+    </div>
+</div>
+
+</body>
+</html>

@@ -16,6 +16,7 @@
             font-family: Arial, sans-serif;
         }
 
+
         /* 큰 사각형 테두리 */
         .login-container {
             width: 500px;
@@ -24,6 +25,7 @@
             border-radius: 20px; /* 곡선 모서리 */
             text-align: center;
         }
+
 
         /* 제목 */
         h1 {
@@ -138,7 +140,8 @@
                     alert("✅로그인 성공!");
                     const accessToken = responseData.data.accessToken;
                     sessionStorage.setItem("accessToken", accessToken);
-                    console.log(accessToken);
+                    sessionStorage.setItem("nickname", responseData.data.name);
+                    
                     window.location.href = "/main";
                 } else {
                     alert("❌로그인 실패");
