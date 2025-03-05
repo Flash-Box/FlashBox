@@ -67,7 +67,10 @@ jobs:
           path: ./build/libs
           
       - name: Display structure of downloaded files
-        run: ls -R ./build/libs
+        run: |
+          pwd
+          ls -l
+          ls -R ./build/libs
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
