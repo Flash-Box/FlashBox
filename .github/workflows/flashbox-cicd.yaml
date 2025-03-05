@@ -12,10 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: Flash-Box/FlashBox
-          ref: develop
-          token: ${{ secrets.TOKEN }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
