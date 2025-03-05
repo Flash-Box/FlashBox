@@ -46,7 +46,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: build/libs/app.jar
+          path: |
+            ./Dockerfile
+            ./build/libs/app.jar
 
 
   cd:
@@ -60,7 +62,6 @@ jobs:
           ref: main
           token: ${{ secrets.TOKEN }}
           
-     
       - uses: actions/download-artifact@v4
         with:
           name: app
@@ -89,7 +90,7 @@ jobs:
           REPOSITORY: ${{ secrets.ECR_PRIVATE_REPOSITORY}}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./build/libs
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           
           sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" manifest/argocd-app.yaml
