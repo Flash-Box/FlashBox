@@ -10,6 +10,44 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/box_detail_style.css">
+    <script>
+		document.addEventListener("DOMContentLoaded", function () {
+            const delBtn = document.getElementById("delete-btn");
+            const bid = delBtn.getAttribute("data-bid");
+            const token = sessionStorage.getItem("accessToken");
+
+            // 🔹 삭제 요청 (DELETE)
+            document.getElementById("delete-btn").addEventListener("click", function () {
+                if (!confirm("정말 삭제하시겠습니까?")) {
+                    return;
+                }
+                
+                const bidList = [parseInt(bid)]; 
+
+                fetch(`/box`, {
+                    method: "DELETE",
+                    headers: {
+	                    "Authorization": `Bearer ${token}`,
+	                    "Content-Type": "application/json"
+                	},
+                	body: JSON.stringify(bidList)
+                })
+                .then(response => {
+                    if (response.ok) {
+				        return response.text().then(msg => {
+				            alert(msg);
+				            window.location.href = "/boxes";
+				        });
+				    } else {
+				        return response.text().then(errMsg => {
+				            alert("삭제 실패: " + errMsg);
+				        });
+				    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+	</script>
 </head>
 <body>
     <div class="container mt-4">
@@ -21,7 +59,8 @@
             <input type="checkbox" id="select-all"> 전체 선택
             <button id="upload-btn" class="btn btn-secondary ms-2">업로드</button>
             <button id="download-btn" class="btn btn-primary ms-2" disabled>다운로드</button>
-            <button id="delete-btn" class="btn btn-danger ms-2" disabled>삭제</button>
+            <button id="edit-btn" class="btn btn-info ms-2" th:onclick="|window.location.href='/box/' + ${box.bid} + '/edit'|">수정</button>
+            <button id="delete-btn" class="btn btn-danger ms-2" th:data-bid="${box.bid}">삭제</button>
         </div>
 
         <!-- 이미지 리스트 -->
