@@ -2,13 +2,10 @@ package com.drive.flashbox.dto.request;
 
 import com.drive.flashbox.entity.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @ToString
+@Setter
 @Getter
 @Builder
 @NoArgsConstructor // JSON을 객체로 변환할 때 기본 생성자를 찾지 못하는 문제 해결 위해 추가 ------ SCRUM-30-view-members
@@ -28,7 +25,7 @@ public class SignupRequestDTO {
 
 
     public User toEntity(String encodedPassword){
-        System.out.println(encodedPassword);
+        System.out.println("encoded: "+encodedPassword);
 
         return User.builder()
                 .name(name)
