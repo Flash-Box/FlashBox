@@ -32,8 +32,6 @@ jobs:
           chmod +x gradlew
           ./gradlew build --no-daemon -x test
         
-      - name: Naming jar file
-        run: mv ./build/libs/*.jar ./build/libs/app.jar
 
       - name: Check jar file
         run: ls ./build/libs
@@ -43,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: ./build/libs/*.jar
+          path: build/libs
 
 
   cd:
@@ -60,7 +58,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: app
-          path: ./target/
+          path: ./build/libs
           
       - name: Display structure of downloaded files
         run: ls -R path/to/artifacts
