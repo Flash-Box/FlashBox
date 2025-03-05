@@ -1,0 +1,100 @@
+name: App With Github Actions with ArgoCD
+
+on:
+  workflow_dispatch
+#  push:
+#    branches:
+#      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Flash-Box/FlashBox
+          ref: main
+          token: ${{ secrets.TOKEN }}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Make application.properties
+        run: |
+          cd ./src/main/resources
+          touch ./application.properties
+          echo "${{ secrets.PROPERTIES }}" > ./application.properties
+        shell: bash
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+
+      - name: Naming jar file
+        run: mv ./target/*.jar ./target/app.jar
+
+      - name: Check jar file
+        run: ls ./target
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: ./target/*.jar
+
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Flash-Box/FlashBox-manifest
+          ref: main
+          token: ${{ secrets.TOKEN }}
+     
+      - uses: actions/download-artifact@v4
+        with:
+          name: app
+          path: ./target/
+          
+      - name: Display structure of downloaded files
+        run: ls -R path/to/artifacts
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push docker image to Amazon ECR + update argocd-app.yaml file
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ secrets.ECR_PRIVATE_REPOSITORY}}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          
+          sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" manifest/argocd-app.yaml
+
+      - name: Set timestamp
+        id: timestamp
+        run: echo "date=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "sky3nlq@gmail.com"
+          git config --local user.name "leGit-y"
+          git add .
+          git commit -m "Update image version to ${{ env.date }}"
+          git push
