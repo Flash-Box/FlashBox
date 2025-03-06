@@ -13,7 +13,6 @@ import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.security.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -59,8 +58,7 @@ public class AuthService {
 
 
         // redis에 refreshToken 객체 저장
-        tokenRepository.save(new Token(fbUserDetails.getUid(), jwtToken.getRefreshToken()));
-
+        saveRefreshToken(fbUserDetails.getUid(), jwtToken.getRefreshToken());
 
 
         LoginResponse loginResponse = LoginResponse.builder()
@@ -112,6 +110,14 @@ public class AuthService {
     public void deleteRefreshToken(Long uid) {
         // redis에서 해당 uid 유저의 refreshToken 삭제
         tokenRepository.deleteById(uid);
+
+    }
+
+
+    @Transactional
+    public void saveRefreshToken(Long id, String token) {
+
+        tokenRepository.save(new Token(id,token));
 
     }
 
