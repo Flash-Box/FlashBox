@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Box 생성</title>
+    <title>새 Box 생성</title>
     <style>
         * {
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
         }
 
+		/* 전체 화면 스타일 */
         body {
             display: flex;
             justify-content: center;
@@ -17,70 +18,75 @@
             height: 100vh;
             margin: 0;
             background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            font-family: Arial, sans-serif;
         }
 
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		/* 큰 사각형 테두리 */
+        .newBox-container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 7px; /* 곡선 모서리 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             width: 400px;
             text-align: center;
         }
 
-        h2 {
+		/* 제목 */
+        h1 {
+            margin-top: 0px;
+            margin-bottom: 30px;
+            font-size: 26px;
+            color: black;
+        }
+
+		/* 입력창 레이블과 입력 필드 */
+        .input-group {
             margin-bottom: 20px;
-            font-size: 24px;
-            color: #333;
+            text-align: left;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .input-group label {
+            color: black;
+            font-size: 16px;
+            display: block;
+            margin-bottom: 5px;
         }
 
-        label {
-            align-self: flex-start;
-            font-weight: bold;
-            margin: 10px 0 5px;
-        }
-
-        input {
+        .input-group input {
+			height: 39px;
             width: 100%;
             padding: 10px;
-            margin-bottom: 15px;
+            background-color: #f0f0f0; /* 회색 바탕 */
             border: 1px solid #ccc;
-            border-radius: 6px;
+            border-radius: 10px; /* 곡선 모서리 */
             font-size: 14px;
+            box-sizing: border-box;
         }
 
-        .date-group {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .date-group input {
-            flex: 1;
-        }
-
-        button {
+		/* 생성 버튼 */
+        .create-button {
             width: 100%;
             padding: 12px;
-            background: #007bff;
+            background-color: #808080; /* 회색 바탕 */
             border: none;
             color: white;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 10px; /* 곡선 모서리 */
             cursor: pointer;
             transition: 0.3s;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
 
-        button:hover {
-            background: #0056b3;
+        .create-button:hover {
+            background-color: #666666; /* 호버 시 조금 어두운 회색 */
+        }
+        
+        /* 에러 메시지 */
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
         }
     </style>
     <script src="/js/auth.js"></script>
@@ -164,22 +170,42 @@
             }
 
         }
+        
+        // 입력칸 클릭 시 달력 열기 기능 추가
+    	document.addEventListener("DOMContentLoaded", function () {
+        	const startDateInput = document.getElementById("eventStartDate");
+        	const endDateInput = document.getElementById("eventEndDate");
+
+        	startDateInput.addEventListener("click", function () {
+            	this.showPicker();
+        	});
+
+        	endDateInput.addEventListener("click", function () {
+            	this.showPicker();
+        	});
+    	});
+    	
     </script>
 </head>
 <body>
-    <div class="container">
-        <h2>Box 생성</h2>
+    <div class="newBox-container">
+        <h1>Box 생성</h1>
         <form onsubmit="createBox(event)">
-            <label for="name">이름</label>
-            <input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
-
-            <label>모임 날짜</label>
-            <div class="date-group">
+            <div class="input-group">
+            	<label for="name">Box 이름</label>
+            	<input type="text" id="name" name="name" placeholder="Box 이름을 입력해주세요." required>
+			</div>
+            <div class="input-group">
+                <label for="eventStartDate">모임 개시 날짜</label>
                 <input type="date" id="eventStartDate" name="eventStartDate" required onchange="validateDates()">
+            </div>
+            <div class="input-group">
+                <label for="eventEndDate">모임 종료 날짜</label>
                 <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
             </div>
-
-            <button type="submit">생성</button>
+			
+            <button type="submit" class="create-button">생성</button>
+            
         </form>
     </div>
 </body>
