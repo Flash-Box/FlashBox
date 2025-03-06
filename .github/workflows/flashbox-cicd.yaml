@@ -46,7 +46,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: build/libs/app.jar
+          path: |
+            ./Dockerfile
+            ./build/libs/app.jar
 
 
   cd:
@@ -60,14 +62,16 @@ jobs:
           ref: main
           token: ${{ secrets.TOKEN }}
           
-     
       - uses: actions/download-artifact@v4
         with:
           name: app
           path: ./build/libs
           
       - name: Display structure of downloaded files
-        run: ls -R ./build/libs
+        run: |
+          pwd
+          ls -l
+          ls -R ./build/libs
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -86,7 +90,7 @@ jobs:
           REPOSITORY: ${{ secrets.ECR_PRIVATE_REPOSITORY}}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./build/libs
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           
           sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" manifest/argocd-app.yaml
@@ -99,6 +103,6 @@ jobs:
         run: |
           git config --local user.email "${{ secrets.EMAIL }}"
           git config --local user.name "leGit-y"
-          git add .
+          git add manifest/argocd-app.yaml
           git commit -m "Update image version to ${{ env.date }}"
           git push

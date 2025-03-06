@@ -4,191 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>새 Box 생성</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
 
-		/* 전체 화면 스타일 */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: Arial, sans-serif;
-        }
-
-		/* 큰 사각형 테두리 */
-        .newBox-container {
-            background-color: white;
-            padding: 30px 40px;
-            border-radius: 7px; /* 곡선 모서리 */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 400px;
-            text-align: center;
-        }
-
-		/* 제목 */
-        h1 {
-            margin-top: 0px;
-            margin-bottom: 30px;
-            font-size: 26px;
-            color: black;
-        }
-
-		/* 입력창 레이블과 입력 필드 */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            color: black;
-            font-size: 16px;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .input-group input {
-			height: 39px;
-            width: 100%;
-            padding: 10px;
-            background-color: #f0f0f0; /* 회색 바탕 */
-            border: 1px solid #ccc;
-            border-radius: 10px; /* 곡선 모서리 */
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-		/* 생성 버튼 */
-        .create-button {
-            width: 100%;
-            padding: 12px;
-            background-color: #808080; /* 회색 바탕 */
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px; /* 곡선 모서리 */
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-
-        .create-button:hover {
-            background-color: #666666; /* 호버 시 조금 어두운 회색 */
-        }
-        
-        /* 에러 메시지 */
-        .error-message {
-            color: red;
-            margin-bottom: 20px;
-        }
-    </style>
+	<link rel="stylesheet" href="/css/box_form.css">
     <script src="/js/auth.js"></script>
-    <script>
-        const JWT_ERROR_MSG = "jwt 토큰 인증 실패"
-
-        function validateDates() {
-            var startDate = document.getElementById("eventStartDate");
-            var endDate = document.getElementById("eventEndDate");
-
-            if (startDate.value) {
-                endDate.min = startDate.value;
-            }
-            if (endDate.value) {
-                startDate.max = endDate.value;
-            }
-            
-            if (startDate.value && endDate.value) {
-                var start = new Date(startDate.value);
-                var end = new Date(endDate.value);
-
-                if (start > end) {
-                    alert("시작 날짜가 종료 날짜보다 클 수 없습니다.");
-                    endDate.value = "";
-                }
-            }
-        }
-
-        async function createBox(event) {
-            try {
-                event.preventDefault();  // 폼이 제출되지 않도록 막음
-
-                const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
-
-                const name = document.getElementById("name").value;
-                const startDate = document.getElementById("eventStartDate").value;
-                const endDate = document.getElementById("eventEndDate").value;
-
-                const data = {
-                    name: name,
-                    eventStartDate: startDate,
-                    eventEndDate: endDate
-                };
-
-                const response = await fetch("/box", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)  // 데이터 전송
-                })
-
-                const responseData = await response.json();
-                console.log("서버 응답 데이터:", responseData);
-
-                if (responseData.success) {
-                    alert("✅박스 생성 성공!");
-                    window.location.href = '/boxes';
-                  
-                } else {
-                    alert("❌박스 생성 실패");
-                    if (responseData.message === JWT_ERROR_MSG) {
-                        alert("😭JWT 토큰 만료");
-                        try {
-                            const newToken = await refreshToken();
-                            if (newToken) {
-                                await createBox(event); // 새로운 토큰으로 재시도
-                            }
-                        } catch (error) {
-                            console.error("토큰 갱신 실패:", error);
-                            alert("🔒재로그인이 필요합니다.");
-                            window.location.href="/login"
-                        }
-                    }
-
-                }
-
-            }catch (error) {
-                console.error("Error:", error);
-            }
-
-        }
-        
-        // 입력칸 클릭 시 달력 열기 기능 추가
-    	document.addEventListener("DOMContentLoaded", function () {
-        	const startDateInput = document.getElementById("eventStartDate");
-        	const endDateInput = document.getElementById("eventEndDate");
-
-        	startDateInput.addEventListener("click", function () {
-            	this.showPicker();
-        	});
-
-        	endDateInput.addEventListener("click", function () {
-            	this.showPicker();
-        	});
-    	});
-    	
-    </script>
+    <script src="/js/new_box.js"></script>
 </head>
+
 <body>
-    <div class="newBox-container">
+    <div class="container">
         <h1>Box 생성</h1>
         <form onsubmit="createBox(event)">
             <div class="input-group">
@@ -204,7 +27,7 @@
                 <input type="date" id="eventEndDate" name="eventEndDate" required onchange="validateDates()">
             </div>
 			
-            <button type="submit" class="create-button">생성</button>
+            <button type="submit" class="button">생성</button>
             
         </form>
     </div>

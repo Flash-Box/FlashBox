@@ -1,99 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
+
     <style>
-		* {
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        
-        /* 전체 화면 스타일 */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: Arial, sans-serif;
-        }
-
-
-        /* 큰 사각형 테두리 */
-        .login-container {
-            background-color: white;
-            padding: 30px 40px;
-            border-radius: 7px; /* 곡선 모서리 */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 400px;
-            text-align: center;
-        }
-
-        /* 제목 */
-        h1 {
-            margin-top: 0px;
-            margin-bottom: 30px;
-            font-size: 26px;
-            color: black;
-        }
-
-        /* 입력창 레이블과 입력 필드 */
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            color: black;
-            font-size: 16px;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .input-group input {
-            height: 39px;
-            width: 100%;
-            padding: 10px;
-            background-color: #f0f0f0; /* 회색 바탕 */
-            border: 1px solid #ccc;
-            border-radius: 10px; /* 곡선 모서리 */
-            font-size: 14px;
-            box-sizing: border-box;
-            margin-bottom: 5px;
-        }
-
-        /* 로그인 버튼 */
-        .login-button, .signup-button {
-           width: 100%;
-            padding: 12px;
-            background-color: #808080; /* 회색 바탕 */
-            border: none;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px; /* 곡선 모서리 */
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 20px;
-            margin-bottom: 10px; /* 버튼 간 간격 */
-        }
-
-        .login-button:hover, .signup-button:hover {
-            background-color: #666666;
-        }
-
-        /* 에러 메시지 */
-        .error-message {
-            color: red;
-            margin-bottom: 20px;
-        }
-    </style>
+		.input-group input {
+			margin-bottom: 5px;
+        }	
+	</style>
+	
+    <link rel="stylesheet" href="/css/box_form.css">
+    <script src="/js/auth.js"></script>
 </head>
+
 <body>
-    <div class="login-container">
+    <div class="container">
         <h1>로그인</h1>
         <form th:action="@{/login}" method="post">
             <div class="input-group">
@@ -106,14 +29,12 @@
             </div>
             <div th:if="${param.error}" class="error-message">
                 <p th:text="${param.error}">Invalid username or password.</p>
-            </div>
-            
-            <button type="submit" class="login-button">로그인</button>
-            
-            <a href="/signup"><button type="button" class="signup-button">회원 가입</button></a>
-            
+            </div>            
+            <button type="submit" class="button">로그인</button>            
+            <a href="/signup"><button type="button" class="button">회원 가입</button></a>            
         </form>
     </div>
+
 
     <script>
         document.querySelector("form").addEventListener("submit", async function (event) {
@@ -167,5 +88,6 @@
             }
         }
     </script>
+
 </body>
 </html>
