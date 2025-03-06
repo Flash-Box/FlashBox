@@ -22,6 +22,7 @@
     flex: 6;
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
 /* 정렬 버튼 */
@@ -125,6 +126,7 @@
     display: none; /* 기본적으로 숨김 */
 }
 
+
 /* 📌 다운로드 / 삭제 버튼 위치 조정 */
 #action-buttons-container {
     position: fixed;
@@ -166,6 +168,26 @@
 .new-box-btn:hover {
     background-color: #0056b3;  /* 더 어두운 파란색 */
     transform: scale(1.1);  /* 약간 확대 */
+}
+
+/* 썸네일 이미지 스타일 */
+.thumbnail-container {
+    width: 100%;
+    height: 120px; /* 원하는 크기로 조정 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.thumbnail-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
 }
 
 
