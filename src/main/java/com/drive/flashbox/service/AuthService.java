@@ -16,11 +16,13 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -29,6 +31,8 @@ import java.util.Optional;
 public class AuthService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+    
     @Lazy
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -52,60 +56,43 @@ public class AuthService {
 
     @Transactional
     public LoginResponse login(Authentication authentication) {
-
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
         TokenDto jwtToken = jwtTokenProvider.generateToken(authentication);
         FBUserDetails fbUserDetails = (FBUserDetails) authentication.getPrincipal();
 
+        // ✅ Redis에 refreshToken을 단순한 String 값으로 저장
+        redisTemplate.opsForValue().set("token:" + fbUserDetails.getUid(), jwtToken.getRefreshToken(), Duration.ofDays(7));
 
-        // redis에 refreshToken 객체 저장
-        tokenRepository.save(new Token(fbUserDetails.getUid(), jwtToken.getRefreshToken()));
-
-
-
-        LoginResponse loginResponse = LoginResponse.builder()
+        return LoginResponse.builder()
                 .uid(fbUserDetails.getUid())
                 .name(fbUserDetails.getName())
                 .accessToken(jwtToken.getAccessToken())
                 .refreshToken(jwtToken.getRefreshToken())
                 .build();
-
-        return loginResponse;
     }
 
     @Transactional
-    public RefreshTokenResponse refreshToken(String token){
+    public RefreshTokenResponse refreshToken(String token) {
         Long id = jwtTokenProvider.validateAndParseIdFromToken(token);
 
-        // redis에 저장된 refresh token 값과 일치하는지 확인
-        Token redisToken = tokenRepository.findById(id).orElseThrow(() -> new NoSuchElementException("refresh token값을 찾을 수 없습니다"));
+        // ✅ Redis에서 refreshToken을 String 값으로 가져오기
+        String storedRefreshToken = (String) redisTemplate.opsForValue().get("token:" + id);
 
-        System.out.println("redis 에 저장된 : "+redisToken.getRefreshToken());
-        if(!redisToken.getRefreshToken().equals(token)){
+        if (storedRefreshToken == null || !storedRefreshToken.equals(token)) {
             throw new IllegalStateException("유효하지 않은 refresh token 값 입니다.");
         }
 
-        if(id == null){
-            throw new JwtException("jwt 토큰 예외");
-        }
-
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 id의 유저를 찾을 수 없습니다."));
-
         TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
 
-        // redis에 새로운 refreshToken 객체 저장
-        tokenRepository.save(new Token(id, tokenDto.getRefreshToken()));
+        // ✅ 새로운 refreshToken 저장
+        redisTemplate.opsForValue().set("token:" + id, tokenDto.getRefreshToken(), Duration.ofDays(7));
 
-
-        RefreshTokenResponse tokenResponse = RefreshTokenResponse.builder()
-                        .uid(id)
-                        .name(user.getName())
-                        .accessToken(tokenDto.getAccessToken())
-                        .refreshToken(tokenDto.getRefreshToken())
-                        .build();
-
-        return tokenResponse;
-
+        return RefreshTokenResponse.builder()
+                .uid(id)
+                .name(user.getName())
+                .accessToken(tokenDto.getAccessToken())
+                .refreshToken(tokenDto.getRefreshToken())
+                .build();
     }
 
     @Transactional

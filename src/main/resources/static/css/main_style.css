@@ -1,103 +1,147 @@
-/* 기본 설정 */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-}
-
-/* 컨테이너 스타일 */
-.wrapper-container {
-    max-width: 1920px; /* 컨테이너 너비 확장 */
-    min-height: 1080px; /* 컨테이너 높이 확장 */
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
-}
-
-/* 카드 스타일 */
-.card {
+/* 상단 바 레이아웃 */
+.header-container {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: space-between;
-    border: 1px solid #007bff;
-    padding: 10px;
-    text-align: center;
-    background-color: #fff;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    min-height: 250px; /* 🔹 최소 높이 조정 */
-    max-width: 300px; /* 🔹 최대 너비 설정 */
-    margin: 10px; /* 🔹 간격 추가 */
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #f8f9fa;
 }
 
-.card h3, 
-.card p {
-    white-space: nowrap; /* 줄바꿈 방지 */
-    overflow: hidden; /* 넘치는 부분 숨기기 */
-    text-overflow: ellipsis; /* 넘치면 '...' 표시 */
+/* 검색창과 유저 정보 컨테이너 (6:4 비율 적용) */
+.search-user-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-/* 카드 내부 */
-.card-body {
-    padding: 15px;
-    background: #f9f9f9;
+/* 검색창 (6 비율) */
+.search-container {
+    flex: 6;
+    display: flex;
+    align-items: center;
 }
 
-/* 카드 hover 효과 */
-.card:hover {
-    transform: scale(1.02);
-}
-
-/* 선택된 카드 스타일 */
-.selected-box {
-    border: 3px solid #28a745 !important; /* 선택된 경우 초록색 테두리 */
+/* 정렬 버튼 */
+.sort-btn {
+    background-color: #ddd;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    margin-right: 10px;
     cursor: pointer;
 }
 
-/* 선택 가능 카드 */
-.selectable-box {
-    transition: transform 0.2s ease-in-out;
+/* 유저 정보 (4 비율) */
+.user-container {
+    flex: 4;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* 검색창 스타일 */
+.search-container input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 유저 정보 버튼 스타일 */
+.user-container .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #e5e5e5;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+/* 다운로드 / 삭제 버튼 (우측 상단 고정) */
+.action-buttons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: none;
+    gap: 10px;
+}
+
+/* 동그란 버튼 스타일 */
+.round-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
     cursor: pointer;
 }
 
-.selectable-box:hover {
-    transform: scale(1.02);
+.download-btn {
+    background-color: #90caf9;
+    color: white;
 }
 
-/* 버튼 스타일 */
-.btn-select {
-    font-weight: bold;
-    font-size: 14px;
-    width: 100%; /* 버튼 가득 차게 */
-    margin-top: 10px;
+.delete-btn {
+    background-color: #ef5350;
+    color: white;
 }
 
-/* 박스 정렬 (5개씩) */
-.row {
+/* 박스 정렬 개선 */
+#box-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px; /* 박스 간 간격 */
+    gap: 20px;
+    padding: 20px;
+}
+
+/* 개별 박스 스타일 */
+.selectable-box {
+    width: 200px;
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+    padding: 10px;
+    border: 2px solid transparent;
+}
+
+/* 선택된 박스 스타일 */
+.selected-box {
+    border: 3px solid #007bff;
+    transform: scale(1.05);
+}
+
+/* 선택 해제 버튼 스타일 */
+.deselect-btn {
+    width: 100%;
+    margin-top: 5px;
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* 📌 다운로드 / 삭제 버튼 위치 조정 */
+#action-buttons-container {
+    position: fixed;
+    top: 100px;  /* 기존보다 조금 아래로 조정 */
+    right: 30px;
+    display: none;
+    gap: 20px;
+}
+
+/* 카드 내부 스타일 */
+.card {
+    border: none;
+    padding: 10px;
 }
 
 
-/* 반응형: 화면 크기에 따라 조정 */
-@media (max-width: 992px) {
-    .card {
-        max-width: 160px;
-    }
-}
-
-@media (max-width: 768px) {
-    .row {
-        justify-content: space-between;
-    }
-    .card {
-        max-width: 100%;
-    }
-}
+/* 추가(+) 버튼 스타일 개선 */
 .new-box-btn {
 	position: fixed;
   	bottom: 40px; 
@@ -118,7 +162,29 @@ body {
   	z-index: 1050;
 }
 
+/* 버튼 호버(마우스 올릴 때) 효과 */
 .new-box-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background-color: #0056b3;  /* 더 어두운 파란색 */
+    transform: scale(1.1);  /* 약간 확대 */
+}
+
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .selectable-box {
+        width: 150px;
+    }
+    #box-container {
+        gap: 10px;
+    }
+    #action-buttons-container {
+    	top: 50px; /* 모바일에서는 조금 더 위로 조정 */
+    }
+    .new-box-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        bottom: 15px;
+        right: 15px;
+    }
 }

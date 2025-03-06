@@ -14,120 +14,43 @@
     <link rel="stylesheet" type="text/css" href="/css/navBar.css">
 </head>
 <body>
-    <div class="wrapper-container mt-4">
-        <header class="d-flex justify-content-between align-items-center mb-3" th:replace="~{layout/navBar :: headerLayout}">
-<!--            <div ></div>-->
-<!--            <h1>메인 페이지</h1>-->
-
-<!--            <span>안녕하세요, <span  >OOO</span>님</span>-->
-
-        </header>
-
-        <!-- 검색창 -->
-        <div class="input-group mb-3 mt-3">
-            <input type="text" class="form-control" placeholder="검색어를 입력하세요">
-            <button class="btn btn-primary">🔍 검색</button>
-        </div>
-
-        <!-- 박스 리스트 -->
-		<div class="container position-relative">
-		    <div class="row">
-<!--				<div class="selectable-box col-12 col-sm-6 col-md-4 col-lg-2" th:each="box : ${boxes}" th:data-bid="${box.bid}">-->
-<!--				    <div class="card">-->
-<!--				        <div class="card-body">-->
-<!--				            <h5 class="card-title text-primary" th:text="${box.name}">메뉴 제목</h5>-->
-<!--				            <p>📅모임 날짜: <span th:text="${#temporals.format(box.eventStartDate, 'yyyy-MM-dd')}"></span></p>-->
-<!--				            <p>⏳최종 업로드: <span th:text="${#temporals.format(box.modifiedDate, 'yyyy-MM-dd')}"></span></p>-->
-<!--				            <p>🔥폭파 날짜: <span th:text="${#temporals.format(box.boomDate, 'yyyy-MM-dd')}"></span></p>-->
-<!--				        </div>-->
-<!--				    </div>-->
-<!--				    <button class="btn btn-danger deselect-btn" style="display: none;">선택 해제</button>-->
-<!--				</div>-->
-		    </div>
-		</div>
-
-		<!-- 다운로드 / 삭제 버튼 (처음에는 숨김) -->
-		<div id="action-buttons-container" style="display: none;">
-		    <div class="d-flex justify-content-between mt-4">
-		        <button id="download-btn" class="btn btn-primary">⬇</button>
-		        <button id="delete-btn" class="btn btn-danger">🗑</button>
-		    </div>
-		</div>
-    </div>
-
-	<button class="new-box-btn" onclick="window.location.href='/box'">+</button>
+	<header class="header-container">
+	    <div class="search-user-container">
+	        <!-- 검색창과 정렬 버튼 -->
+	        <div class="search-container">
+	            <button class="sort-btn">Sort ▼</button>
+	            <input type="text" class="form-control" placeholder="검색어를 입력하세요">
+	            <button class="btn btn-primary"> 🔍 검색</button>
+	        </div>
 	
+	        <!-- 유저 정보 -->
+	        <div class="user-container">
+	            <div class="user-info">
+	                <span>안녕하세요, <span class="nickname">OOO</span>님</span>
+	            </div>
+	        </div>
+	    </div>
+	</header>
+	
+	<!-- 박스 리스트 -->
+	<div class="container position-relative">
+	    <div id="box-container"></div>
+	</div>
+	
+	<!-- 다운로드 / 삭제 버튼 -->
+	<div id="action-buttons-container" class="action-buttons">
+	    <button id="download-btn" class="round-btn download-btn">⬇</button>
+	    <button id="delete-btn" class="round-btn delete-btn">🗑</button>
+	</div>
+	
+	<!-- 추가 버튼 -->
+	<button class="new-box-btn" onclick="window.location.href='/box'">+</button>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JS -->
     <script src="/js/main_script.js"></script>
     <script src="/js/auth.js"></script>
-
-	<script>
-		document.addEventListener("DOMContentLoaded", async function () {
-
-            const token = sessionStorage.getItem("accessToken");
-            if (!token) {
-                alert("로그인이 필요합니다.");
-                window.location.href="/login"
-                return;
-            }
-
-            //
-            try {
-            // // 사용자 정보 가져오기
-            const nickname = sessionStorage.getItem("nickname")
-            document.querySelector(".nickname").innerHTML = `안녕하세요, <span style="color: black;">${nickname}</span>님`;
-
-
-                // 박스 데이터 가져오기
-            const boxResponse = await fetch("/api/boxes", {
-                method: "GET",
-                headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/json"
-                }
-            });
-
-            console.log("boxResponse: ",boxResponse)
-
-            if (!boxResponse.ok) {
-                throw new Error("Failed to fetch boxes");
-            }
-
-            const boxes = await boxResponse.json();
-            console.log("boxes: ",boxes)
-            await renderBoxes(boxes);
-
-            } catch (error) {
-            console.error("Error:", error);
-
-            }
-		});
-
-		async function renderBoxes(boxes) {
-            const container = document.querySelector(".row");
-            container.innerHTML = ""; // 기존 내용 삭제
-
-            boxes.data.forEach(box => {
-            const boxHTML = `
-                <div class="selectable-box col-12 col-sm-6 col-md-4 col-lg-2" data-bid="${box.bid}">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary">${box.name}</h5>
-                            <p>📅모임 날짜: ${box.eventStartDate}</p>
-                            <p>⏳최종 업로드: ${box.modifiedDate}</p>
-                            <p>🔥폭파 날짜: ${box.boomDate}</p>
-                        </div>
-                    </div>
-                    <button class="btn btn-danger deselect-btn" style="display: none;">선택 해제</button>
-                </div>
-                `;
-            container.innerHTML += boxHTML;
-            });
-		}
-	</script>
-
 </body>
 </html>

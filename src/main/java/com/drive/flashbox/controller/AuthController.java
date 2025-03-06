@@ -142,8 +142,8 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
                 .httpOnly(true) // JavaScript에서 접근 불가능
-                .secure(true) // HTTPS에서만 전송
-                .sameSite("Strict") // CSRF 방어
+                .secure(false) // HTTPS에서만 전송
+                .sameSite("Lax") // CSRF 방어
                 .path("/") // 모든 경로에서 사용 가능
                 .maxAge(1000 * 7 * 24 * 60 * 60) // 7일 동안 유효
                 .build();
