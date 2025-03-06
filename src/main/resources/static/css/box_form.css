@@ -1,0 +1,107 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+}
+
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    align-self: flex-start;
+    font-weight: bold;
+    margin: 10px 0 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.date-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+}
+
+.date-group input {
+    flex: 1;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    width: 100%; /* 버튼들이 form의 너비를 꽉 채우게 설정 */
+}
+
+button {
+    padding: 12px;
+    background: #007bff;
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%; /* 생성 버튼을 form의 크기에 맞게 꽉 차게 설정 */
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* 수정, 삭제 버튼만 width를 48%로 설정하여 두 버튼을 나란히 배치 */
+.update-btn, .delete-btn {
+    width: 48%; /* 각 버튼을 50%로 설정하고, 여백을 두기 위해 48%로 설정 */
+}
+
+.update-btn {
+    background: #007bff;
+    color: white;
+}
+
+.update-btn:hover {
+    background: #0056b3;
+}
+
+.delete-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #5a6268;
+}
