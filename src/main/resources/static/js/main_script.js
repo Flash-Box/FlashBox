@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const boxes = await boxResponse.json();
         console.log("📦 박스 리스트:", boxes);
 
-        renderBoxes(boxes); // 박스 렌더링 실행
+        await renderBoxes(boxes); // 박스 렌더링 실행
     } catch (error) {
         console.error("🚨 오류 발생:", error);
         alert("데이터를 불러오는 중 문제가 발생했습니다.");
