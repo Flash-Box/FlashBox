@@ -1,23 +1,160 @@
-.gallery-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
-}
-.image-box {
-    width: 100px;
-    height: 100px;
-    background-color: #ddd;
+/* ✅ 전체 레이아웃 */
+.container {
     display: flex;
-    align-items: center;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 20px;
+}
+
+/* ✅ 갤러리 컨텐츠 */
+.gallery-content {
+    flex: 1;
+}
+
+/* ✅ 제목 스타일 */
+h1 {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* ✅ 버튼 영역 스타일 */
+.button-group {
+    display: flex;
     justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* ✅ 버튼 기본 스타일 */
+button {
+    padding: 12px 18px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: none;
     cursor: pointer;
-    border: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
 }
-.selected {
-    border: 2px solid blue;
+
+/* ✅ 버튼 색상 구분 */
+#upload-btn {
+    background-color: #28a745; /* 녹색 */
+    color: white;
 }
-.member-list {
-    background-color: #f0f0f0;
+
+#download-btn {
+    background-color: #007bff; /* 파란색 */
+    color: white;
+}
+
+#delete-btn {
+    background-color: #dc3545; /* 빨간색 */
+    color: white;
+}
+
+#edit-btn {
+    background-color: #17a2b8; /* 청록색 */
+    color: white;
+}
+
+/* ✅ 버튼 호버 효과 */
+button:hover {
+    filter: brightness(90%);
+}
+
+/* ✅ 이미지 갤러리 */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 반응형 */
+    gap: 12px;
     padding: 10px;
-    min-height: 200px;
+}
+
+/* ✅ 이미지 스타일 */
+.gallery-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.gallery-item img:hover {
+    transform: scale(1.05);
+}
+
+/* ✅ 선택된 이미지 강조 */
+.gallery-item.selected {
+    border: 3px solid #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+/* ✅ 회원 초대 섹션 */
+.member-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    width: 260px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    
+    margin-top: 50px;
+}
+
+/* ✅ 회원 목록 스타일 */
+.member-list {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.member-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.member-list li {
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ✅ 회원 초대 버튼 스타일 */
+#invite-btn {
+    background-color: #6c757d; /* 회색 */
+    color: white;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+/* ✅ 반응형 (태블릿 & 모바일 대응) */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button-group {
+        flex-wrap: wrap;
+    }
+
+    .member-section {
+        align-items: center;
+        width: 100%;
+    }
+
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
 }
