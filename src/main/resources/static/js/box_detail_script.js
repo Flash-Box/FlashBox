@@ -8,33 +8,39 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedImages = new Set();
 
     // ✅ Access Token 갱신 함수 (리프레시 토큰 사용)
-    async function refreshToken() {
-        try {
-            const response = await fetch("/token/refresh", {
-                method: "POST",
-                credentials: "include", // 쿠키 포함
-            });
+	async function refreshToken() {
+	    try {
+	        const response = await fetch("/token/refresh", {
+	            method: "POST",
+	            credentials: "include", // 리프레시 토큰을 쿠키에서 가져옴
+	        });
+	
+	        if (!response.ok) {
+	            console.error("리프레시 토큰이 만료됨");
+	            alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+	            window.location.href = "/login";
+	            return null;
+	        }
+	
+	        const data = await response.json();
+	        if (data.success) {
+	            console.log("✅ 새 액세스 토큰 발급:", data.data.accessToken);
+	            localStorage.setItem("token", data.data.accessToken);
+	            return data.data.accessToken;
+	        } else {
+	            console.error("🚨 리프레시 토큰 만료됨, 다시 로그인 필요");
+	            alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+	            window.location.href = "/login";
+	            return null;
+	        }
+	    } catch (error) {
+	        console.error("🚨 토큰 갱신 오류:", error);
+	        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+	        window.location.href = "/login";
+	        return null;
+	    }
+	}
 
-            if (!response.ok) {
-                throw new Error("토큰 갱신 실패");
-            }
-
-            const data = await response.json();
-            if (data.success) {
-                localStorage.setItem("token", data.data.accessToken);
-                return data.data.accessToken;
-            } else {
-                alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-                window.location.href = "/login";
-                return null;
-            }
-        } catch (error) {
-            console.error("토큰 갱신 오류:", error);
-            alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-            window.location.href = "/login";
-            return null;
-        }
-    }
 
     // ✅ 인증된 fetch 요청 (401 처리)
     async function authenticatedFetch(url, options = {}) {
