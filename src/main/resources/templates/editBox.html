@@ -4,33 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Box 수정</title>
+    
     <link rel="stylesheet" href="/css/box_form.css">
     <script src="/js/edit_box.js"></script>
+    
 </head>
 <body>
     <div class="container">
         <h2>Box 수정</h2>
         <form id="updateForm" th:data-bid="${box.bid}">
-            <label for="name">이름</label>
+            <label for="name">Box 이름</label>
             <input type="text" id="name" name="name" 
                    th:value="${box?.name != null ? box.name : ''}" 
                    placeholder="Box 이름을 입력해주세요." required>
 
-            <label>모임 날짜</label>
-            <div class="date-group">
+			<div class="input-group">
+            	<label>모임 개시 날짜</label>
                 <input type="date" id="eventStartDate" name="eventStartDate"
                        th:value="${box?.eventStartDate != null ? box.eventStartDate : ''}" 
                        required onchange="validateDates()">
-
+            </div> 
+            <div class="input-group">         
+				<label>모임 종료 날짜</label>
                 <input type="date" id="eventEndDate" name="eventEndDate"
                        th:value="${box?.eventEndDate != null ? box.eventEndDate : ''}" 
                        required onchange="validateDates()">
             </div>
 
-            <div class="btn-group">
-                <button type="submit" class="update-btn">수정</button>
-                <button type="button" id="deleteButton" class="delete-btn">삭제</button>
-            </div>
+            <button type="submit" class="update-btn">수정</button>
+            <button type="button" id="deleteButton" class="delete-btn">삭제</button>
+            
         </form>
     </div>
 </body>

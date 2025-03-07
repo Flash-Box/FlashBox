@@ -75,3 +75,17 @@ async function createBox(event) {
         console.error("Error:", error);
     }
 }
+
+// 입력칸 클릭 시 달력 열기 기능 추가
+    	document.addEventListener("DOMContentLoaded", function () {
+        	const startDateInput = document.getElementById("eventStartDate");
+        	const endDateInput = document.getElementById("eventEndDate");
+
+        	startDateInput.addEventListener("click", function () {
+            	this.showPicker();
+        	});
+
+        	endDateInput.addEventListener("click", function () {
+            	this.showPicker();
+        	});
+    	});
