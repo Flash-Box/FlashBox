@@ -6,7 +6,7 @@ import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
 import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
-import com.drive.flashbox.entity.Token;
+import com.drive.flashbox.entity.RefreshToken;
 import com.drive.flashbox.entity.User;
 import com.drive.flashbox.repository.TokenRepository;
 import com.drive.flashbox.repository.UserRepository;
@@ -76,10 +76,10 @@ public class AuthService {
         Long id = jwtTokenProvider.validateAndParseIdFromToken(token);
 
         // redis에 저장된 refresh token 값과 일치하는지 확인
-        Token redisToken = tokenRepository.findById(id).orElseThrow(() -> new NoSuchElementException("refresh token값을 찾을 수 없습니다"));
+        RefreshToken redisRefreshToken = tokenRepository.findById(id).orElseThrow(() -> new NoSuchElementException("refresh token값을 찾을 수 없습니다"));
 
-        System.out.println("redis 에 저장된 : "+redisToken.getRefreshToken());
-        if(!redisToken.getRefreshToken().equals(token)){
+        System.out.println("redis 에 저장된 : "+ redisRefreshToken.getToken());
+        if(!redisRefreshToken.getToken().equals(token)){
             throw new IllegalStateException("유효하지 않은 refresh token 값 입니다.");
         }
 
@@ -92,7 +92,7 @@ public class AuthService {
         TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
 
         // redis에 새로운 refreshToken 객체 저장
-        tokenRepository.save(new Token(id, tokenDto.getRefreshToken()));
+        tokenRepository.save(new RefreshToken(id, tokenDto.getRefreshToken()));
 
 
         RefreshTokenResponse tokenResponse = RefreshTokenResponse.builder()
@@ -117,7 +117,7 @@ public class AuthService {
     @Transactional
     public void saveRefreshToken(Long id, String token) {
 
-        tokenRepository.save(new Token(id,token));
+        tokenRepository.save(new RefreshToken(id,token));
 
     }
 
