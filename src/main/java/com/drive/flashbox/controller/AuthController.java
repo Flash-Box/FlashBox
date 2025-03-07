@@ -110,7 +110,7 @@ public class AuthController {
 
     @ResponseBody
     @PostMapping("/api/logout")
-    public ResponseEntity<CustomResponse<?>> logout(@AuthenticationPrincipal FBUserDetails fbUserDetails, HttpServletResponse response) {
+    public ResponseEntity<CustomResponse<?>> logout(@AuthenticationPrincipal FBUserDetails fbUserDetails) {
         Long uid = fbUserDetails.getUid();
 
         // redis에 저장된 refresh token 삭제
@@ -140,6 +140,7 @@ public class AuthController {
                 data
         );
 
+        // 새로운 refresh token cookie 에 저장
         ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
                 .httpOnly(true) // JavaScript에서 접근 불가능
                 .secure(true) // HTTPS에서만 전송
@@ -149,6 +150,9 @@ public class AuthController {
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
+
+        // 새로운 refresh token redis 에 저장
+        authService.saveRefreshToken(data.getUid(),data.getRefreshToken());
 
         return ResponseEntity.ok(refreshTokenResponse);
     }
