@@ -27,14 +27,6 @@ public class RedisConfig {
         );
     }
 
-
-//    @Bean
-//    public RedisTemplate<Long, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-//        RedisTemplate<Long, String> template = new RedisTemplate<>();
-//        template.setConnectionFactory(redisConnectionFactory);
-//        return template;
-//    }
-
     @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         return new StringRedisTemplate(redisConnectionFactory);

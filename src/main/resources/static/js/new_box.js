@@ -52,7 +52,7 @@ async function createBox(event) {
 
         if (responseData.success) {
             alert("✅박스 생성 성공!");
-            window.location.href = '/boxes';
+            window.location.href = '/main';
           
         } else {
             alert("❌박스 생성 실패");
