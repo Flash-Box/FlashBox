@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
 		        return response.text().then(msg => {
 		            alert(msg);
-		            window.location.href = "/boxes";
+		            window.location.href = "/main";
 		        });
 		    } else {
 		        return response.text().then(errMsg => {
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
 		        return response.text().then(msg => {
 		            alert(msg);
-		            window.location.href = "/boxes";
+		            window.location.href = "/main";
 		        });
 		    } else {
 		        return response.text().then(errMsg => {

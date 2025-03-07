@@ -53,9 +53,8 @@ public class BoxController {
 
     // 박스 전체 조회: HTML 페이지 반환
     @GetMapping("/boxes")
-    public String getAllBoxes(Model model) {
-        List<Box> boxes = boxService.getAllBoxes();
-        model.addAttribute("boxes", boxes);
+    public String getAllBoxes() {
+
         return "main"; // templates/main.html 렌더링
     }
 

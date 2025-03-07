@@ -4,15 +4,11 @@ import com.drive.flashbox.dto.TokenDto;
 import com.drive.flashbox.dto.UserDto;
 import com.drive.flashbox.dto.request.SignupRequestDTO;
 import com.drive.flashbox.dto.response.LoginResponse;
-import com.drive.flashbox.dto.response.RefreshTokenResponse;
 import com.drive.flashbox.dto.response.SignupResponseDTO;
-import com.drive.flashbox.entity.Token;
 import com.drive.flashbox.entity.User;
-import com.drive.flashbox.repository.TokenRepository;
 import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.security.JwtTokenProvider;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
@@ -20,14 +16,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class AuthService {
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
+
+    private final TokenService tokenService;
     @Lazy
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -58,7 +54,7 @@ public class AuthService {
 
 
         // redis에 refreshToken 객체 저장
-        saveRefreshToken(fbUserDetails.getUid(), jwtToken.getRefreshToken());
+        tokenService.saveToken(fbUserDetails.getUid(), jwtToken.getRefreshToken());
 
 
         LoginResponse loginResponse = LoginResponse.builder()
@@ -71,56 +67,10 @@ public class AuthService {
         return loginResponse;
     }
 
-    @Transactional
-    public RefreshTokenResponse refreshToken(String token){
-        Long id = jwtTokenProvider.validateAndParseIdFromToken(token);
 
-        // redis에 저장된 refresh token 값과 일치하는지 확인
-        Token redisToken = tokenRepository.findById(id).orElseThrow(() -> new NoSuchElementException("refresh token값을 찾을 수 없습니다"));
+    public void logout(Long uid) {
 
-        System.out.println("redis 에 저장된 : "+redisToken.getRefreshToken());
-        if(!redisToken.getRefreshToken().equals(token)){
-            throw new IllegalStateException("유효하지 않은 refresh token 값 입니다.");
-        }
-
-        if(id == null){
-            throw new JwtException("jwt 토큰 예외");
-        }
-
-        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 id의 유저를 찾을 수 없습니다."));
-
-        TokenDto tokenDto = jwtTokenProvider.refreshTokens(id, user.getName());
-
-        // redis에 새로운 refreshToken 객체 저장
-        tokenRepository.save(new Token(id, tokenDto.getRefreshToken()));
-
-
-        RefreshTokenResponse tokenResponse = RefreshTokenResponse.builder()
-                        .uid(id)
-                        .name(user.getName())
-                        .accessToken(tokenDto.getAccessToken())
-                        .refreshToken(tokenDto.getRefreshToken())
-                        .build();
-
-        return tokenResponse;
-
+        // redis에 저장된 refresh token 삭제
+        tokenService.deleteToken(uid);
     }
-
-    @Transactional
-    public void deleteRefreshToken(Long uid) {
-        // redis에서 해당 uid 유저의 refreshToken 삭제
-        tokenRepository.deleteById(uid);
-
-    }
-
-
-    @Transactional
-    public void saveRefreshToken(Long id, String token) {
-
-        tokenRepository.save(new Token(id,token));
-
-    }
-
-
-
 }
