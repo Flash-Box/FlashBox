@@ -36,9 +36,13 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/box").permitAll()
+                        // get mapping 허용
+                        .requestMatchers(HttpMethod.GET, "/box", "/boxes").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/signup", "/boxes","/login","/main","/token/refresh", "/box/**").permitAll()
+                        // html 접근 허용
+                        .requestMatchers("/signup","/login", "main").permitAll()
+                        // api 허용
+                        .requestMatchers("/token/refresh", "/box/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
