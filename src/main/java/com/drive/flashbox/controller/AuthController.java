@@ -111,11 +111,8 @@ public class AuthController {
     @ResponseBody
     @PostMapping("/api/logout")
     public ResponseEntity<CustomResponse<?>> logout(@AuthenticationPrincipal FBUserDetails fbUserDetails) {
-        Long uid = fbUserDetails.getUid();
 
-        // redis에 저장된 refresh token 삭제
-        authService.deleteRefreshToken(uid);
-
+        authService.logout(fbUserDetails.getUid());
 
         CustomResponse<Object> loginResponse = new CustomResponse<>(
                 HttpStatus.OK.value(),
@@ -128,32 +125,5 @@ public class AuthController {
     }
 
 
-    @PostMapping("/token/refresh")
-    public ResponseEntity<CustomResponse<RefreshTokenResponse>> refreshToken(@CookieValue("refreshToken") String refreshToken, HttpServletResponse response) {
-//        log.info("refreshToken: "+ refreshToken);
 
-        RefreshTokenResponse data = authService.refreshToken(refreshToken);
-        CustomResponse<RefreshTokenResponse> refreshTokenResponse = new CustomResponse<>(
-                HttpStatus.OK.value(),
-                true,
-                "토큰 재발급 성공",
-                data
-        );
-
-        // 새로운 refresh token cookie 에 저장
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
-                .httpOnly(true) // JavaScript에서 접근 불가능
-                .secure(true) // HTTPS에서만 전송
-                .sameSite("Strict") // CSRF 방어
-                .path("/") // 모든 경로에서 사용 가능
-                .maxAge(1000 * 7 * 24 * 60 * 60) // 7일 동안 유효
-                .build();
-
-        response.setHeader("Set-Cookie", cookie.toString());
-
-        // 새로운 refresh token redis 에 저장
-        authService.saveRefreshToken(data.getUid(),data.getRefreshToken());
-
-        return ResponseEntity.ok(refreshTokenResponse);
-    }
 }

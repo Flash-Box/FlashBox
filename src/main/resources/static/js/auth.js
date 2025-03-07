@@ -65,6 +65,7 @@ async function logout(){
 // 우리 서비스 로그아웃 API 호출 (위의 것과 구분을 위해 앞에 /api 추가)
 async function FBlogout(){
     try {
+        const JWT_ERROR_MSG = "jwt 토큰 인증 실패"
         const token = sessionStorage.getItem("accessToken"); // 저장된 토큰 가져오기
 
         const response = await fetch("/api/logout", {
@@ -81,6 +82,22 @@ async function FBlogout(){
         if (responseData.success) {
             sessionStorage.clear(); // 저장된 값들 전부 삭제
             await logout();
+        }else {
+            alert("❌로그아웃 실패");
+            if (responseData.message === JWT_ERROR_MSG) {
+                alert("😭JWT 토큰 만료");
+                try {
+                    const newToken = await refreshToken();
+                    if (newToken) {
+                        await FBlogout(); // 새로운 토큰으로 재시도
+                    }
+                } catch (error) {
+                    console.error("토큰 갱신 실패:", error);
+                    alert("🔒재로그인이 필요합니다.");
+                    window.location.href="/login"
+                }
+            }
+
         }
     }catch (e) {
         console.error("Error:", e)
