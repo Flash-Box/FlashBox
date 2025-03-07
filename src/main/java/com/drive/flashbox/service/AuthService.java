@@ -78,8 +78,8 @@ public class AuthService {
         // redis에 저장된 refresh token 값과 일치하는지 확인
         RefreshToken redisRefreshToken = tokenRepository.findById(id).orElseThrow(() -> new NoSuchElementException("refresh token값을 찾을 수 없습니다"));
 
-        System.out.println("redis 에 저장된 : "+ redisRefreshToken.getToken());
-        if(!redisRefreshToken.getToken().equals(token)){
+        System.out.println("redis 에 저장된 : "+ redisRefreshToken.getRefreshToken());
+        if(!redisRefreshToken.getRefreshToken().equals(token)){
             throw new IllegalStateException("유효하지 않은 refresh token 값 입니다.");
         }
 

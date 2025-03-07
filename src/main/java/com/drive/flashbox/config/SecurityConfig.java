@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/box").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                        .requestMatchers("/signup", "/boxes","/login","/main","/token/refresh", "/box/**").permitAll()
+                        .requestMatchers("/signup", "/boxes","/login","/main","/token/refresh", "/box/**" , "/get/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
