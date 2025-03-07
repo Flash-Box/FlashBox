@@ -4,218 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Box 수정</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-        }
-
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333;
-        }
-
-        label {
-            display: block;
-            text-align: left;
-            font-weight: bold;
-            margin: 10px 0 5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .date-group {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .date-group input {
-            flex: 1;
-        }
-
-        .btn-group {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .update-btn {
-            background: #007bff;
-            color: white;
-        }
-
-        .update-btn:hover {
-            background: #0056b3;
-        }
-
-        .delete-btn {
-		    background: #6c757d;
-		    color: white;
-		    margin-left: 10px;
-		}
-		
-		.delete-btn:hover {
-		    background: #5a6268; 
-		}
-    </style>
-
-    <script>
-        function validateDates() {
-            var startDate = document.getElementById("eventStartDate");
-            var endDate = document.getElementById("eventEndDate");
-
-            if (startDate.value) {
-                endDate.min = startDate.value;
-            }
-            if (endDate.value) {
-                startDate.max = endDate.value;
-            }
-
-            if (startDate.value && endDate.value) {
-                var start = new Date(startDate.value);
-                var end = new Date(endDate.value);
-
-                if (start > end) {
-                    alert("시작 날짜가 종료 날짜보다 클 수 없습니다.");
-                    endDate.value = "";
-                }
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-			
-            const form = document.getElementById("updateForm");
-            const bid = form.getAttribute("data-bid");
-            const token = sessionStorage.getItem("accessToken");
-
-            // 🔹 수정 요청 (PUT)
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
-
-                const formData = {
-                    name: document.getElementById("name").value,
-                    eventStartDate: document.getElementById("eventStartDate").value,
-                    eventEndDate: document.getElementById("eventEndDate").value
-                };
-
-                fetch(`/box/${bid}`, {
-                    method: "PUT",
-                    headers: {
-	                    "Authorization": `Bearer ${token}`,
-	                    "Content-Type": "application/json"
-                	},
-                    body: JSON.stringify(formData)
-                })
-                .then(response => {
-                    if (response.ok) {
-				        return response.text().then(msg => {
-				            alert(msg);
-				            window.location.href = "/boxes";
-				        });
-				    } else {
-				        return response.text().then(errMsg => {
-				            alert("수정 실패: " + errMsg);
-				        });
-				    }
-                })
-                .catch(error => console.error("Error:", error));
-            });
-
-            // 🔹 삭제 요청 (DELETE)
-            document.getElementById("deleteButton").addEventListener("click", function () {
-                if (!confirm("정말 삭제하시겠습니까?")) {
-                    return;
-                }
-
-                const bidList = [parseInt(bid)]; 
-
-                fetch(`/box`, {
-                    method: "DELETE",
-                    headers: {
-	                    "Authorization": `Bearer ${token}`,
-	                    "Content-Type": "application/json"
-                	},
-                	body: JSON.stringify(bidList)
-                })
-                .then(response => {
-                    if (response.ok) {
-				        return response.text().then(msg => {
-				            alert(msg);
-				            window.location.href = "/boxes";
-				        });
-				    } else {
-				        return response.text().then(errMsg => {
-				            alert("삭제 실패: " + errMsg);
-				        });
-				    }
-                })
-                .catch(error => console.error("Error:", error));
-            });
-        });
-    </script>
+    
+    <link rel="stylesheet" href="/css/box_form.css">
+    <script src="/js/edit_box.js"></script>
+    
 </head>
 <body>
     <div class="container">
         <h2>Box 수정</h2>
         <form id="updateForm" th:data-bid="${box.bid}">
-            <label for="name">이름</label>
+            <label for="name">Box 이름</label>
             <input type="text" id="name" name="name" 
                    th:value="${box?.name != null ? box.name : ''}" 
                    placeholder="Box 이름을 입력해주세요." required>
 
-            <label>모임 날짜</label>
-            <div class="date-group">
+			<div class="input-group">
+            	<label>모임 개시 날짜</label>
                 <input type="date" id="eventStartDate" name="eventStartDate"
                        th:value="${box?.eventStartDate != null ? box.eventStartDate : ''}" 
                        required onchange="validateDates()">
-
+            </div> 
+            <div class="input-group">         
+				<label>모임 종료 날짜</label>
                 <input type="date" id="eventEndDate" name="eventEndDate"
                        th:value="${box?.eventEndDate != null ? box.eventEndDate : ''}" 
                        required onchange="validateDates()">
             </div>
 
-            <div class="btn-group">
-                <button type="submit" class="update-btn">수정</button>
-                <button type="button" id="deleteButton" class="delete-btn">삭제</button>
-            </div>
+            <button type="submit" class="update-btn">수정</button>
+            <button type="button" id="deleteButton" class="delete-btn">삭제</button>
+            
         </form>
     </div>
 </body>

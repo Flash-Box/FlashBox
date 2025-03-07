@@ -38,6 +38,8 @@ public class AuthController {
     
 
 
+
+    
     // SCRUM-43-signup-page ----------- form 데이터 처리하도록 위 코드 교체
     @PostMapping("/signup")
     public String signup(SignupRequestDTO signupRequestDTO, Model model) {
@@ -108,7 +110,7 @@ public class AuthController {
 
     @ResponseBody
     @PostMapping("/api/logout")
-    public ResponseEntity<CustomResponse<?>> logout(@AuthenticationPrincipal FBUserDetails fbUserDetails, HttpServletResponse response) {
+    public ResponseEntity<CustomResponse<?>> logout(@AuthenticationPrincipal FBUserDetails fbUserDetails) {
         Long uid = fbUserDetails.getUid();
 
         // redis에 저장된 refresh token 삭제
@@ -131,13 +133,14 @@ public class AuthController {
 //        log.info("refreshToken: "+ refreshToken);
 
         RefreshTokenResponse data = authService.refreshToken(refreshToken);
-        CustomResponse<RefreshTokenResponse> refreshTokenResponse = new CustomResponse<RefreshTokenResponse>(
+        CustomResponse<RefreshTokenResponse> refreshTokenResponse = new CustomResponse<>(
                 HttpStatus.OK.value(),
                 true,
                 "토큰 재발급 성공",
                 data
         );
 
+        // 새로운 refresh token cookie 에 저장
         ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
                 .httpOnly(true) // JavaScript에서 접근 불가능
                 .secure(true) // HTTPS에서만 전송
@@ -147,6 +150,9 @@ public class AuthController {
                 .build();
 
         response.setHeader("Set-Cookie", cookie.toString());
+
+        // 새로운 refresh token redis 에 저장
+        authService.saveRefreshToken(data.getUid(),data.getRefreshToken());
 
         return ResponseEntity.ok(refreshTokenResponse);
     }
