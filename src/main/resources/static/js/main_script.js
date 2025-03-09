@@ -127,7 +127,8 @@ function addEventListeners() {
                 const response = await fetch(`/box/${selectedCard.getAttribute("data-bid")}/download`, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     }
                 });
 
@@ -135,16 +136,12 @@ function addEventListeners() {
                     throw new Error("다운로드 실패!");
                 }
 
-                // 파일 다운로드 처리
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `box_${selectedCard.getAttribute("data-bid")}.zip`; // 파일명 지정
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
+                // JSON 응답에서 downloadUrl 추출
+                const data = await response.json();
+                const downloadUrl = data.downloadUrl;
+
+                // 브라우저를 해당 URL로 리다이렉트하여 다운로드 실행
+                window.location.href = downloadUrl;
             } catch (error) {
                 console.error("다운로드 오류:", error);
                 alert("다운로드 중 오류가 발생했습니다.");
