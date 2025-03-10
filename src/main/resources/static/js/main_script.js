@@ -1,6 +1,6 @@
 const JWT_ERROR_MSG = "jwt 토큰 인증 실패"
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", async function getBoxes() {
     const token = sessionStorage.getItem("accessToken");
     if (!token) {
         alert("로그인이 필요합니다.");
@@ -22,12 +22,27 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         });
 
-        if (!boxResponse.ok) throw new Error("박스 데이터를 불러오는 데 실패했습니다.");
-
         const boxes = await boxResponse.json();
-        console.log("📦 박스 리스트:", boxes);
+        if (boxResponse.ok) {
+            console.log("📦 박스 리스트:", boxes);
+            await renderBoxes(boxes); // 박스 렌더링 실행
 
-        await renderBoxes(boxes); // 박스 렌더링 실행
+        }else {
+            alert("❌박스 조회 실패");
+            if (boxes.message === JWT_ERROR_MSG) {
+                alert("😭JWT 토큰 만료");
+                try {
+                    const newToken = await refreshToken();
+                    if (newToken) {
+                        await getBoxes(); // 새로운 토큰으로 재시도
+                    }
+                } catch (error) {
+                    console.error("토큰 갱신 실패:", error);
+                    alert("🔒재로그인이 필요합니다.");
+                    window.location.href = "/login"
+                }
+            }
+        }
     } catch (error) {
         console.error("🚨 오류 발생:", error);
         alert("데이터를 불러오는 중 문제가 발생했습니다.");
