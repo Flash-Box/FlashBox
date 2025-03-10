@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const inviteBtn = document.getElementById("invite-btn");
+    const inviteBtn = document.getElementById("invite-button");
     const emailInput = document.getElementById("email");
     const errorMessage = document.getElementById("error-message");
 

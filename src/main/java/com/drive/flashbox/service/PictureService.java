@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,23 @@ public class PictureService {
     private final BoxRepository boxRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    
+    // ✅ 추가: 특정 박스의 모든 이미지 가져오기
+    @Transactional(readOnly = true)
+    public List<PictureDto> getPicturesByBoxId(Long bid) {
+        List<Picture> pictures = pictureRepository.findAllByBoxBid(bid);
+        
+        return pictures.stream()
+                .map(picture -> PictureDto.builder()
+                        .pid(picture.getPid())
+                        .name(picture.getName())
+                        .uploadDate(picture.getUploadDate())
+                        .imageUrl(picture.getImageUrl())
+                        .userId(picture.getUser().getId())
+                        .boxId(picture.getBox().getBid())
+                        .build())
+                .collect(Collectors.toList());
+    }
     
     @Transactional(readOnly = true)
     public PictureDto getPictureDetails(Long bid, Long pid) {
@@ -46,9 +64,7 @@ public class PictureService {
                 .boxId(picture.getBox().getBid())
                 .build();
     }
-
-    
-    
+      
     public List<Picture> findByBoxId(Long boxId) {
         return pictureRepository.findAllByBoxBid(boxId); // ✅ Repository 호출
     }

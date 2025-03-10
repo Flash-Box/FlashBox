@@ -10,8 +10,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let selectedImages = new Set();
 
-    // ✅ 인증된 fetch 요청 (액세스 토큰만 사용)
+    // ✅ 인증된 fetch 요청 (토큰 인증 포함)
     async function authenticatedFetch(url, options = {}) {
+		console.log("🔍 보낼 URL:", url);
+    	console.log("🔍 보낼 토큰:", token);
+				
         if (!token) {
             alert("세션이 만료되었습니다. 다시 로그인해주세요.");
             window.location.href = "/login";
@@ -35,9 +38,64 @@ document.addEventListener("DOMContentLoaded", function () {
         return response;
     }
 
-    // ✅ 개별 이미지 클릭 이벤트 (이미지 선택)
+    // ✅ 갤러리 새로고침 (업로드 후 자동 반영)
+	async function refreshGallery() {
+	    console.log("📸 갤러리 새로고침 시작!");
+	
+	    try {
+	        const response = await authenticatedFetch(`/box/${bid}/pictures`);
+	        if (!response) throw new Error("갤러리 데이터를 불러올 수 없음");
+	
+	        const data = await response.json();
+	        console.log("✅ 새 이미지 목록:", data);
+	
+	        // galleryContainer 변경: id가 아니라 class 사용
+	        const galleryContainer = document.querySelector(".gallery-grid");
+	        if (!galleryContainer) {
+	            console.error("🚨 갤러리 컨테이너를 찾을 수 없습니다! (gallery-grid)");
+	            return;
+	        }
+	
+	        console.log("📌 기존 갤러리 초기화...");
+	        galleryContainer.innerHTML = ""; // 기존 이미지 삭제
+	        console.log("✅ 갤러리 초기화 완료!");
+	
+	        console.log(`📸 새로 불러온 이미지 개수: ${data.length}`);
+	        if (data.length === 0) {
+	            console.warn("⚠ 새로 불러온 이미지가 없습니다.");
+	            return;
+	        }
+	
+	        console.log("📌 새 이미지 추가 시작...");
+	        data.forEach(picture => {
+	            console.log("🖼 추가되는 이미지:", picture.imageUrl);
+	
+	            const imgWrapper = document.createElement("div");
+	            imgWrapper.classList.add("gallery-item");
+	            imgWrapper.setAttribute("data-id", picture.pid);
+	
+	            const imgElement = document.createElement("img");
+	            imgElement.src = `${picture.imageUrl}?nocache=${Math.random()}`; // 캐싱 방지
+	            imgElement.classList.add("gallery-image");
+	
+	            imgWrapper.appendChild(imgElement);
+	            galleryContainer.appendChild(imgWrapper);
+	            console.log(`✅ 이미지 추가됨: ${imgElement.src}`);
+	        });
+	
+	        console.log("🎉 갤러리 업데이트 완료!");
+	
+	    } catch (error) {
+	        console.error("❌ 갤러리 갱신 실패:", error);
+	    }
+	}
+
+
+
+
+    // ✅ 개별 이미지 클릭 이벤트 바인딩
     function bindImageClickEvents() {
-        galleryItems = document.querySelectorAll(".gallery-item");
+        galleryItems = document.querySelectorAll(".gallery-image");
         galleryItems.forEach(item => {
             item.addEventListener("click", function () {
                 const imageId = this.getAttribute("data-id");
@@ -53,99 +111,83 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+
     bindImageClickEvents(); // 초기에 한 번 실행
 
-    // ✅ 전체 선택 버튼 클릭 이벤트
+    // ✅ 전체 선택 버튼
     if (selectAllBtn) {
         selectAllBtn.addEventListener("click", function () {
-            galleryItems = document.querySelectorAll(".gallery-item"); // ✅ 업로드 후 갤러리 최신화
+            galleryItems = document.querySelectorAll(".gallery-image"); // 최신화
             if (selectedImages.size === galleryItems.length) {
                 galleryItems.forEach(item => item.classList.remove("selected"));
                 selectedImages.clear();
             } else {
                 galleryItems.forEach(item => {
-                    const imageId = item.getAttribute("data-id");
                     item.classList.add("selected");
-                    selectedImages.add(imageId);
+                    selectedImages.add(item.getAttribute("data-id"));
                 });
             }
             updateButtons();
         });
     }
 
-    // ✅ 버튼 상태 업데이트 함수
+    // ✅ 버튼 상태 업데이트
     function updateButtons() {
         const hasSelection = selectedImages.size > 0;
         if (downloadBtn) downloadBtn.disabled = !hasSelection;
         if (deleteBtn) deleteBtn.disabled = !hasSelection;
     }
 
-    // ✅ 업로드 버튼 클릭 이벤트 (파일 업로드 후 갤러리 갱신)
-    if (uploadBtn) {
-        uploadBtn.addEventListener("click", async function () {
-            if (!bid) return;
+    // ✅ 업로드 버튼 (이미지 업로드 후 즉시 반영)
+	if (uploadBtn) {
+	    uploadBtn.addEventListener("click", async function () {
+	        if (!bid) return;
+	
+	        const input = document.createElement("input");
+	        input.type = "file";
+	        input.multiple = true;
+	        input.accept = "image/*";
+	
+	        input.addEventListener("change", async function () {
+	            const files = input.files;
+	            if (files.length === 0) return;
+	
+	            const formData = new FormData();
+	            for (let i = 0; i < files.length; i++) {
+	                formData.append("files", files[i]);
+	            }
+	
+	            try {
+	                const response = await authenticatedFetch(`/box/${bid}/picture`, {
+	                    method: "POST",
+	                    body: formData
+	                });
+	
+	                if (!response) throw new Error("서버 응답 없음");
+	
+	                const data = await response.json();
+	                if (data.status === 201) {
+	                    alert("이미지 업로드가 완료되었습니다.");
+	                    
+	                    // ✅ 서버에서 이미지가 완전히 저장된 후 갤러리 새로고침
+	                    setTimeout(async () => {
+	                        await refreshGallery();
+	                    }, 500); // 서버 반영을 기다릴 딜레이 추가
+	
+	                } else {
+	                    alert(`업로드 실패: ${data.message}`);
+	                }
+	            } catch (error) {
+	                alert(`오류 발생: ${error.message}`);
+	            }
+	        });
+	
+	        input.click();
+	    });
+	}
 
-            const input = document.createElement("input");
-            input.type = "file";
-            input.multiple = true;
-            input.accept = "image/*";
 
-            input.addEventListener("change", async function () {
-                const files = input.files;
-                if (files.length === 0) return;
-
-                const formData = new FormData();
-                for (let i = 0; i < files.length; i++) {
-                    formData.append("files", files[i]);
-                }
-
-                const response = await authenticatedFetch(`/box/${bid}/picture`, {
-                    method: "POST",
-                    body: formData
-                });
-
-                if (!response) return;
-
-                const data = await response.json();
-                if (data.status === 201) {
-                    alert("이미지 업로드가 완료되었습니다.");
-                    refreshGallery(); // ✅ 갤러리 갱신 후 전체 선택 정상 작동
-                } else {
-                    alert(`업로드 실패: ${data.message}`);
-                }
-            });
-
-            input.click();
-        });
-    }
-
-    // ✅ 갤러리 새로고침 (업로드 후 호출됨)
-    async function refreshGallery() {
-        const response = await authenticatedFetch(`/box/${bid}/pictures`, {
-            method: "GET"
-        });
-
-        if (!response) return;
-
-        const data = await response.json();
-        const galleryContainer = document.querySelector(".gallery-grid");
-
-        // 기존 이미지 제거
-        galleryContainer.innerHTML = "";
-
-        // 새로운 이미지 추가
-        data.forEach(image => {
-            const imgElement = document.createElement("div");
-            imgElement.classList.add("gallery-item");
-            imgElement.setAttribute("data-id", image.pid);
-            imgElement.innerHTML = `<img src="${image.imageUrl}" />`;
-            galleryContainer.appendChild(imgElement);
-        });
-
-        bindImageClickEvents(); // ✅ 새로 추가된 이미지에도 이벤트 바인딩
-    }
-
-    // ✅ 다운로드 버튼 클릭 이벤트
+    // ✅ 다운로드 버튼
     if (downloadBtn) {
         downloadBtn.addEventListener("click", function () {
             if (selectedImages.size === 0) {
@@ -156,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ 이미지 삭제 버튼 클릭 이벤트
+    // ✅ 삭제 버튼
     if (deleteBtn) {
         deleteBtn.addEventListener("click", async function () {
             if (selectedImages.size === 0) {
@@ -182,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ 갤러리(박스) 삭제 버튼 클릭 이벤트
+    // ✅ 박스 삭제 버튼
     if (deleteBtn) {
         deleteBtn.addEventListener("click", function () {
             if (!confirm("정말 삭제하시겠습니까?")) {
