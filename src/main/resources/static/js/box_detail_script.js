@@ -85,6 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	        });
 	
 	        console.log("🎉 갤러리 업데이트 완료!");
+	        
+	        bindImageClickEvents();
 	
 	    } catch (error) {
 	        console.error("❌ 갤러리 갱신 실패:", error);
@@ -96,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ 개별 이미지 클릭 이벤트 바인딩
     function bindImageClickEvents() {
-        galleryItems = document.querySelectorAll(".gallery-image");
+        galleryItems = document.querySelectorAll(".gallery-item");
         galleryItems.forEach(item => {
             item.addEventListener("click", function () {
                 const imageId = this.getAttribute("data-id");
