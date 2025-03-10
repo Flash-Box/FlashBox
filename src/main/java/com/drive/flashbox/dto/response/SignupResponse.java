@@ -9,12 +9,12 @@ import lombok.ToString;
 @Builder
 @Getter
 @ToString
-public class SignupResponseDTO {
+public class SignupResponse {
     Long id;
     String name;
 
-    public static SignupResponseDTO of(User user){
-        return SignupResponseDTO.builder()
+    public static SignupResponse of(User user){
+        return SignupResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .build();
