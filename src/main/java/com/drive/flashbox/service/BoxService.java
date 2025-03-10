@@ -167,7 +167,7 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public void updateBox(Long bid, Long uid, BoxRequest boxDto) {
+	public BoxResponse updateBox(Long bid, Long uid, BoxRequest boxDto) {
 	    Box box = boxRepository.findById(bid)
 	        .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 
@@ -180,7 +180,10 @@ public class BoxService {
 	    
 		box.editBox(boxDto.getName(),
 					boxDto.getEventStartDate().atStartOfDay(),
-					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));	
+					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));
+
+		return BoxResponse.from(box);
+
 	}
  
 	public void inviteUserToBox(Long boxId, Long userId) {

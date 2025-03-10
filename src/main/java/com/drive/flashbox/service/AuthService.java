@@ -2,9 +2,9 @@ package com.drive.flashbox.service;
 
 import com.drive.flashbox.dto.TokenDto;
 import com.drive.flashbox.dto.UserDto;
-import com.drive.flashbox.dto.request.SignupRequestDTO;
+import com.drive.flashbox.dto.request.SignupRequest;
 import com.drive.flashbox.dto.response.LoginResponse;
-import com.drive.flashbox.dto.response.SignupResponseDTO;
+import com.drive.flashbox.dto.response.SignupResponse;
 import com.drive.flashbox.entity.User;
 import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
@@ -28,16 +28,16 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public SignupResponseDTO registerUser(SignupRequestDTO signupRequestDTO) {
+    public SignupResponse registerUser(SignupRequest signupRequest) {
 
-        Optional<UserDto> found = searchUser(signupRequestDTO.getEmail());
+        Optional<UserDto> found = searchUser(signupRequest.getEmail());
         if(found.isPresent()) {
             throw new IllegalStateException("동일한 email의 유저가 이미 존재합니다.");
         }
 
 
-        User user = signupRequestDTO.toEntity(passwordEncoder.encode(signupRequestDTO.getPassword()));
-        return SignupResponseDTO.of(userRepository.save(user));
+        User user = signupRequest.toEntity(passwordEncoder.encode(signupRequest.getPassword()));
+        return SignupResponse.of(userRepository.save(user));
     }
 
     public Optional<UserDto> searchUser(String email) {
