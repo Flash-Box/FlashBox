@@ -42,7 +42,7 @@ public class SecurityConfig {
                         // html 접근 허용
                         .requestMatchers("/signup","/login", "main").permitAll()
                         // api 허용
-                        .requestMatchers("/token/refresh", "/box/**").permitAll()
+                        .requestMatchers("/token/refresh", "/box/**", "/box/{bid}/pictures").permitAll()
                         .anyRequest().authenticated()
                 )
 

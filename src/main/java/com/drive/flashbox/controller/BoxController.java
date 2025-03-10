@@ -30,6 +30,7 @@ import com.drive.flashbox.dto.request.BoxRequest;
 import com.drive.flashbox.dto.response.BoxResponse;
 import com.drive.flashbox.entity.Box;
 import com.drive.flashbox.entity.Picture;
+import com.drive.flashbox.repository.BoxRepository;
 import com.drive.flashbox.repository.UserRepository;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.BoxService;
@@ -43,7 +44,7 @@ public class BoxController {
 	private final BoxService boxService;
 	private final UserRepository userRepository; // 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --- SCRUM-30-view-members
     private final PictureService pictureService; // ✅ PictureService 주입
-	
+    private final BoxRepository boxRepository; // BoxRepository 주입
 	
 	// box 생성 페이지
 	@GetMapping("/box")
@@ -167,10 +168,18 @@ public class BoxController {
 	// box에 다른 User 초대 페이지 표시
 	@GetMapping("/box/{bid}/members")
 	public String showInvitePage(@PathVariable("bid") Long boxId, Model model) {
-	    List<User> users = userRepository.findUsersByBoxId(boxId);
+	    
+		// boxId에 해당하는 Box 정보를 가져와서 갤러리 이름 설정
+	    Box box = boxRepository.findById(boxId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 박스 ID"));
+		List<User> users = userRepository.findUsersByBoxId(boxId);
+	    
 	    model.addAttribute("boxId", boxId); // 박스 ID 전달
 	    model.addAttribute("users", users); // 기존 참여 유저 리스트 전달
-	    return "user_invite"; // invite.html 템플릿 반환
+
+	    // 갤러리 이름 설정 (예제: "내 갤러리" → 실제 데이터와 연결 가능)
+	    model.addAttribute("galleryName", box.getName()); 
+
+	    return "user_invite"; // Thymeleaf 템플릿 반환
 	}
 	
 	// box에 다른 User 초대하는 동작 API
