@@ -151,17 +151,25 @@ public class BoxController {
 	
 	// box 수정 기능
 	@PutMapping("/box/{bid}")
-	public ResponseEntity<String> updateBox(
+	public ResponseEntity<CustomResponse<BoxResponse>> updateBox(
 	    @PathVariable("bid") Long bid,
 	    @RequestBody BoxRequest boxDto,  // JSON을 받을 수 있도록 변경
 	    @AuthenticationPrincipal FBUserDetails fbUserDetails
 	) {
 		Long uid = fbUserDetails.getUid();
 		try {
-			boxService.updateBox(bid, uid, boxDto);
-			return ResponseEntity.ok("수정 완료!");
-		} catch (IllegalStateException e) {	
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+			BoxResponse data = boxService.updateBox(bid, uid, boxDto);
+			CustomResponse<BoxResponse> response = new CustomResponse<>(
+					HttpStatus.OK.value(),
+					true,
+					"Box 수정 성공",
+					data
+			);
+
+			return ResponseEntity.ok(response);
+		}
+		catch (IllegalStateException e) {
+	        throw e;
 	    }
 	}
 	
@@ -209,16 +217,23 @@ public class BoxController {
 	
 	// box 삭제 기능
 	@DeleteMapping("/box")
-	public ResponseEntity<String> deleteBoxes(
+	public ResponseEntity<CustomResponse<Object>> deleteBoxes(
 	        @RequestBody List<Long> bidList,	// 여러 박스 한번에 삭제할 때 json 형태로 받아와야함 ex) [1, 2, 4]
 	        @AuthenticationPrincipal FBUserDetails fbUserDetails
 	) {
 	    Long uid = fbUserDetails.getUid();
 	    try {
 	        boxService.deleteBoxes(bidList, uid);
-	        return ResponseEntity.ok("삭제 완료!");
+			CustomResponse<Object> response = new CustomResponse<>(
+					HttpStatus.OK.value(),
+					true,
+					"Box 삭제 성공",
+					null
+			);
+
+			return ResponseEntity.ok(response);
 	    } catch (IllegalStateException e) {
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	        throw e;
 	    }
 	}
 	

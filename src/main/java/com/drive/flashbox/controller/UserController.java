@@ -1,10 +1,5 @@
 package com.drive.flashbox.controller;
 
-import com.drive.flashbox.common.CustomResponse;
-import com.drive.flashbox.dto.UserDto;
-import com.drive.flashbox.dto.request.LoginRequest;
-import com.drive.flashbox.dto.request.SignupRequestDTO;
-import com.drive.flashbox.dto.response.SignupResponseDTO;
 import com.drive.flashbox.entity.User;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.UserService;
