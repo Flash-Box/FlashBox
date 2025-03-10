@@ -132,39 +132,7 @@ function addEventListeners() {
             console.log("선택 해제됨:", bid);
         });
 
-        // 🔹 다운로드 버튼 클릭 시 API 요청
-        downloadBtn.addEventListener("click", async function () {
-            if (!selectedCard) {
-                alert("다운로드할 박스를 선택하세요!");
-                return;
-            }
-
-            try {
-                const token = sessionStorage.getItem("accessToken");
-                const response = await fetch(`/box/${selectedCard.getAttribute("data-bid")}/download`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error("다운로드 실패!");
-                }
-
-                // JSON 응답에서 downloadUrl 추출
-                const data = await response.json();
-                const downloadUrl = data.downloadUrl;
-
-                // 브라우저를 해당 URL로 리다이렉트하여 다운로드 실행
-                window.location.href = downloadUrl;
-            } catch (error) {
-                console.error("다운로드 오류:", error);
-                alert("다운로드 중 오류가 발생했습니다.");
-            }
-        });
-
+        //
 
         // 기존 이벤트 리스너 제거 후 다시 등록 (중복 방지)
         const newDeleteBtn = deleteBtn.cloneNode(true);
@@ -188,8 +156,46 @@ function addEventListeners() {
             await deleteBox()
 
         });
+    });
 
+    // 🔹 다운로드 버튼 클릭 시 API 요청
+    downloadBtn.addEventListener("click", async function () {
+        if (!selectedCard) {
+            alert("다운로드할 박스를 선택하세요!");
+            return;
+            }
 
+            try {
+                const token = sessionStorage.getItem("accessToken");
+                const response = await fetch(`/box/${selectedCard.getAttribute("data-bid")}/download`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                    }
+                });
+
+                // 응답 본문을 한 번만 파싱
+                const result = await response.json();
+
+                // 상태 코드가 200이 아닌 경우 에러 처리
+                if (!response.ok) {
+                    alert("다운로드 오류: " + result.message);
+                    selectedCard.classList.remove("selected-box");
+                    actionButtonsContainer.style.display = "none";
+                    selectedCard = null;
+                    return;
+                }
+
+                // JSON 응답에서 downloadUrl 추출
+                const downloadUrl = result.downloadUrl;
+
+                // 브라우저를 해당 URL로 리다이렉트하여 다운로드 실행
+                window.location.href = downloadUrl;
+            } catch (error) {
+                console.error("다운로드 오류:", error);
+                alert("다운로드 중 오류가 발생했습니다.");
+            }
     });
 
     async function deleteBox(){

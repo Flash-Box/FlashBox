@@ -66,7 +66,7 @@ public class BoxService {
 		// 2) 박스 내 사진 조회
 		List<Picture> pictures = pictureRepository.findAllByBoxBid(bid);
 		if (pictures.isEmpty()) {
-			throw new IllegalArgumentException("박스에 사진이 없습니다.");
+			throw new IllegalStateException("박스에 사진이 없습니다.");
 		}
 
 		// 3) ZIP 파일 생성 (메모리 내 생성; 대용량일 경우 다른 방식을 고려)
