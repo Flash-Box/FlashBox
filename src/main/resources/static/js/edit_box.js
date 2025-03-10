@@ -22,6 +22,51 @@ function validateDates() {
     }
 }
 
+async function deleteBox(){
+    try {
+        console.log("deleteBox 실행됨"); // ✅ 확인
+        const bidList = [parseInt(bid)];
+
+        const token = sessionStorage.getItem("accessToken");
+
+        const response = await fetch(`/box`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(bidList)
+        })
+
+
+        if (response.ok) {
+            alert("✅박스 삭제 성공");
+            window.location.href = "/main";
+
+        } else {
+            const responseData = await response.json();
+            alert("❌박스 삭제 실패: " + responseData.message);
+
+            if (responseData.message === JWT_ERROR_MSG) {
+                alert("😭JWT 토큰 만료");
+                try {
+                    const newToken = await refreshToken();
+                    if (newToken) {
+                        await deleteBox(); // 새로운 토큰으로 재시도
+                    }
+                } catch (error) {
+                    console.error("토큰 갱신 실패:", error);
+                    alert("🔒재로그인이 필요합니다.");
+                    window.location.href = "/login"
+                }
+            }
+        }
+    }catch (error) {
+        console.error("Error:", error)
+    }
+
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 	
     const form = document.getElementById("updateForm");
@@ -78,33 +123,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // 🔹 삭제 요청 (DELETE)
-    document.getElementById("deleteButton").addEventListener("click", function () {
-        if (!confirm("정말 삭제하시겠습니까?")) {
-            return;
+    document.getElementById("deleteButton").addEventListener("click", async function handleDelete() {
+        try {
+            if (!confirm("정말 삭제하시겠습니까?")) {
+                console.log("사용자가 취소를 눌렀습니다."); // ✅ 확인
+                return;
+            }
+
+            console.log("사용자가 확인을 눌렀습니다. deleteBox 실행"); // ✅ 확인
+            await deleteBox();
+        }catch (error) {
+            console.error("Error:", error)
         }
 
-        const bidList = [parseInt(bid)]; 
-
-        fetch(`/box`, {
-            method: "DELETE",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-        	},
-        	body: JSON.stringify(bidList)
-        })
-        .then(response => {
-            if (response.ok) {
-		        return response.text().then(msg => {
-		            alert(msg);
-		            window.location.href = "/main";
-		        });
-		    } else {
-		        return response.text().then(errMsg => {
-		            alert("삭제 실패: " + errMsg);
-		        });
-		    }
-        })
-        .catch(error => console.error("Error:", error));
     });
+
+
 });

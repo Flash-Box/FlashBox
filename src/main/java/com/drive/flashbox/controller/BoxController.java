@@ -208,16 +208,23 @@ public class BoxController {
 	
 	// box 삭제 기능
 	@DeleteMapping("/box")
-	public ResponseEntity<String> deleteBoxes(
+	public ResponseEntity<CustomResponse<Object>> deleteBoxes(
 	        @RequestBody List<Long> bidList,	// 여러 박스 한번에 삭제할 때 json 형태로 받아와야함 ex) [1, 2, 4]
 	        @AuthenticationPrincipal FBUserDetails fbUserDetails
 	) {
 	    Long uid = fbUserDetails.getUid();
 	    try {
 	        boxService.deleteBoxes(bidList, uid);
-	        return ResponseEntity.ok("삭제 완료!");
+			CustomResponse<Object> response = new CustomResponse<>(
+					HttpStatus.OK.value(),
+					true,
+					"Box 삭제 성공",
+					null
+			);
+
+			return ResponseEntity.ok(response);
 	    } catch (IllegalStateException e) {
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	        throw e;
 	    }
 	}
 	
