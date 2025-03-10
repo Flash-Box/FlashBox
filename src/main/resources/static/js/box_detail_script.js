@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const token = sessionStorage.getItem("accessToken");
 
     let selectedImages = new Set();
-
+	let currentImageId = null;
+	
     // ✅ 인증된 fetch 요청 (토큰 인증 포함)
     async function authenticatedFetch(url, options = {}) {
 		console.log("🔍 보낼 URL:", url);
@@ -108,6 +109,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     selectedImages.add(imageId);
                 }
                 updateButtons();
+            });
+            
+            // 더블클릭 시 모달 띄우기
+            item.addEventListener("dblclick", function () {
+                const imageId = this.getAttribute("data-id");
+                const imageUrl = this.querySelector("img").src;
+
+                // currentImageId에 클릭한 이미지 ID 저장
+                currentImageId = imageId;
+
+                // 모달에 이미지 표시
+                const modalImage = document.getElementById("modalImage");
+                modalImage.src = imageUrl;
+
+                // 다운로드 버튼 활성화
+                const downloadModalBtn = document.getElementById("downloadModalBtn");
+                downloadModalBtn.disabled = false;
+
+                // 모달 열기
+                const modal = new bootstrap.Modal(document.getElementById("imageModal"));
+                modal.show();
             });
         });
     }
@@ -254,4 +276,63 @@ document.addEventListener("DOMContentLoaded", function () {
                 .catch(error => console.error("Error:", error));
         });
     }
+    
+    const downloadModalBtn = document.getElementById("downloadModalBtn");
+    if (downloadModalBtn) {
+        downloadModalBtn.addEventListener("click", async function () {
+            if (currentImageId) {
+			    // currentImageId를 List 형태로 변환하여 서버로 보냄
+			    const response = await fetch(`/box/${bid}/picture/download?pid=${currentImageId}`, {
+			        method: "GET",
+			        headers: {
+			            "Authorization": `Bearer ${token}`,
+			            "Content-Type": "application/json"
+			        }
+			    });
+			
+			    const data = await response.json();
+			    console.log(data);
+			    const downloadUrl = data.downloadUrl;
+			    // 브라우저를 해당 URL로 리다이렉트하여 다운로드 실행
+			    window.location.href = downloadUrl;
+			}
+        });
+    }
+
+    const deleteModalBtn = document.getElementById("deleteModalBtn");
+    if (deleteModalBtn) {
+        deleteModalBtn.addEventListener("click", async function () {
+            if (currentImageId) {
+                if (confirm("이 이미지를 삭제하시겠습니까?")) {
+					
+                    const response = await authenticatedFetch(`/box/${bid}/picture/${currentImageId}`, {
+                        method: "DELETE"
+                    });
+
+                    if (response && response.ok) {
+                        document.querySelector(`[data-id='${currentImageId}']`).remove();
+                        const modal = bootstrap.Modal.getInstance(document.getElementById("imageModal"));
+                        modal.hide();
+                    } else {
+                        alert("삭제 실패");
+                    }
+                }
+            }
+        });
+    }
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            const modal = bootstrap.Modal.getInstance(document.getElementById("imageModal"));
+            modal.hide();
+        }
+    });
+    
+    const modalElement = document.getElementById("imageModal");
+    modalElement.addEventListener("click", function (event) {
+        if (event.target === modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+        }
+    });
 });
