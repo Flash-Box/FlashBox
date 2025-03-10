@@ -22,9 +22,17 @@ public class PictureController {
 
     private final PictureService pictureService;
 
+    // 업로드 후 이미지 랜더링 관련 GetMapping 소스코드
+    @GetMapping("/{bid}/pictures")
+    public ResponseEntity<List<PictureDto>> getPictures(@PathVariable("bid") Long bid) {
+        List<PictureDto> pictures = pictureService.getPicturesByBoxId(bid);
+        return ResponseEntity.ok(pictures);
+    }
+    
+    
     @GetMapping("/{bid}/picture/{pid}")
     @ResponseBody
-    public ResponseEntity<PictureDto> getPictureDetails(@PathVariable Long bid, @PathVariable Long pid) {
+    public ResponseEntity<PictureDto> getPictureDetails(@PathVariable("bid") Long bid, @PathVariable("pid") Long pid) {
         PictureDto pictureDTO = pictureService.getPictureDetails(bid, pid);
         return ResponseEntity.ok(pictureDTO);
     }

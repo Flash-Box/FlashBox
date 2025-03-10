@@ -167,7 +167,7 @@ public class BoxService {
 	}
 	
 	@Transactional
-	public void updateBox(Long bid, Long uid, BoxRequest boxDto) {
+	public BoxResponse updateBox(Long bid, Long uid, BoxRequest boxDto) {
 	    Box box = boxRepository.findById(bid)
 	        .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
 
@@ -180,7 +180,10 @@ public class BoxService {
 	    
 		box.editBox(boxDto.getName(),
 					boxDto.getEventStartDate().atStartOfDay(),
-					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));	
+					boxDto.getEventEndDate().atStartOfDay().plusDays(1).minusSeconds(1));
+
+		return BoxResponse.from(box);
+
 	}
  
 	public void inviteUserToBox(Long boxId, Long userId) {
@@ -332,7 +335,7 @@ public class BoxService {
                 .orElseThrow(() -> new IllegalStateException("해당 박스에 참여하지 않았습니다."));
 
         if (boxUser.getRole() != RoleType.OWNER && boxUser.getRole() != RoleType.MEMBER) {
-            throw new IllegalStateException("박스의 소유자 또는 멤버만 수정할 수 있습니다.");
+            throw new IllegalStateException("박스의 소유자 또는 멤버만 연장할 수 있습니다.");
         }
 
         if (box.getCount() <= 0) {

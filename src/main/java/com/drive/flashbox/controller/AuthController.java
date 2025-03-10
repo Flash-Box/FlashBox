@@ -2,10 +2,9 @@ package com.drive.flashbox.controller;
 
 import com.drive.flashbox.common.CustomResponse;
 import com.drive.flashbox.dto.request.LoginRequest;
-import com.drive.flashbox.dto.request.SignupRequestDTO;
+import com.drive.flashbox.dto.request.SignupRequest;
 import com.drive.flashbox.dto.response.LoginResponse;
-import com.drive.flashbox.dto.response.RefreshTokenResponse;
-import com.drive.flashbox.dto.response.SignupResponseDTO;
+import com.drive.flashbox.dto.response.SignupResponse;
 import com.drive.flashbox.security.FBUserDetails;
 import com.drive.flashbox.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -42,10 +40,10 @@ public class AuthController {
     
     // SCRUM-43-signup-page ----------- form 데이터 처리하도록 위 코드 교체
     @PostMapping("/signup")
-    public String signup(SignupRequestDTO signupRequestDTO, Model model) {
+    public String signup(SignupRequest signupRequest, Model model) {
         try {
-            System.out.println(signupRequestDTO.toString());
-            SignupResponseDTO data = authService.registerUser(signupRequestDTO);
+            System.out.println(signupRequest.toString());
+            SignupResponse data = authService.registerUser(signupRequest);
             return "redirect:/login"; // 성공 시 리디렉션
         } catch (IllegalStateException e) {
             model.addAttribute("error", e.getMessage()); // 에러 메시지 전달
