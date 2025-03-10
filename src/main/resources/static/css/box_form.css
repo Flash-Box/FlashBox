@@ -75,23 +75,24 @@
             background-color: #5a6268; /* 호버 시 조금 어두운 회색 */
         }
 
-/* 수정, 삭제 버튼만 width를 48%로 설정하여 두 버튼을 나란히 배치 */
+/* 수정, 삭제 버튼만 width를 49.2%로 설정하여 두 버튼을 나란히 배치 */
 	.update-btn, .delete-btn {
-	    width: 48%; /* 각 버튼을 50%로 설정하고, 여백을 두기 위해 48%로 설정 */
-	}
-	
-	.update-btn {
-	    background: #808080;
-	    color: white;
+	    width: 49.2%; /* 각 버튼을 50%로 설정하고, 여백을 두기 위해 49.2%로 설정 */
+	    padding: 12px;
+        background-color: #808080; /* 회색 바탕 */
+		border: none;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 10px; /* 곡선 모서리 */
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 20px;
+        margin-bottom: 10px;
 	}
 	
 	.update-btn:hover {
 	    background: #5a6268;
-	}
-	
-	.delete-btn {
-	    background: #808080;
-	    color: white;
 	}
 	
 	.delete-btn:hover {

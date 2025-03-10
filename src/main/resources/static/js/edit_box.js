@@ -121,6 +121,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error:", error)
         }
     });
+});
 
     // 🔹 삭제 요청 (DELETE)
     document.getElementById("deleteButton").addEventListener("click", async function handleDelete() {
@@ -138,5 +139,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+	// 입력칸 클릭 시 달력 열기 기능 추가
+    	document.addEventListener("DOMContentLoaded", function () {
+        	const startDateInput = document.getElementById("eventStartDate");
+        	const endDateInput = document.getElementById("eventEndDate");
 
-});
+        	startDateInput.addEventListener("click", function () {
+            	this.showPicker();
+        	});
+
+        	endDateInput.addEventListener("click", function () {
+            	this.showPicker();
+        	});
+    	});
