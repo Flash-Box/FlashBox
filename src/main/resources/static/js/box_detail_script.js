@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ✅ 전체 선택 버튼
     if (selectAllBtn) {
         selectAllBtn.addEventListener("click", function () {
-            galleryItems = document.querySelectorAll(".gallery-image"); // 최신화
+            galleryItems = document.querySelectorAll(".gallery-item"); // 최신화
             if (selectedImages.size === galleryItems.length) {
                 galleryItems.forEach(item => item.classList.remove("selected"));
                 selectedImages.clear();
