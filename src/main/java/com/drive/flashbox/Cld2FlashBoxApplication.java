@@ -15,4 +15,8 @@ public class Cld2FlashBoxApplication {
 		SpringApplication.run(Cld2FlashBoxApplication.class, args);
 	}
 
+	public static void printVersion() {
+		System.out.println("version 1.0.0");
+	}
+
 }
