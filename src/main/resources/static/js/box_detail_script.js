@@ -247,38 +247,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-
-    // ✅ 박스 삭제 버튼
-    if (deleteBtn) {
-        deleteBtn.addEventListener("click", function () {
-            if (!confirm("정말 삭제하시겠습니까?")) {
-                return;
-            }
-
-            fetch(`/box`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify([parseInt(bid)])
-            })
-                .then(response => {
-                    if (response.ok) {
-                        return response.text().then(msg => {
-                            alert(msg);
-                            window.location.href = "/main";
-                        });
-                    } else {
-                        return response.text().then(errMsg => {
-                            alert("삭제 실패: " + errMsg);
-                        });
-                    }
-                })
-                .catch(error => console.error("Error:", error));
-        });
-    }
-    
     const downloadModalBtn = document.getElementById("downloadModalBtn");
     if (downloadModalBtn) {
         downloadModalBtn.addEventListener("click", async function () {
