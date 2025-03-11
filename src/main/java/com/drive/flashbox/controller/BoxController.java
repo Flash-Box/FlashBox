@@ -100,7 +100,7 @@ public class BoxController {
 	// box 다운
 	@GetMapping("/box/{bid}/download")
 	@ResponseBody
-	public Map<String, Object> downloadBox(@PathVariable Long bid,
+	public Map<String, Object> downloadBox(@PathVariable("bid") Long bid,
 										   @RequestParam(value = "uid", required = false) Long uid) {
 		if (uid == null) {
 			uid = 1L; // 기본 테스트 사용자

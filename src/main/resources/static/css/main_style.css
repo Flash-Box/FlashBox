@@ -130,10 +130,10 @@
 /* 📌 다운로드 / 삭제 버튼 위치 조정 */
 #action-buttons-container {
     position: fixed;
-    top: 100px;  /* 기존보다 조금 아래로 조정 */
+    top: 150px;  /* 기존보다 조금 아래로 조정 */
     right: 30px;
     display: none;
-    gap: 20px;
+    gap: 35px;
 }
 
 /* 카드 내부 스타일 */
