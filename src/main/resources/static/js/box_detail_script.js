@@ -4,10 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const downloadBtn = document.getElementById("download-btn");
     const uploadBtn = document.getElementById("upload-btn");
     const deleteBtn = document.getElementById("delete-btn");
+    const extendBtn = document.getElementById("extend-btn");
 
     const bid = uploadBtn ? uploadBtn.getAttribute("data-bid") : null;
     const token = sessionStorage.getItem("accessToken");
-
+	const JWT_ERROR_MSG = "jwt 토큰 인증 실패"
     let selectedImages = new Set();
 	let currentImageId = null;
 	
@@ -247,6 +248,56 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+    
+    // ✅ 박스 연장 버튼
+    if (extendBtn) {
+	    extendBtn.addEventListener("click", extendBox);
+	}
+	
+	// 연장 요청 함수
+	async function extendBox() {
+	    try {
+	        const token = sessionStorage.getItem("accessToken");
+	
+	        const response = await fetch(`/box/${bid}/extend`, {
+	            method: "POST",
+	            headers: {
+	                "Authorization": `Bearer ${token}`,
+	                "Content-Type": "application/json"
+	            },
+	        });
+	
+	        if (response.ok) {
+	            alert("✅박스 연장 성공");
+	            window.location.href = `/box/${bid}`;
+	        } else {
+	            const responseData = await response.json();
+	            alert("❌박스 연장 실패: " + responseData.message);
+	
+	            // JWT 토큰 만료 오류 처리
+	            if (responseData.message === JWT_ERROR_MSG) {
+	                alert("😭JWT 토큰 만료");
+	
+	                // 토큰 갱신 처리
+	                try {
+	                    const newToken = await refreshToken();  // 새 토큰 발급
+	                    if (newToken) {
+	                        sessionStorage.setItem("accessToken", newToken);  // 새 토큰 세션에 저장
+	
+	                        // 새로운 토큰으로 재시도
+	                        await extendBox();  // extendBox() 함수로 재시도
+	                    }
+	                } catch (error) {
+	                    console.error("토큰 갱신 실패:", error);
+	                    alert("🔒재로그인이 필요합니다.");
+	                    window.location.href = "/login";  // 로그인 페이지로 이동
+	                }
+	            }
+	        }
+	    } catch (error) {
+	        console.error("Error:", error);
+	    }
+	}
     const downloadModalBtn = document.getElementById("downloadModalBtn");
     if (downloadModalBtn) {
         downloadModalBtn.addEventListener("click", async function () {
@@ -305,4 +356,54 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.hide();
         }
     });
+    
+    const boomDateStr = document.getElementById('countdown-timer').getAttribute('data-boomDate');
+    // 'boomDateStr'을 Date 객체로 변환
+    const boomDate = new Date(boomDateStr);
+
+    // 2자리로 포맷하는 함수
+    function formatTimeUnit(unit) {
+        return unit < 10 ? '0' + unit : unit;
+    }
+
+    // 카운트다운 업데이트 함수
+    function updateCountdown() {
+        const now = new Date(); // 현재 시간
+        const timeDifference = boomDate - now; // 남은 시간 계산
+
+        if (timeDifference <= 0) {
+            document.getElementById("countdown").textContent = "카운트다운 종료!";
+            clearInterval(countdownInterval); // 카운트다운 종료
+        } else {
+            // 남은 시간 계산
+            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24)); // 남은 일수
+            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // 남은 시간
+            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60)); // 남은 분
+            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000); // 남은 초
+
+            // 2자리 형식으로 포맷
+            const formattedDays = formatTimeUnit(days);
+            const formattedHours = formatTimeUnit(hours);
+            const formattedMinutes = formatTimeUnit(minutes);
+            const formattedSeconds = formatTimeUnit(seconds);
+
+            // 카운트다운 표시
+            document.getElementById("countdown").textContent = `${formattedDays}일 ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+			const countdownTimer = document.getElementById("countdown-timer");
+			// bg-danger 클래스 제거
+			countdownTimer.classList.remove("bg-danger");
+			
+			// 24시간 이내일 경우 배경을 빨간색, 그 외에는 파란색
+			if (timeDifference <= 24 * 60 * 60 * 1000) {
+			    countdownTimer.style.backgroundColor = "#dc3545"; // 빨간색
+			} else {
+			    countdownTimer.style.backgroundColor = "#007bff"; // 파란색
+			}
+        }
+    }
+
+    // 1초마다 카운트다운 업데이트
+    const countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown(); // 초기 카운트다운 값 설정
 });

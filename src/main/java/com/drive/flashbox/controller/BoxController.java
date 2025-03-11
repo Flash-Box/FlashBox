@@ -239,16 +239,28 @@ public class BoxController {
 	
 	// box 폭파 기한 연장
 	@PostMapping("/box/{bid}/extend")
-	public ResponseEntity<String> extendBoomDate(
+	public ResponseEntity<CustomResponse<Object>> extendBoomDate(
 			@PathVariable("bid") Long bid,
 			@AuthenticationPrincipal FBUserDetails fbUserDetails
 	){
 		Long uid = fbUserDetails.getUid();
 		try {
 	        boxService.extendBoomDate(bid, uid);
-	        return ResponseEntity.ok("연장 완료!");
+	        CustomResponse<Object> response = new CustomResponse<>(
+					HttpStatus.OK.value(),
+					true,
+					"Box 연장 성공",
+					null
+			);
+	        return ResponseEntity.ok(response);
 	    } catch (IllegalStateException e) {	
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    	CustomResponse<Object> response = new CustomResponse<>(
+					HttpStatus.BAD_REQUEST.value(),
+					false,
+					e.getMessage(),
+					null
+			);
+	    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	    }
 	}
 }
