@@ -121,23 +121,10 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error:", error)
         }
     });
+
 });
 
-    // 🔹 삭제 요청 (DELETE)
-    document.getElementById("deleteButton").addEventListener("click", async function handleDelete() {
-        try {
-            if (!confirm("정말 삭제하시겠습니까?")) {
-                console.log("사용자가 취소를 눌렀습니다."); // ✅ 확인
-                return;
-            }
 
-            console.log("사용자가 확인을 눌렀습니다. deleteBox 실행"); // ✅ 확인
-            await deleteBox();
-        }catch (error) {
-            console.error("Error:", error)
-        }
-
-    });
 
 	// 입력칸 클릭 시 달력 열기 기능 추가
     	document.addEventListener("DOMContentLoaded", function () {
