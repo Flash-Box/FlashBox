@@ -162,61 +162,76 @@ function addEventListeners() {
             }
     });
 
-    async function deleteBox(){
-        try {
-            deleteBtn.disabled = true; // 중복 클릭 방지
+	// 🔹 삭제 버튼 클릭 시 `deleteBox` 실행
+    deleteBtn.addEventListener("click", async function () {
+        await deleteBox(); // 삭제 함수 실행
+    });
 
-            const token = sessionStorage.getItem("accessToken");
-            const bid = selectedCard.getAttribute("data-bid");
-
-            console.log("삭제 요청 보냄, bid:", bid);
-
-            const response = await fetch(`/box`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify([bid]) // bid를 JSON 배열로 전송
-            });
-
-            const responseData = await response.json();
-            if (response.ok) {
-                alert("✅ 박스 삭제 성공");
-
-                // UI에서 삭제된 박스 제거
-                selectedCard.parentElement.remove();
-                actionButtonsContainer.style.display = "none"; // 버튼 숨기기
-                selectedCard = null;
-
-                window.location.href="/main"
-
-            } else {
-                alert("❌박스 삭제 실패: " + responseData.message);
-
-                if (responseData.message === JWT_ERROR_MSG) {
-                    alert("😭JWT 토큰 만료");
-                    try {
-                        const newToken = await refreshToken();
-                        if (newToken) {
-                            await deleteBox(); // 새로운 토큰으로 재시도
-                        }
-                    } catch (error) {
-                        console.error("토큰 갱신 실패:", error);
-                        alert("🔒재로그인이 필요합니다.");
-                        window.location.href="/login"
-                    }
-                }
-            }
-
-        } catch (error) {
-            console.error("삭제 오류:", error);
-            alert("삭제 중 오류가 발생했습니다.");
-        } finally {
-            deleteBtn.disabled = false; // 버튼 다시 활성화
-        }
-
-    }
-
-
+		async function deleteBox() {
+	    try {
+	        const deleteBtn = document.getElementById("delete-btn");
+	        deleteBtn.disabled = true; // 중복 클릭 방지
+	
+	        const token = sessionStorage.getItem("accessToken");
+	
+	        if (selectedCard.size === 0) {
+	            alert("삭제할 박스를 선택하세요!");
+	            deleteBtn.disabled = false;
+	            return;
+	        }
+	
+	        // 선택된 모든 박스의 bid 배열을 가져옴
+	        const bidList = Array.from(selectedCard);
+	
+	        console.log("🛠 삭제 요청 시작 - 선택된 박스 bid:", bidList);
+	
+	        const response = await fetch(`/box`, {
+	            method: "DELETE",
+	            headers: {
+	                "Authorization": `Bearer ${token}`,
+	                "Content-Type": "application/json"
+	            },
+	            body: JSON.stringify(bidList) // bid를 JSON 배열로 전송
+	        });
+	
+	        const responseData = await response.json();
+	        if (response.ok) {
+	            alert("✅ 박스 삭제 성공");
+	
+	            // UI에서 삭제된 박스 제거
+	            bidList.forEach(bid => {
+	                const selectedElement = document.querySelector(`[data-bid="${bid}"]`);
+	                if (selectedElement) {
+	                    selectedElement.remove();
+	                }
+	            });
+	
+	            actionButtonsContainer.style.display = "none"; // 버튼 숨기기
+	            selectedCard.clear(); // 선택 목록 초기화
+	
+	            window.location.href = "/main";
+	        } else {
+	            alert("❌ 박스 삭제 실패: " + responseData.message);
+	
+	            if (responseData.message === JWT_ERROR_MSG) {
+	                alert("😭 JWT 토큰 만료");
+	                try {
+	                    const newToken = await refreshToken();
+	                    if (newToken) {
+	                        await deleteBox(); // 새로운 토큰으로 재시도
+	                    }
+	                } catch (error) {
+	                    console.error("토큰 갱신 실패:", error);
+	                    alert("🔒 재로그인이 필요합니다.");
+	                    window.location.href = "/login";
+	                }
+	            }
+	        }
+	    } catch (error) {
+	        console.error("🚨 삭제 오류 발생:", error);
+	        alert("삭제 중 오류가 발생했습니다.");
+	    } finally {
+	        deleteBtn.disabled = false;
+	    }
+	}
 }
