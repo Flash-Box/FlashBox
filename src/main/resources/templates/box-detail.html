@@ -24,6 +24,7 @@
 	            <button id="download-btn" class="btn btn-primary" th:data-bid="${box.bid}" disabled>다운로드</button>
 	            <button id="edit-btn" class="btn btn-info" th:onclick="|window.location.href='/box/' + ${box.bid} + '/edit'|">수정</button>
 	            <button id="delete-btn" class="btn btn-danger" th:data-bid="${box.bid}">삭제</button>
+	            <button id="extend-btn" class="btn btn-info" th:data-bid="${box.bid}">박스 연장</button>
 	        </div>
 	
 	        <!-- 이미지 리스트 -->
@@ -56,15 +57,22 @@
 		    </div>
 		</div>
 	
-	    <!-- 🔹 오른쪽: 회원 초대 및 참여자 목록 -->
+	    <!-- 오른쪽: 회원 초대 및 카운트다운 -->
 	    <div class="member-section">
-			<button id="invite-btn" class="btn btn-secondary"
+	        <!-- 위쪽: 폭파 카운트다운 -->
+	        <div id="countdown-timer" class="p-4 bg-danger text-white border rounded mb-4 shadow-lg" th:data-boomDate="${box.boomDate}">
+	            <h5 class="fw-bold text-center">폭파 카운트 다운</h4>
+	            <div id="countdown" class="fw-bold fs-2 text-center" style="font-family: 'Arial', sans-serif; color: #ffffff;">00:00:00</div>
+	        </div>
+
+	        <!-- 아래쪽: 회원 초대 및 명단 -->
+	        <button id="invite-btn" class="btn btn-secondary w-100 mb-3"
 			        th:data-bid="${box.bid}"
 			        th:onclick="|window.location.href='/box/' + ${box.bid} + '/members'|">
-			    회원 초대
+			    멤버 초대
 			</button>
-	        <div class="member-list">
-	            <h4>갤러리 참여한 회원</h4>
+	        <div class="member-list p-4 bg-light border rounded shadow-sm">
+	            <h4>박스 멤버</h4>
 	            <ul>
 	                <li th:each="member : ${box.members}" th:text="${member.userName}">회원 이름</li>
 	            </ul>
