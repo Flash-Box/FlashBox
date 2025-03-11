@@ -76,7 +76,7 @@
         }
 
 /* 수정, 삭제 버튼만 width를 49.2%로 설정하여 두 버튼을 나란히 배치 */
-	.update-btn, .delete-btn {
+	.update-btn, .delete-btn, .cancel-btn {
 	    width: 49.2%; /* 각 버튼을 50%로 설정하고, 여백을 두기 위해 49.2%로 설정 */
 	    padding: 12px;
         background-color: #808080; /* 회색 바탕 */
@@ -98,3 +98,7 @@
 	.delete-btn:hover {
 	    background: #5a6268;
 	}
+
+    .cancel-btn:hover {
+        background: #5a6268;
+    }
