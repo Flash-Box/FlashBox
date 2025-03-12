@@ -214,12 +214,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ 다운로드 버튼
     if (downloadBtn) {
-        downloadBtn.addEventListener("click", function () {
+        downloadBtn.addEventListener("click", async function () {
             if (selectedImages.size === 0) {
                 alert("다운로드할 이미지를 선택해주세요.");
                 return;
             }
-            window.location.href = `/box/${bid}/picture/download?pid=${Array.from(selectedImages).join(",")}`;
+            
+            // currentImageId를 List 형태로 변환하여 서버로 보냄
+		    const response = await fetch(`/box/${bid}/picture/download?pid=${Array.from(selectedImages).join(",")}`, {
+		        method: "GET",
+		        headers: {
+		            "Authorization": `Bearer ${token}`,
+		            "Content-Type": "application/json"
+		        }
+		    });
+		
+		    const data = await response.json();
+		    console.log(data);
+		    const downloadUrl = data.downloadUrl;
+		    // 브라우저를 해당 URL로 리다이렉트하여 다운로드 실행
+		    window.location.href = downloadUrl;
+
         });
     }
 
