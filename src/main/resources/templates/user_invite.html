@@ -2,29 +2,29 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>갤러리 초대</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Box 초대</title>
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">-->
     <link rel="stylesheet" href="/css/user_invite_style.css">
+    <script src="/js/user_invite_script.js"></script> <!-- invite.js 불러오기 -->
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>갤러리 초대</h1>
- 		<p>(<span th:text="${galleryName}">갤러리 명</span>)</p>
+    <div class="container">
+        <h1>Box 초대</h1>
+ 		<p>(<span th:text="${galleryName}">Box 이름</span>)</p>
 
         <!-- 초대 이메일 입력 -->
-        <label for="email">초대할 이메일</label>
-        <input type="email" id="email" class="input-field" placeholder="이메일을 입력해주세요.">
-        <p id="error-message" class="text-danger" style="display:none;">해당 이메일의 유저가 존재하지 않습니다.</p>
+        <div class="input-group">
+        	<label for="email">초대할 이메일</label>
+        	<input type="email" id="email" name="email" placeholder="이메일을 입력해주세요." required>
+        	<p id="error-message" class="text-danger" style="display:none;">해당 이메일의 유저가 존재하지 않습니다.</p>
+		</div>
+        <button id="invite-button" class="invite-button">초대</button>
 
-        <button id="invite-button" class="btn btn-primary mt-3">초대</button>
-
-        <h4 class="mt-5">참여자 명단 공간</h4>
+        <h4 class="mt-5">멤버 명단</h4>
         <ul id="member-list">
             <li th:each="user : ${users}" th:text="${user.name}">회원 이름</li>
         </ul>
     </div>
 
-    <!-- invite.js 불러오기 -->
-    <script src="/js/user_invite_script.js"></script>
 </body>
 </html>
