@@ -129,7 +129,12 @@ function addEventListeners() {
             alert("다운로드할 박스를 선택하세요!");
             return;
             }
-
+			
+			if(selectedCard.size > 1) {
+				alert("박스 전체 다운은 1개의 박스만 선택 가능합니다!");
+				return;
+			}
+			
             try {
                 const token = sessionStorage.getItem("accessToken");
                 const bid = Array.from(selectedCard)[0]; // ✅ 첫 번째 선택된 박스의 bid 값
