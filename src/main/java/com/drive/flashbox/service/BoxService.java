@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -144,26 +145,32 @@ public class BoxService {
 	}
 	
     // 박스 전체 조회
-    public List<Box> getAllBoxes() {
-        return boxRepository.findAll();
-    }
+	public List<BoxResponse> getAllUserBoxes(Long uid) {
+	    List<Box> boxes = boxRepository.findBoxesByUser_Id(uid);
 
-    public List<BoxResponse> getAllUserBoxes(Long uid) {
-        List<Box> boxes = boxRepository.findBoxesByUser_Id(uid);
-        return boxes.stream().map(box -> BoxResponse.from(box)).toList();
-    }
+	    return boxes.stream().map(box -> {
+	        List<BoxUserResponse> members = boxUserRepository.findAllByBoxBid(box.getBid()).stream()
+	                .map(BoxUserResponse::from)
+	                .collect(Collectors.toList());
+
+	        List<String> images = pictureRepository.findAllByBoxBid(box.getBid()).stream()
+	                .map(Picture::getImageUrl)
+	                .collect(Collectors.toList());
+
+	        return BoxResponse.from(box, members, images); // ✅ members 포함하여 올바르게 호출
+	    }).collect(Collectors.toList());
+	}
 	
     // 박스 조회, 수정 --------------------------------------------------------------------- SCRUM-30-view-members
 	public BoxResponse getBox(Long bid) {				
-		Box box = boxRepository.findById(bid)		
-				.orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다.")); 
-		
-		// 모임원 리스트 조회 추가 ------------------------------------------------------------ SCRUM-30-view-members
-        List<BoxUserResponse> members = boxUserRepository.findAllByBoxBid(bid).stream()
-                .map(BoxUserResponse::from)
-                .collect(Collectors.toList());
+	    Box box = boxRepository.findById(bid)		
+	            .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다.")); 
 
-        return BoxResponse.from(box, members); // 수정된 from 메서드 사용		
+	    List<BoxUserResponse> members = boxUserRepository.findAllByBoxBid(bid).stream()
+	            .map(BoxUserResponse::from)
+	            .collect(Collectors.toList());
+
+	    return BoxResponse.from(box, members, Collections.emptyList());  // ✅ 빈 리스트 전달하여 오류 해결!
 	}
 	
 	@Transactional
