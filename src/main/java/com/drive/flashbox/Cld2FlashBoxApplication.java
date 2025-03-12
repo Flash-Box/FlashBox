@@ -16,7 +16,7 @@ public class Cld2FlashBoxApplication {
 	}
 
 	public static void printVersion() {
-		System.out.println("version 1.0.2");
+		System.out.println("version 1.0.3");
 	}
 
 }
