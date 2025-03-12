@@ -63,18 +63,17 @@ public class BoxController {
 	public ResponseEntity<CustomResponse<?>> getAllUserBoxes(@AuthenticationPrincipal FBUserDetails fbUserDetails) {
 		List<BoxResponse> boxes = boxService.getAllUserBoxes(fbUserDetails.getUid());
 
-		if (boxes.isEmpty()) {
+		if (boxes == null) {
 			CustomResponse<Object> response = new CustomResponse<Object>(
-					HttpStatus.NOT_FOUND.value(),
+					HttpStatus.BAD_REQUEST.value(),
 					false,
 					"유저 박스 전체조회 실패",
 					null
-			);
-
+					);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 
-		CustomResponse<List<BoxResponse>> response = new CustomResponse<>(
+		CustomResponse<Object> response = new CustomResponse<>(
 				HttpStatus.OK.value(),
 				true,
 				"유저 박스 전체조회 성공",
@@ -83,6 +82,7 @@ public class BoxController {
 //		System.out.println(boxes);
 		return ResponseEntity.ok(response);
 	}
+    
     
     // 박스 상세 조회: HTML 페이지 반환
     @GetMapping("/box/{bid}")
