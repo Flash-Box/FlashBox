@@ -101,10 +101,9 @@ public class BoxController {
 	@GetMapping("/box/{bid}/download")
 	@ResponseBody
 	public Map<String, Object> downloadBox(@PathVariable("bid") Long bid,
-										   @RequestParam(value = "uid", required = false) Long uid) {
-		if (uid == null) {
-			uid = 1L; // 기본 테스트 사용자
-		}
+											@AuthenticationPrincipal FBUserDetails fbUserDetails) {
+
+		Long uid = fbUserDetails.getUid();
 		String downloadUrl = boxService.generateZipAndGetPresignedUrl(bid, uid);
 
 		Map<String, Object> response = new HashMap<>();
