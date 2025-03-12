@@ -40,7 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/box", "/boxes").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         // html 접근 허용
-                        .requestMatchers("/signup","/login", "main").permitAll()
+                        .requestMatchers("/", "/health", "/actuator/health", "/signup","/login", "main").permitAll()
                         // api 허용
                         .requestMatchers("/token/refresh", "/box/**", "/box/{bid}/pictures").permitAll()
                         .anyRequest().authenticated()
