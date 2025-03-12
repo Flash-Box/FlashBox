@@ -1,10 +1,10 @@
 name: App With Github Actions with ArgoCD
 
 on:
-  # workflow_dispatch
- push:
-   branches:
-     - develop
+  workflow_dispatch
+ # push:
+ #   branches:
+ #     - develop
 
 jobs:
   ci:
@@ -87,13 +87,15 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR + update argocd-app.yaml file
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ secrets.ECR_PRIVATE_REPOSITORY}}
+          REPOSITORY: ${{ secrets.ECR_PRIVATE_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
+          CERT_ID: ${{ secrets.CERT_ID }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG ./build/libs
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           
           sed -i "s|image: .*|image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}|" manifest/argocd-app.yaml
+          sed -i "s|your-cert-id|${CERT_ID}|g" manifest/argocd-app.yaml
 
       - name: Set timestamp
         id: timestamp
