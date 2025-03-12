@@ -22,9 +22,7 @@
 	            <input type="checkbox" id="select-all-btn"> 전체 선택
 	            <button id="upload-btn" class="btn btn-success" th:data-bid="${box.bid}">업로드</button>
 	            <button id="download-btn" class="btn btn-primary" th:data-bid="${box.bid}" disabled>다운로드</button>
-	            <button id="edit-btn" class="btn btn-info" th:onclick="|window.location.href='/box/' + ${box.bid} + '/edit'|">수정</button>
 	            <button id="delete-btn" class="btn btn-danger" th:data-bid="${box.bid}">삭제</button>
-	            <button id="extend-btn" class="btn btn-info" th:data-bid="${box.bid}">박스 연장</button>
 	        </div>
 	
 	        <!-- 이미지 리스트 -->
@@ -58,26 +56,36 @@
 		</div>
 	
 	    <!-- 오른쪽: 회원 초대 및 카운트다운 -->
-	    <div class="member-section">
-	        <!-- 위쪽: 폭파 카운트다운 -->
-	        <div id="countdown-timer" class="p-4 bg-danger text-white border rounded mb-4 shadow-lg" th:data-boomDate="${box.boomDate}">
-	            <h5 class="fw-bold text-center">폭파 카운트 다운</h4>
-	            <div id="countdown" class="fw-bold fs-2 text-center" style="font-family: 'Arial', sans-serif; color: #ffffff;">00:00:00</div>
-	        </div>
+		<div class="right-section">
 
-	        <!-- 아래쪽: 회원 초대 및 명단 -->
-	        <button id="invite-btn" class="btn btn-secondary w-100 mb-3"
-			        th:data-bid="${box.bid}"
-			        th:onclick="|window.location.href='/box/' + ${box.bid} + '/members'|">
-			    멤버 초대
-			</button>
-	        <div class="member-list p-4 bg-light border rounded shadow-sm">
-	            <h4>박스 멤버</h4>
-	            <ul>
-	                <li th:each="member : ${box.members}" th:text="${member.userName}">회원 이름</li>
-	            </ul>
-	        </div>
-	    </div>
+			<div class="box-button-section">
+				<button id="edit-btn" class="btn btn-info" th:onclick="|window.location.href='/box/' + ${box.bid} + '/edit'|">박스 수정</button>
+				<button id="extend-btn" class="btn btn-info" th:data-bid="${box.bid}">박스 연장</button>
+			</div>
+
+			<div class="member-section">
+				<!-- 위쪽: 폭파 카운트다운 -->
+				<div id="countdown-timer" class="p-4 bg-danger text-white border rounded mb-4 shadow-lg" th:data-boomDate="${box.boomDate}">
+					<h5 class="fw-bold text-center">폭파 카운트 다운</h5>
+					<div id="countdown" class="fw-bold fs-2 text-center" style="font-family: 'Arial', sans-serif; color: #ffffff;">00:00:00</div>
+				</div>
+
+				<!-- 아래쪽: 회원 초대 및 명단 -->
+				<button id="invite-btn" class="btn btn-secondary w-100 mb-4"
+						th:data-bid="${box.bid}"
+						th:onclick="|window.location.href='/box/' + ${box.bid} + '/members'|">
+					멤버 초대
+				</button>
+				<div class="member-list-section">
+					<h4 class="member-list-title">박스 멤버</h4>
+					<div class="member-list p-4 bg-light border rounded shadow-sm">
+						<ul>
+							<li th:each="member : ${box.members}" th:text="${member.userName}">회원 이름</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
     <!-- Bootstrap JS -->
