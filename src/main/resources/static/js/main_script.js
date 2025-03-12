@@ -70,7 +70,8 @@ async function renderBoxes(boxes) {
                         <p>⏳ 최종 업로드: ${box.modifiedDate}</p>
                         <p style="color: red;">🔥 폭파 날짜: ${box.boomDate}</p>
                         <div class="thumbnail-container">
-                            <img src="${thumbnailSrc}" alt="썸네일 이미지" class="thumbnail-img">
+                                <img src="${thumbnailSrc}" alt="썸네일 이미지" class="thumbnail-img"
+                                 onerror="this.onerror=null;this.src='/images/default-thumbnail.jpg';"> 
                         </div>
                         <button class="btn btn-info detail-btn" data-bid="${box.bid}">상세 보기</button>
                     </div>
