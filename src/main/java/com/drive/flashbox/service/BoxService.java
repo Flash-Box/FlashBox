@@ -146,7 +146,8 @@ public class BoxService {
 	
     // 박스 전체 조회
 	public List<BoxResponse> getAllUserBoxes(Long uid) {
-	    List<Box> boxes = boxRepository.findBoxesByUser_Id(uid);
+		List<Long> bids = boxUserRepository.findAllByUserId(uid).stream().map(boxuser -> boxuser.getBox().getBid()).toList();
+		List<Box> boxes = boxRepository.findAllById(bids);
 
 	    return boxes.stream().map(box -> {
 	        List<BoxUserResponse> members = boxUserRepository.findAllByBoxBid(box.getBid()).stream()
