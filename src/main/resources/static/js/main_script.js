@@ -132,7 +132,8 @@ function addEventListeners() {
 
             try {
                 const token = sessionStorage.getItem("accessToken");
-                const response = await fetch(`/box/${selectedCard.getAttribute("data-bid")}/download`, {
+                const bid = Array.from(selectedCard)[0]; // ✅ 첫 번째 선택된 박스의 bid 값
+                const response = await fetch(`/box/${bid}/download`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
