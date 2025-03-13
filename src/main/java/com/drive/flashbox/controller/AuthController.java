@@ -41,13 +41,14 @@ public class AuthController {
     // SCRUM-43-signup-page ----------- form 데이터 처리하도록 위 코드 교체
     @PostMapping("/signup")
     public String signup(SignupRequest signupRequest, Model model) {
+
         try {
             System.out.println(signupRequest.toString());
             SignupResponse data = authService.registerUser(signupRequest);
             return "redirect:/login"; // 성공 시 리디렉션
-        } catch (IllegalStateException e) {
-            model.addAttribute("error", e.getMessage()); // 에러 메시지 전달
-            return "signup"; // 실패 시 signup.html로 돌아감
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "signup";
         }
     }    
         
@@ -66,44 +67,53 @@ public class AuthController {
 
     @ResponseBody
     @PostMapping("/login")
-    public ResponseEntity<CustomResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<CustomResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response, Model model) {
 
-        log.info("AuthController.login");
-        System.out.println("AuthController.login");
+        try {
 
-        // 1. username + password 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword());
+            // 1. username + password 를 기반으로 Authentication 객체 생성
+            // 이때 authentication 은 인증 여부를 확인하는 authenticated 값이 false
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword());
 
-        // 2. 실제 검증. authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
-        // authenticate 메서드가 실행될 때 UserDetailsService 에서 만든 loadUserByUsername 메서드 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-
-        // 인증된 사용자 정보 얻기
-        LoginResponse data = authService.login(authentication);
+            // 2. 실제 검증. authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
+            // authenticate 메서드가 실행될 때 UserDetailsService 에서 만든 loadUserByUsername 메서드 실행
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
 
-
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
-                .httpOnly(true) // JavaScript에서 접근 불가능
-                .secure(true) // HTTPS에서만 전송
-                .sameSite("Strict") // CSRF 방어
-                .path("/") // 모든 경로에서 사용 가능
-                .maxAge(1000 * 7 * 24 * 60 * 60) // 7일 동안 유효
-                .build();
-
-        response.setHeader("Set-Cookie", cookie.toString());
+            // 인증된 사용자 정보 얻기
+            LoginResponse data = authService.login(authentication);
 
 
-        CustomResponse<LoginResponse> loginResponse = new CustomResponse<>(
-                HttpStatus.OK.value(),
-                true,
-                "로그인 성공",
-                data
-        );
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", data.getRefreshToken())
+                    .httpOnly(true) // JavaScript에서 접근 불가능
+                    .secure(true) // HTTPS에서만 전송
+                    .sameSite("Strict") // CSRF 방어
+                    .path("/") // 모든 경로에서 사용 가능
+                    .maxAge(1000 * 7 * 24 * 60 * 60) // 7일 동안 유효
+                    .build();
 
-        return ResponseEntity.ok(loginResponse);
+            response.setHeader("Set-Cookie", cookie.toString());
+
+
+            CustomResponse<LoginResponse> loginResponse = new CustomResponse<>(
+                    HttpStatus.OK.value(),
+                    true,
+                    "로그인 성공",
+                    data
+            );
+            return ResponseEntity.ok(loginResponse);
+
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new CustomResponse<>(
+                            HttpStatus.UNAUTHORIZED.value(),
+                            false,
+                            "로그인 실패: " + e.getMessage(),
+                            null
+                    ));
+        }
+
+
     }
 
     @ResponseBody
