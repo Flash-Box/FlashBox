@@ -32,7 +32,7 @@ public class PictureService {
     private final BoxRepository boxRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
-    
+
     // ✅ 추가: 특정 박스의 모든 이미지 가져오기
     @Transactional(readOnly = true)
     public List<PictureDto> getPicturesByBoxId(Long bid) {
@@ -73,6 +73,7 @@ public class PictureService {
     // 이미지 업로드 (하나 또는 여러 개의 파일 업로드)
     @Transactional
     public List<Long> uploadPictures(Long bid, Long uid,MultipartFile[] files) {
+
         // 1. 박스 조회 (존재하지 않으면 예외 처리)
         Box box = boxRepository.findById(bid)
                 .orElseThrow(() -> new IllegalArgumentException("Box를 찾을 수 없습니다."));
@@ -105,8 +106,9 @@ public class PictureService {
                 byte[] fileBytes = file.getBytes();
                 s3Service.uploadFileToS3(s3Key, fileBytes);
 
-                // 5. 전체 URL 가져오기
-                String fileUrl = s3Service.getFileUrl(s3Key);
+                // 5. cloudFront url + bid + 파일명으로 저장
+                String cloudFrontUrl = "https://d32yukowftfsy2.cloudfront.net/";
+                String fileUrl = cloudFrontUrl + box.getBid() + "/" + uniqueFilename;
 
                 // 6. Picture 엔티티 생성 및 DB 저장
                 Picture picture = Picture.builder()
