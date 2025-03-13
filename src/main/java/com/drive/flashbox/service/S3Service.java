@@ -77,9 +77,9 @@ public class S3Service {
 
     // 전체 URL에서 객체 키만 추출 (예: "https://t5-flashbox.s3.ap-northeast-2.amazonaws.com/box-1/3.png" -> "box-1/3.png")
     public String extractKeyFromUrl(String fileUrl) {
-        int index = fileUrl.indexOf("amazonaws.com/");
+        int index = fileUrl.indexOf("cloudfront.net/");
         if (index != -1) {
-            return fileUrl.substring(index + "amazonaws.com/".length());
+            return fileUrl.substring(index + "cloudfront.net/".length());
         }
         return fileUrl;
     }
