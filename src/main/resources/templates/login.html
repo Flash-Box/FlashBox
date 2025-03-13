@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인</title>
 
-    <style>
-		.input-group input {
-			margin-bottom: 5px;
-        }	
-	</style>
-	
     <link rel="stylesheet" href="/css/box_form.css">
+    <link rel="stylesheet" href="/css/auth.css">
+
     <script src="/js/auth.js"></script>
 </head>
 
@@ -27,9 +23,9 @@
                 <label for="password">비밀번호</label>
                 <input type="password" id="password" name="password" placeholder="비밀번호를 입력해주세요." required>
             </div>
-            <div th:if="${param.error}" class="error-message">
-                <p th:text="${param.error}">Invalid username or password.</p>
-            </div>            
+
+            <div id="error-message-container" class="error-message" style="display: none;"></div>
+
             <button type="submit" class="button">로그인</button>            
             <a href="/signup"><button type="button" class="button">회원 가입</button></a>            
         </form>
@@ -66,27 +62,19 @@
                     
                     window.location.href = "/main";
                 } else {
-                    alert("❌로그인 실패");
+                    const errorContainer = document.getElementById("error-message-container");
+
+                    // 로그인 실패 시 화면에 에러 메시지 표시
+                    errorContainer.textContent = responseData.message || "로그인에 실패했습니다.";
+                    errorContainer.style.display = "block";
+
+                    // alert("❌로그인 실패");
                 }
             } catch (error) {
                 console.error("Error:", error);
             }
         });
 
-        async function getMainPage(token) {
-            try {
-                console.log("get main page");
-                await fetch("/", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Accept": "text/html"
-                    }
-                });
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
     </script>
 
 </body>

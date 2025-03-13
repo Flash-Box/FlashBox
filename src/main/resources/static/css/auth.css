@@ -1,0 +1,9 @@
+.error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.input-group input {
+    margin-bottom: 5px;
+}
