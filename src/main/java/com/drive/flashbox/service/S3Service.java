@@ -1,17 +1,28 @@
 package com.drive.flashbox.service;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.HttpMethod;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.*;
-import lombok.RequiredArgsConstructor;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.HttpMethod;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.ResponseHeaderOverrides;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -140,5 +151,17 @@ public class S3Service {
         }
     }
         
-    
+    public String generatePresignedUrlWithFilename(String fileUrl, String filename) {
+    	String s3Key = extractKeyFromUrl(fileUrl);  // CloudFront URL에서 S3 키 추출
+    	Date expiration = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
+        // Presigned URL 요청 객체 생성
+        GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucketName, s3Key)
+                .withMethod(HttpMethod.GET)  // 다운로드는 GET 요청
+                .withExpiration(expiration)  // 만료 시간 설정
+                .withResponseHeaders(new ResponseHeaderOverrides()
+                        .withContentDisposition("attachment; filename=\"" + filename + "\""));
+
+        URL presignedUrl = amazonS3.generatePresignedUrl(request);  // S3에서 Presigned URL 생성
+        return presignedUrl.toString();
+    }
 }

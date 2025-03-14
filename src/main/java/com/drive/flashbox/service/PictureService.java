@@ -134,11 +134,16 @@ public class PictureService {
     @Transactional(readOnly = true)
     public String generateDownloadUrlForPictures(Long bid, List<Long> pids) {
         if (pids.size() == 1) {
-            // 단일 이미지인 경우
+        	// 단일 이미지인 경우
             Picture picture = pictureRepository.findByPidAndBoxBid(pids.get(0), bid)
                     .orElseThrow(() -> new IllegalArgumentException("해당 이미지 또는 박스를 찾을 수 없습니다. pid=" + pids.get(0)));
-            // DB에 저장된 imageUrl은 전체 URL이라 가정 (이전 방식 B)
-            return s3Service.generatePresignedUrl(picture.getImageUrl());
+            // UUID 제거 후 원본 파일명 추출
+            String storedFilename = picture.getName();  // 저장된 파일명 (UUID_원래파일명)
+            String originalFileName = storedFilename.replaceFirst("^[^_]+_", "");  // UUID 제거
+
+            // Presigned URL 생성
+            String fileKey = s3Service.extractKeyFromUrl(picture.getImageUrl());
+            return s3Service.generatePresignedUrlWithFilename(fileKey, originalFileName);
         } else {
             // 여러 이미지인 경우 ZIP 파일로 묶기
             byte[] zipBytes = createZipFileForPictures(bid, pids);
