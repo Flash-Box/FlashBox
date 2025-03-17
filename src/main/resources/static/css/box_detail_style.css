@@ -1,8 +1,18 @@
 /* ✅ 전체 레이아웃 */
+* {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;    
+}
+	
+body {	
+	background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+	margin: 0; /* 기본 여백 제거 */
+}
+
 .container {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 30px;
     padding: 20px;
 }
@@ -14,7 +24,7 @@
 
 /* ✅ 제목 스타일 */
 h1 {
-    font-size: 36px;
+    font-size: 30px;
     font-weight: bold;
     margin-bottom: 20px;
     text-align: center;

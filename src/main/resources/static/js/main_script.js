@@ -9,9 +9,10 @@ document.addEventListener("DOMContentLoaded", async function getBoxes() {
     }
 
     try {
+// 닉네임 제거 - main에서만 반영되고 있음. 모든 페이지의 js에 아래 코드를 각각 반영하면 관리하기 어려우므로 통일성을 위해 제거함
         // 🔹 로그인된 유저의 닉네임 가져오기
-        const nickname = sessionStorage.getItem("nickname") || "사용자";
-        document.querySelector(".nickname").textContent = nickname;
+//        const nickname = sessionStorage.getItem("nickname") || "사용자";
+//        document.querySelector(".nickname").textContent = nickname;
 
         // 🔹 박스 리스트 가져오기
         const boxResponse = await fetch("/api/boxes", {
@@ -63,18 +64,17 @@ async function renderBoxes(boxes) {
 
         const boxHTML = `
             <div class="selectable-box" data-bid="${box.bid}">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">${box.name}</h5>
-                        <p>📅 모임 날짜: ${box.eventStartDate}</p>
-                        <p>⏳ 최종 업로드: ${box.modifiedDate}</p>
-                        <p style="color: red;">🔥 폭파 날짜: ${box.boomDate}</p>
-                        <div class="thumbnail-container">
-                                <img src="${thumbnailSrc}" alt="썸네일 이미지" class="thumbnail-img"
-                                 onerror="this.onerror=null;this.src='/images/default-thumbnail.jpg';"> 
-                        </div>
-                        <button class="btn btn-info detail-btn" data-bid="${box.bid}">상세 보기</button>
+                <div class="card">                        
+                    <div class="thumbnail-container">
+                        <img src="${thumbnailSrc}" alt="썸네일 이미지" class="thumbnail-img" data-bid="${box.bid}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="thumbnail-fallback" style="display: none;">썸네일 이미지</div> 	 
+                        <div class="thumbnail-overlay">상세보기</div> 
                     </div>
+                    <h4 class="card-title">${box.name}</h4>
+                    <h5 class="box-info">📅 모임 날짜: ${box.eventStartDate}</h5>
+                    <h5 class="box-info">⏳ 최종 업로드: ${box.modifiedDate}</h5>
+                    <h5 class="box-info boom-date">🔥 폭파 날짜: ${box.boomDate}</h5>
                 </div>
             </div>
         `;
@@ -98,8 +98,8 @@ function addEventListeners() {
 
         // 📌 박스 선택 기능 (클릭하면 선택됨)
         card.addEventListener("click", function (event) {
-            // 상세 보기 버튼을 클릭했을 때는 선택 기능이 실행되지 않도록 함
-            if (event.target.classList.contains("detail-btn")) {
+            // 썸네일 상세보기를 클릭했을 때는 선택 기능이 실행되지 않도록 함
+            if (event.target.classList.contains("thumbnail-container")) {
                 return;
             }
 
@@ -114,11 +114,21 @@ function addEventListeners() {
         });
     });
 
-    // 📌 상세 보기 버튼을 클릭하면 상세 페이지로 이동
+/*    // 📌 상세 보기 버튼을 클릭하면 상세 페이지로 이동
     document.querySelectorAll(".detail-btn").forEach(button => {
         button.addEventListener("click", function (event) {
             event.stopPropagation(); // 부모 div 클릭 이벤트 방지
             const bid = button.getAttribute("data-bid");
+            window.location.href = `/box/${bid}`;
+        });
+    });
+*/
+
+    // 썸네일 컨테이너 클릭 시 상세 페이지로 이동
+    document.querySelectorAll(".thumbnail-container").forEach(container => {
+        container.addEventListener("click", function (event) {
+            event.stopPropagation(); // 박스 선택 이벤트 방지
+            const bid = container.querySelector(".thumbnail-img").getAttribute("data-bid");
             window.location.href = `/box/${bid}`;
         });
     });
@@ -242,3 +252,7 @@ function addEventListeners() {
 	    }
 	}
 }
+
+
+    
+    

@@ -1,36 +1,165 @@
-.header {
-    width: 100%;
-    max-width: 1920px;
-    height: fit-content;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: lightslategray;
-    padding: 8px 0px 8px 0px;
-}
+/* 상단 네비게이션 바 */
+ 
+/* 전체 영역 */
+	.header {
+	 	width: 100%;
+	    max-width: 1920px;
+	    height: 80px;
+	    display: flex;
+	    align-items: center;
+	    background-color: white;
+	    padding: 8px 20px; /* 좌우 여백 조정 */
+	    position: fixed;
+	    top: 0;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    z-index: 1000;
+	}
 
-.right-header {
-    display: flex;
-    align-items: center;
-    gap: 20px; /* 요소 사이 간격 */  /* 별명과 로그아웃 버튼 사이 간격 */
-    font-family: "Gothic A1", sans-serif;
-    font-size: 16px;
-    color: white;
-}
 
-.logout-button{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 90px;
-    height: 40px;
-    font-family: "Gothic A1", sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 20px;
-    margin-right: 10px;
-    cursor: pointer;
+/* 좌측 영역 : 25% */	
+	.left-header {
+	    width: 25%;
+	    max-width: 25%;
+	    display: flex;
+	    align-items: center;
+	    gap: 5px;
+	}
+	
+	/* 브랜드 아이콘 */
+	.logo {
+	    display: inline-block;
+	    width: 24px; /* 아이콘 크기 */
+	    height: 24px;
+	    background-image: url('/favicon.ico'); /* 파비콘 경로 */
+	    background-size: cover;
+	    background-position: center top; /* 위쪽으로 이동 */
+	    position: relative;
+    	top: -1px; /* 위로 5px 이동 (조정 가능) */
+	    text-indent: -9999px; /* 텍스트 숨김 */
+	}
+	
+	.brand {
+	    font-size: 24px;
+	    font-weight: bold;
+	    color: mediumblue;
+	    text-decoration: none;
+	}
+	
 
+/* 중앙 영역 - 검책창 : 50% */
+	.search-container {
+	    width: 50%;
+	    max-width: 50%;
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    gap: 10px;
+	}
+	
+	.search-container input.form-control {
+	    width: 100%; /* 컨테이너 내에서 꽉 차게 */
+	    max-width: 600px; /* 최대 너비 제한 */
+	    padding: 8px 12px;
+	    border-radius: 10px;
+	    background-color: #f0f0f0; /* 회색 바탕 */
+	    border: 1px solid #ddd;
+	    box-shadow: none;
+	    font-size: 14px;
+	}
+
+	/* 검색 버튼 */
+    .search-button {        
+        display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    width: 90px;
+	    height: 40px;
+	    font-family: "Gothic A1", sans-serif;
+	    font-size: 14px;
+	    font-weight: bold;
+	    background-color: mediumblue;
+	    color: #fff;
+	    border: none;
+	    border-radius: 7px; /* 곡선 모서리 */
+	    cursor: pointer;
+	    transition: background-color 0.2s;
+	    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    }
+    .search-button:hover {
+        background-color: #0056b3;
+    }
+
+
+/* 우측 영역 : 25% */ 
+	.right-header {
+	    width: 25%;
+	    max-width: 25%;
+	    display: flex;
+	    align-items: center;
+	    justify-content: flex-end;
+	    gap: 20px;
+	    font-family: "Gothic A1", sans-serif;
+	    font-size: 16px;
+	    font-weight: bold;
+	    color: #333;
+	}
+
+	.nickname {
+		font-size: 16px;
+	    font-weight: bold;
+	    color: black;
+	    text-decoration: none;
+	    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+	    overflow: hidden; /* 긴 이름 잘림 */
+    	text-overflow: ellipsis; /* "..." 표시 */
+	}
+	
+	.logout-button {
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    width: 90px;
+	    height: 40px;
+	    font-family: "Gothic A1", sans-serif;
+	    font-size: 14px;
+	    font-weight: bold;
+	    background-color: #808080; /* 회색 바탕 */
+	    color: #fff;
+	    border: none;
+	    border-radius: 20px;
+	    cursor: pointer;
+	    transition: background-color 0.2s;
+	    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+	}	
+	.logout-button:hover {
+	    background-color: #5a6268; /* 호버 시 조금 어두운 회색 */
+	}
+
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+    .left-header {
+        width: 25%;
+        max-width: 25%;
+    }
+    .search-container {
+        width: 50%;
+        max-width: 50%;
+    }
+    .right-header {
+        width: 25%;
+        max-width: 25%;
+    }
+    .search-container input.form-control {
+        max-width: 100%; /* 모바일에서 검색창 축소 */
+    }
+    .nickname {
+        font-size: 14px; /* 모바일에서 글자 축소 */
+    }
+    .logout-button {
+        width: 70px;
+        height: 35px;
+        font-size: 12px;
+    }
 }

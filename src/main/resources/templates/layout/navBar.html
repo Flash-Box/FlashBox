@@ -11,13 +11,20 @@
 <div class="header" th:fragment="headerLayout">
     <!-- 왼쪽 로고 -->
     <div class="left-header">
-        <a href="/boxes" class="logo">FlashBox</a>
+        <a href="/boxes" class="logo">(로고)</a>
+        <a href="/boxes" class="brand">FlashBox</a>
+    </div>
+    
+	<!-- 검색창 추가 -->
+    <div class="search-container">
+        <input type="text" class="form-control" placeholder="검색어를 입력하세요">
+        <button class="search-button">🔍 검색</button>
     </div>
 
     <!-- 오른쪽 별명과 로그아웃 버튼 -->
     <div class="right-header">
-        <div class="nickname">안녕하세요, oo 님!</div>
-        <button class="logout-button" onclick="FBlogout()">Logout</button>
+        <div class="nickname" th:text="'안녕하세요, ' + ${username} + '님!'">안녕하세요, 회원님!</div>
+        <button class="logout-button" onclick="FBlogout()">로그아웃</button>
     </div>
 </div>
 
