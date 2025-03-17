@@ -1,212 +1,351 @@
-/* 상단 바 레이아웃 */
-.header-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px 20px;
-    background-color: #f8f9fa;
-}
-
-/* 검색창과 유저 정보 컨테이너 (6:4 비율 적용) */
-.search-user-container {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-/* 검색창 (6 비율) */
-.search-container {
-    flex: 6;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* 정렬 버튼 */
-.sort-btn {
-    background-color: #ddd;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    margin-right: 10px;
-    cursor: pointer;
-}
-
-/* 유저 정보 (4 비율) */
-.user-container {
-    flex: 4;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-/* 검색창 스타일 */
-.search-container input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-/* 유저 정보 버튼 스타일 */
-.user-container .user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: #e5e5e5;
-    padding: 5px 10px;
-    border-radius: 20px;
-}
-
-/* 다운로드 / 삭제 버튼 (우측 상단 고정) */
-.action-buttons {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    display: none;
-    gap: 10px;
-}
-
-/* 동그란 버튼 스타일 */
-.round-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.download-btn {
-    background-color: #90caf9;
-    color: white;
-}
-
-.delete-btn {
-    background-color: #ef5350;
-    color: white;
-}
-
-/* 박스 정렬 개선 */
-#box-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-}
-
-/* 개별 박스 스타일 */
-.selectable-box {
-    width: 200px;
-    max-width: 100%;
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
-    text-align: center;
-    padding: 10px;
-    border: 2px solid transparent;
-}
-
-/* 선택된 박스 스타일 */
-.selected-box {
-    border: 3px solid #007bff;
-    transform: scale(1.05);
-}
-
-/* 선택 해제 버튼 스타일 */
-.deselect-btn {
-    width: 100%;
-    margin-top: 5px;
-    display: none; /* 기본적으로 숨김 */
-}
+/* 전체 화면 스타일 */
+	* {
+	    font-family: Arial, sans-serif;
+	    box-sizing: border-box;    
+	}
+		
+	body {	
+		background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+		margin: 0; /* 기본 여백 제거 */
+	}
 
 
-/* 📌 다운로드 / 삭제 버튼 위치 조정 */
-#action-buttons-container {
-    position: fixed;
-    top: 150px;  /* 기존보다 조금 아래로 조정 */
-    right: 30px;
-    display: none;
-    gap: 35px;
-}
+/* 콘텐츠 영역 */
+	/* 박스 정렬 개선 */
+	#box-container {
+	    display: grid;
+	    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+	    gap: 20px;
+	    padding: 100px 20px 80px; 
+	    max-width: 1920px;
+	    margin: 0 auto;  
+	}
+	
+	/* 선택 박스 스타일 */
+	.selectable-box {
+		border-radius: 7px; /* 곡선 모서리 */
+		overflow: hidden;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+		transition: transform 0.2s ease-in-out;
+		background-color: #D2B48C;
+		border: 7px solid transparent; /* 기본 투명 border 설정 */
+	}
+	
+	.selectable-box:hover {
+	    transform: scale(1.03); 
+	}
+	
+	/* 선택된 박스 스타일 */
+	.selected-box {
+	    border: 7px solid mediumblue;
+	}
 
-/* 카드 내부 스타일 */
-.card {
-    border: none;
-    padding: 10px;
-}
+	/* 선택 해제 버튼 스타일 */
+	.deselect-btn {
+	    width: 100%;
+	    margin-top: 5px;
+	    display: none; /* 기본적으로 숨김 */
+	}		
 
 
-/* 추가(+) 버튼 스타일 개선 */
-.new-box-btn {
-	position: fixed;
-  	bottom: 40px; 
-  	right: 40px;  
-	width: 60px;
-	height: 60px;
-	border-radius: 50%;
-	background-color: #007BFF;
-	color: #fff;
-	border: none;
-	font-size: 36px;
-	cursor: pointer;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: transform 0.2s, box-shadow 0.2s;
-  	z-index: 1050;
-}
+/* 박스 내부 영역 */
+	/* 박스 내부 스타일 */
+	.card {
+	    text-align: center;
+	    color: #333;
+	    display: flex;
+	    flex-direction: column;
+	    background-color: white; /* 흰색 사각형 바탕 */
+	    margin: 15px; /* 박스와의 간격 */
+	    border-radius: 0px; /* 곡선 모서리 */
+	    padding: 20px; /* 좌우 및 상하 여백 추가로 썸네일 간격 확보 */
+	    box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.1);	/* 왼쪽과 하단에 그림자 추가 */
+	}
 
-/* 버튼 호버(마우스 올릴 때) 효과 */
-.new-box-btn:hover {
-    background-color: #0056b3;  /* 더 어두운 파란색 */
-    transform: scale(1.1);  /* 약간 확대 */
-}
+	.card-title {
+		text-align: center;
+		color: mediumblue;
+	    font-size: 16px;
+	    font-weight: bold;	    
+	    margin-bottom: 10px;
+	}
 
-/* 썸네일 이미지 스타일 */
-.thumbnail-container {
-    width: 100%;
-    height: 120px; /* 원하는 크기로 조정 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 10px;
-    margin-top: 10px;
-    cursor: pointer;
-}
+/*	.card-body {
+	    position: relative; 
+	    z-index: 2; 
+	    flex-grow: 1;
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: space-between;
+	}
+*/	
 
-.thumbnail-img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease-in-out;
-}
+	/* 박스 정보 스타일 */
+	.box-info {
+		color: #333;
+	    font-size: 14px;
+	    font-weight: bold;
+	    margin: 5px;
+	}
 
+	.box-info.boom-date {
+	    color: #D30000; /* 폭파 날짜만 빨간색 */
+	}
+
+/* 썸네일 영역 */	
+	/* 썸네일 컨테이너 스타일 */
+	.thumbnail-container {
+	    width: 100%;
+	    height: 150px;
+	    overflow: hidden;
+	    position: relative; 
+	    display: flex; /* Flexbox로 중앙 정렬 */
+	    align-items: center; /* 수직 중앙 */
+	    justify-content: center; /* 수평 중앙 */
+	    cursor: pointer; /* 클릭 가능함을 표시 */
+	    border-radius: 10px; /* 곡선 모서리 */
+	    margin-top: 0px;
+	    margin-bottom: 20px;
+    	box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);	/* 썸네일 왼쪽과 하단에 그림자 추가 */
+	}
+
+	/* 썸네일 이미지 스타일 */
+	.thumbnail-img {
+	    width: 100%;
+	    height: 100%;
+	    object-fit: cover;
+	    transition: transform 0.3s ease-in-out;
+	    cursor: pointer; /* 클릭 가능함을 표시 */
+	}
+
+	/* 오버레이 스타일 */
+	.thumbnail-overlay {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은색 음영 */
+	    color: #f0f4f8;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    font-size: 16px;
+	    opacity: 0; /* 기본적으로 숨김 */
+	    transition: opacity 0.3s ease-in-out; /* 부드러운 전환 */
+	    z-index: 3; /* 카드와 썸네일 위에 */
+	}
+
+	/* 썸네일 호버 시 오버레이 표시 */
+	.thumbnail-container:hover .thumbnail-overlay {
+	    opacity: 1; /* 호버 시 나타남 */
+	}
+
+	/* 이미지 로드 실패 시 대체 텍스트 */
+	.thumbnail-fallback {
+	    width: 100%;
+	    height: 100%;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    color: #333; /* 텍스트 색상 */
+	    font-size: 16px;
+	    background-color: #f0f0f0; /* 배경색으로 구분 */
+	}
+
+
+/* 버튼 영역 */	
+	.btn btn-info detail-btn {
+		display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    width: 90px;
+	    height: 40px;
+	    font-family: "Gothic A1", sans-serif;
+	    font-size: 14px;
+	    font-weight: bold;
+	    background-color: mediumblue;
+	    color: #fff;
+	    border: none;
+	    border-radius: 10px; /* 곡선 모서리 */
+	    cursor: pointer;
+	}
+
+
+	/* 📌 다운로드 / 삭제 버튼 위치 조정 */
+	#action-buttons-container {
+	    position: fixed;
+	    top: 290px;  /* 기존보다 아래로 조정 */
+	    right: 34px; /* 컨테이너 오른쪽 공간 확보 */
+	    display: none;
+	    flex-direction: column; /* 세로로 배치 */
+	    gap: 15px; /* 버튼 사이 간격 */
+	}
+	
+	/* 다운로드 / 삭제 버튼 (우측 상단 고정) */	
+	/* 제거 (필요 없어짐) */	
+/*	.action-buttons {
+	    position: fixed;
+	    top: 20px;
+	    right: 20px;
+	    display: none;
+	    gap: 10px;
+	}
+*/	
+
+	/* 다운로드 버튼 스타일 */	
+	#download-btn {
+	    width: 60px; /* 버튼 크기 증가 */
+	    height: 60px;
+	    font-size: 24px; /* 아이콘 크기 증가 */
+	    background-color: mediumblue; 
+	    color: white;
+	    border: none;
+	    border-radius: 10%; /* 모서리 굴곡 */
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    cursor: pointer;
+	    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	    transition: transform 0.2s, box-shadow 0.2s; /* 호버 효과 부드럽게 */
+	    position: relative; /* 호버 문구를 위한 상대 위치 */
+	}
+	
+	#download-btn:hover {
+    	background-color: #0056b3; /* 더 어두운 초록색 */
+    	transform: scale(1.1);  /* 약간 확대 */
+	}
+
+	/* 다운로드 버튼 호버 시 문구 표시 */
+	#download-btn .tooltip-text {
+	    display: none; /* 기본적으로 숨김 */
+	    position: absolute;
+	    top: -40px; /* 버튼 위에 표시 */
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background-color: rgba(0, 0, 0, 0.8);
+	    color: white;
+	    padding: 5px 10px;
+	    border-radius: 5px;
+	    font-size: 14px;
+	    white-space: nowrap;
+	    z-index: 10;
+	}
+	
+	/* 다운로드 버튼 호버 시 문구 보이게 - 2025.03.16 */
+	#download-btn:hover .tooltip-text {
+	    display: block;
+	}
+
+	/* 삭제 버튼 스타일 */
+	#delete-btn {
+	    width: 60px; /* 버튼 크기 증가 */
+	    height: 60px;
+	    font-size: 24px; /* 아이콘 크기 증가 */
+	    background-color: #D30000; 
+	    color: white;
+	    border: none;
+	    border-radius: 10%; /* 모서리 굴곡 */
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    cursor: pointer;
+	    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	    transition: transform 0.2s, box-shadow 0.2s; /* 호버 효과 부드럽게 */
+	    position: relative; /* 호버 문구를 위한 상대 위치 */
+	}
+
+	/* 삭제 버튼 호버 효과 */
+	#delete-btn:hover {
+	    background-color: #b02a37; /* 더 어두운 빨간색 */
+	    transform: scale(1.1);  /* 약간 확대 */
+	}	
+
+	/* 삭제 버튼 호버 시 문구 표시 - 2025.03.16 */
+	#delete-btn .tooltip-text {
+	    display: none; /* 기본적으로 숨김 */
+	    position: absolute;
+	    top: -40px; /* 버튼 위에 표시 */
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background-color: rgba(0, 0, 0, 0.8);
+	    color: white;
+	    padding: 5px 10px;
+	    border-radius: 5px;
+	    font-size: 14px;
+	    white-space: nowrap;
+	    z-index: 10;
+	}
+	
+	/* 삭제 버튼 호버 시 문구 보이게 - 2025.03.16 */
+	#delete-btn:hover .tooltip-text {
+	    display: block;
+	}
+
+	
+	/* 추가(+) 버튼 스타일 개선 */
+	.new-box-btn {
+		position: fixed;
+	    bottom: 40px;
+	    right: 25px;
+	    width: 80px;
+	    height: 80px;
+	    border-radius: 50%;
+	    background-color: mediumblue;
+	    color: #fff;
+	    border: none;
+	    font-size: 17px;
+	    font-weight: bold;
+	    cursor: pointer;
+	    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    transition: transform 0.2s, box-shadow 0.2s;
+	    z-index: 1050;
+	    line-height: 25px;    
+	}
+	
+	/* 버튼 호버(마우스 올릴 때) 효과 */
+	.new-box-btn:hover {
+	    background-color: #0056b3;  /* 더 어두운 파란색 */
+	    transform: scale(1.1);  /* 약간 확대 */
+	}
+
+/*		.round-btn {
+	    width: 50px;
+	    height: 50px;
+	    border-radius: 50%;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    font-size: 20px;
+	    cursor: pointer;
+	}
+*/
 
 /* 반응형 */
-@media (max-width: 768px) {
-    .selectable-box {
-        width: 150px;
-    }
-    #box-container {
-        gap: 10px;
-    }
-    #action-buttons-container {
-    	top: 50px; /* 모바일에서는 조금 더 위로 조정 */
-    }
-    .new-box-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        bottom: 15px;
-        right: 15px;
-    }
-}
+	@media (max-width: 768px) {
+	       
+	    #box-container {
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	        padding: 70px 10px 10px; /* 모바일에서도 충분한 공간 확보 */
+	    }
+
+/*    .selectable-box {
+	        width: 150px;
+	    }	*/
+	            
+	    #action-buttons-container {
+	    	top: 50px; /* 모바일에서는 조금 더 위로 조정 */
+	    	right: 20px; /* 모바일에서 약간 덜 이동 */
+	    }
+	    	
+	    .new-box-btn {
+	        width: 50px;
+	        height: 50px;
+	        font-size: 24px;
+	        bottom: 15px;
+	        right: 15px;
+	    }
+	}

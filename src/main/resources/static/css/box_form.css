@@ -75,6 +75,25 @@
             background-color: #5a6268; /* 호버 시 조금 어두운 회색 */
         }
 
+        .signup-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #808080; /* 회색 바탕 */
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px; /* 곡선 모서리 */
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .signup-button:hover {
+            background-color: #5a6268; /* 호버 시 조금 어두운 회색 */
+        }
+
 /* 수정, 삭제 버튼만 width를 49.2%로 설정하여 두 버튼을 나란히 배치 */
 	.update-btn, .delete-btn, .cancel-btn {
 	    width: 49.2%; /* 각 버튼을 50%로 설정하고, 여백을 두기 위해 49.2%로 설정 */
