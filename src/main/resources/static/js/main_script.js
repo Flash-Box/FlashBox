@@ -17,10 +17,9 @@ async function fetchBoxes(keyword = "") {	// SCRUM-69-activate-search-bar :수�
     }
 
     try {
-// 닉네임 제거 - main에서만 반영되고 있음. 모든 페이지의 js에 아래 코드를 각각 반영하면 관리하기 어려우므로 통일성을 위해 제거함
-        // 🔹 로그인된 유저의 닉네임 가져오기
-//        const nickname = sessionStorage.getItem("nickname") || "사용자";
-//        document.querySelector(".nickname").textContent = nickname;
+        // SCRUM-72 : 로그인된 유저의 닉네임 가져오기(코드 부활)
+        const nickname = sessionStorage.getItem("nickname") || "사용자";
+        document.querySelector(".nickname").textContent = nickname;
 
         // 🔹 박스 리스트 가져오기
         const url = keyword ? `/api/boxes?keyword=${encodeURIComponent(keyword)}` : "/api/boxes";	// SCRUM-69-activate-search-bar :수정

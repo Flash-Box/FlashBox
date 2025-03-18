@@ -42,16 +42,5 @@ public class User extends BaseTimeEntity {
     private final List<BoxUser> boxUsers = new ArrayList<>();
 
     protected User() {}
-//
-//    private User(String username, String email, String password) {
-//        this.name = username;
-//        this.password = password;
-//        this.email = email;
-//    }
-//
-//    public static User of(String username, String email, String password) {
-//        return new User(username, email, password);
-//    }
-
 
 }

@@ -55,7 +55,7 @@ public class FBUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return name != null ? name : email; // SCRUM-72 : name 우선, 없으면 email
     }
 
     @Override
