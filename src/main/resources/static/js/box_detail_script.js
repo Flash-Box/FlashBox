@@ -421,4 +421,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // 1초마다 카운트다운 업데이트
     const countdownInterval = setInterval(updateCountdown, 1000);
     updateCountdown(); // 초기 카운트다운 값 설정
+    
+    
+    // SCRUM-72 : 로그인된 유저의 닉네임 가져오기
+    const nickname = sessionStorage.getItem("nickname") || "사용자";
+    document.querySelector(".nickname").textContent = nickname;
 });

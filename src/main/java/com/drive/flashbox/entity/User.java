@@ -59,5 +59,4 @@ public class User extends BaseTimeEntity {
 //        return new User(username, email, password);
 //    }
 
-
 }

@@ -33,7 +33,7 @@ public class JwtTokenProvider {
     private static final String BEARER_TYPE = "Bearer";
 
     @Value("${jwt.access.exp-time}")
-    private long ACCESS_TOKEN_EXPIRE_TIME;            // 30분
+    private long ACCESS_TOKEN_EXPIRE_TIME;            // 1시간
     @Value("${jwt.refresh.exp-time}")
     private long REFRESH_TOKEN_EXPIRE_TIME;  // 7일
 
@@ -60,10 +60,11 @@ public class JwtTokenProvider {
 //        UserDetails에서 사용자 ID 추출
         FBUserDetails userDetails = (FBUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getUid();  // 사용자 ID
+        String subject = authentication.getName();
 
         // Access Token 생성
         String accessToken = Jwts.builder()
-                .subject(authentication.getName())       // payload "sub": "name"
+                .subject(subject)       // payload "sub": "name"
                 .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "USER"
                 .claim(ID_KEY, userId)
                 .issuer(ISSUER)
@@ -73,7 +74,7 @@ public class JwtTokenProvider {
 
         // Refresh Token 생성
         String refreshToken = Jwts.builder()
-                .subject(authentication.getName())       // payload "sub": "name"
+                .subject(subject)       // payload "sub": "name"
                 .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "USER"
                 .claim(ID_KEY, userId)
                 .issuer(ISSUER)

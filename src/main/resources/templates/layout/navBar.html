@@ -23,7 +23,8 @@
 
     <!-- 오른쪽 별명과 로그아웃 버튼 -->
     <div class="right-header">
-        <div class="nickname" th:text="'안녕하세요, ' + ${username} + '님!'">안녕하세요, 회원님!</div>
+        
+        <div class="nickname" th:text="'안녕하세요, ' + (${username} ?: '회원') + '님!'">안녕하세요, 회원님!</div>
         <button class="logout-button" onclick="FBlogout()">로그아웃</button>
     </div>
 </div>
