@@ -52,17 +52,29 @@ public class BoxController {
 		return "newBox";
 	}
 
-    // 박스 전체 조회: HTML 페이지 반환
-    @GetMapping("/boxes")
-    public String getAllBoxes() {
-
-        return "main"; // templates/main.html 렌더링
+    // 박스 전체 조회: HTML 페이지 반환    
+    public String getAllBoxes(@AuthenticationPrincipal FBUserDetails fbUserDetails, Model model) {
+        model.addAttribute("username", fbUserDetails.getUsername()); // 네비게이션 바에 사용자 이름 전달 - SCRUM-69-activate-search-bar
+        return "main";
     }
 
 	@GetMapping("/api/boxes")
-	public ResponseEntity<CustomResponse<?>> getAllUserBoxes(@AuthenticationPrincipal FBUserDetails fbUserDetails) {
-		List<BoxResponse> boxes = boxService.getAllUserBoxes(fbUserDetails.getUid());
+	public ResponseEntity<CustomResponse<?>> getAllUserBoxes(
+			// SCRUM-69-activate-search-bar : 검색어 파라미터 추가
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@AuthenticationPrincipal FBUserDetails fbUserDetails) {
+		List<BoxResponse> boxes;
+		Long uid = fbUserDetails.getUid();
 
+		// SCRUM-69-activate-search-bar
+		if (keyword != null && !keyword.trim().isEmpty()) {
+            // 검색어가 있으면 필터링된 박스 조회
+            boxes = boxService.searchBoxesByKeyword(keyword, uid);
+        } else {
+            // 검색어 없으면 전체 박스 조회
+            boxes = boxService.getAllUserBoxes(uid);
+        }		
+		
 		if (boxes == null) {
 			CustomResponse<Object> response = new CustomResponse<Object>(
 					HttpStatus.BAD_REQUEST.value(),

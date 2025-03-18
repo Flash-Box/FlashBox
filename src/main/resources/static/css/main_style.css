@@ -15,7 +15,7 @@
 	#box-container {
 	    display: grid;
 	    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-	    gap: 20px;
+	    gap: 30px;
 	    padding: 100px 20px 80px; 
 	    max-width: 1920px;
 	    margin: 0 auto;  
@@ -25,7 +25,7 @@
 	.selectable-box {
 		border-radius: 7px; /* 곡선 모서리 */
 		overflow: hidden;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+		box-shadow: -5px 5px 5px rgba(0, 0, 0, 0.3);
 		transition: transform 0.2s ease-in-out;
 		background-color: #D2B48C;
 		border: 7px solid transparent; /* 기본 투명 border 설정 */
