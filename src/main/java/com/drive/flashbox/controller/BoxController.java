@@ -52,9 +52,14 @@ public class BoxController {
 		return "newBox";
 	}
 
-    // 박스 전체 조회: HTML 페이지 반환    
+    // 박스 전체 조회: HTML 페이지 반환
+	@GetMapping("/boxes") // SCRUM-70 : /main -> /boxes 전환
     public String getAllBoxes(@AuthenticationPrincipal FBUserDetails fbUserDetails, Model model) {
-        model.addAttribute("username", fbUserDetails.getUsername()); // 네비게이션 바에 사용자 이름 전달 - SCRUM-69-activate-search-bar
+		if (fbUserDetails == null) {
+            model.addAttribute("authFailed", true);	// SCRUM-70 : /boxes로 돌아갈 때 인증 에러 문제 해결
+            return "main";
+        }
+		model.addAttribute("username", fbUserDetails.getUsername()); // 네비게이션 바에 사용자 이름 전달 - SCRUM-69-activate-search-bar
         return "main";
     }
 

@@ -7,12 +7,6 @@ function searchBoxes() {
 }
 
 
-// SCRUM-69-activate-search-bar : 페이지 로드 시 박스 리스트 불러오기
-document.addEventListener("DOMContentLoaded", async function () {
-    await fetchBoxes();
-});
-
-
 // SCRUM-69-activate-search-bar : 박스 리스트 가져오기 수정 2025.03.18
 async function fetchBoxes(keyword = "") {	// SCRUM-69-activate-search-bar :수정
     const token = sessionStorage.getItem("accessToken");
@@ -42,11 +36,18 @@ async function fetchBoxes(keyword = "") {	// SCRUM-69-activate-search-bar :수�
         if (boxResponse.ok) {
             console.log("📦 박스 리스트:", boxes);
             await renderBoxes(boxes); // 박스 렌더링 실행
+            
+            // SCRUM-70-goback-after-search : URL 히스토리 업데이트, /main -> /boxes
+            if (keyword) {
+                history.pushState({ keyword }, "", `/boxes?keyword=${encodeURIComponent(keyword)}`);
+            } else {
+                history.pushState(null, "", "/boxes");
+            }
 
         }else {
             alert("❌박스 조회 실패");
-            if (boxes.message === JWT_ERROR_MSG) {
-                alert("😭JWT 토큰 만료");
+            if (boxes.message === JWT_ERROR_MSG || response.status === 401) {	// SCRUM-70 : 401 추가
+                alert("😭JWT 토큰 만료 또는 인증 실패");
                 try {
                     const newToken = await refreshToken();
                     if (newToken) {
@@ -66,11 +67,54 @@ async function fetchBoxes(keyword = "") {	// SCRUM-69-activate-search-bar :수�
 };
 
 
+// SCRUM-69 & 70 : 페이지 로드 및 뒤로가기 처리
+document.addEventListener("DOMContentLoaded", async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const keyword = urlParams.get("keyword") || "";
+    await fetchBoxes(keyword); // 초기 로드 시 URL의 키워드 반영
+
+	// SCRUM-70 : 검색창에서 엔터 키 입력 시 검색 실행 추가
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // 기본 동작 방지 (폼 제출 방지)
+                searchBoxes(); // 검색 실행
+            }
+        });
+    }
+});
+
+// SCRUM-70-goback-after-search : 뒤로가기 시 전체 박스 리스트 로드
+window.addEventListener("popstate", async function (event) {
+    event.preventDefault(); // 서버 요청 방지
+    const urlParams = new URLSearchParams(window.location.search);
+    const keyword = urlParams.get("keyword") || "";
+    await fetchBoxes(keyword); // 뒤로가기 시 키워드에 맞춰 박스 로드
+});
+
+
 // 🔹 박스 리스트 렌더링 함수
 async function renderBoxes(boxes) {
     const container = document.getElementById("box-container");
     container.innerHTML = "";
 
+	// SCRUM-70-goback-after-search : 검색 결과 없음 처리 + /main -> /boxes
+	if (boxes.data.length === 0) {
+        container.innerHTML = `
+            <div class="no-results">
+                검색 결과가 없습니다.
+                <button id="show-all-btn" class="btn-link">전체 박스로 돌아가기</button>
+            </div>
+        `;
+        document.getElementById("show-all-btn").addEventListener("click", async () => {
+            history.pushState(null, "", "/boxes"); // SCRUM-70 : /main -> /boxes
+            await fetchBoxes();
+        });
+        return;
+    }
+
+	// 박스 리스트 상세 내용
     boxes.data.forEach(box => {
         const images = box.images || [];
         const thumbnailSrc = images.length > 0 ? `${images[0]}?nocache=${Math.random()}` : "/images/default-thumbnail.jpg";
@@ -242,7 +286,7 @@ function addEventListeners() {
 	            actionButtonsContainer.style.display = "none"; // 버튼 숨기기
 	            selectedCard.clear(); // 선택 목록 초기화
 	
-	            window.location.href = "/main";
+	            window.location.href = "/boxes";	// SCRUM-70 : /main -> /boxes
 	        } else {
 	            alert("❌ 박스 삭제 실패: " + responseData.message);
 	
