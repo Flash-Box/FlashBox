@@ -1,190 +1,225 @@
 /* ✅ 전체 레이아웃 */
-* {
-    font-family: Arial, sans-serif;
-    box-sizing: border-box;    
-}
+	* {
+	    font-family: Arial, sans-serif;
+	    box-sizing: border-box;    
+	}
+		
+	body {	
+		background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+		margin: 0; /* 기본 여백 제거 */
+	}
+
+
+
+/* 콘텐츠 영역 */
+	.container {
+	    display: grid;
+	    grid-template-columns: 1fr 260px; /* 왼쪽은 유동적, 오른쪽은 right-section 크기 고정 */
+	    gap: 30px;
+	    padding: 100px 30px 80px; 
+	    max-width: 1920px;
+	    margin: 0 auto;
+	    justify-content: space-between; /* 양쪽 끝으로 분리 */  
+	}
+
+	/* ✅ 갤러리 컨텐츠 */
+	.gallery-content {
+	    flex: 1;
+	}
 	
-body {	
-	background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-	margin: 0; /* 기본 여백 제거 */
-}
+	/* ✅ 제목 스타일 */
+	h1 {
+	    font-size: 30px;
+	    font-weight: bold;
+	    margin-bottom: 20px;
+	    text-align: center;
+	    color: mediumblue;
+	}
+	
+	/* ✅ 버튼 영역 스타일 */
+	.button-group {
+	    display: flex;
+	    justify-content: center;
+	    gap: 15px;
+	    margin-bottom: 20px;
+	}
+	
+	/* ✅ 버튼 기본 스타일 */
+	button {
+	    padding: 12px 18px;
+	    font-size: 15px;
+	    border-radius: 7px;
+	    border: none;
+	    cursor: pointer;
+	    transition: all 0.3s ease-in-out;
+	}
+	
+	/* ✅ 버튼 색상 구분 */
+	#upload-btn {
+	    background-color: #28a745; /* 녹색 */
+	    color: white;
+	    border: 1px solid #28a745;
+	}
+	
+	#download-btn {
+	    background-color: mediumblue; /* 파란색 */
+	    color: white;
+	    border: 1px solid mediumblue;
+	}
+	
+	#delete-btn {
+	    background-color: #D30000; /* 빨간색 */
+	    color: white;
+	    border: 1px solid #D30000;
+	}
+	
+	#edit-btn {
+	    background-color: #17a2b8; /* 청록색 */
+	    color: white;
+	    border: 1px solid #17a2b8;
+	}
+	
+	#extend-btn {
+	    background-color: #0dcaf0;
+	    color: white;
+	    border: 1px solid #0dcaf0;
+	}
+	
+	/* ✅ 버튼 호버 효과 */
+	button:hover {
+	    filter: brightness(80%);
+	}
 
-.container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-    padding: 20px;
-}
 
-/* ✅ 갤러리 컨텐츠 */
-.gallery-content {
-    flex: 1;
-}
 
-/* ✅ 제목 스타일 */
-h1 {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-}
+	/* ✅ 이미지 갤러리 */
+	.gallery-grid {
+	    display: grid;
+	    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 반응형 */
+	    gap: 15px;
+	    padding: 10px;     
+	}
 
-/* ✅ 버튼 영역 스타일 */
-.button-group {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
+	/* ✅ 이미지 스타일 */
+	.gallery-item {
+	    position: relative; 
+	    border-radius: 10px; /* 곡선 모서리 */
+	    overflow: hidden;
+	    box-shadow: -3px 3px 3px rgba(0, 0, 0, 0.3);	/* 썸네일 왼쪽과 하단에 그림자 추가 */    
+	  	width: 220px;
+	    height: 220px;  
+	    cursor: pointer; /* 클릭 가능함을 표시 */
+	    margin-bottom: 10px; 
+	}
 
-/* ✅ 버튼 기본 스타일 */
-button {
-    padding: 12px 18px;
-    font-size: 15px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
+	.gallery-item img {
+	    width: 100%;
+	    height: 100%;    
+	    transition: transform 0.3s ease-in-out;
+	    cursor: pointer; /* 클릭 가능함을 표시 */ 
+	    object-fit: cover;
+	    border-radius: 10px; /* 이미지에도 곡선 모서리 적용 */      
+	}
+	
+	.gallery-item img:hover {
+	    transform: scale(1.05);
+	}
 
-/* ✅ 버튼 색상 구분 */
-#upload-btn {
-    background-color: #28a745; /* 녹색 */
-    color: white;
-}
+	/* ✅ 선택된 이미지 강조 */
+	.gallery-item.selected {
+	    border: 3px solid mediumblue;
+	    border-radius: 10px; /* 선택 시 테두리도 곡선 유지 */
+	}
 
-#download-btn {
-    background-color: #007bff; /* 파란색 */
-    color: white;
-}
 
-#delete-btn {
-    background-color: #dc3545; /* 빨간색 */
-    color: white;
-}
 
-#edit-btn {
-    background-color: #17a2b8; /* 청록색 */
-    color: white;
-}
-
-#extend-btn {
-    background-color: #0dcaf0;
-    color: white;
-}
-
-/* ✅ 버튼 호버 효과 */
-button:hover {
-    filter: brightness(90%);
-}
-
-/* ✅ 이미지 갤러리 */
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 반응형 */
-    gap: 12px;
-    padding: 10px;
-}
-
-/* ✅ 이미지 스타일 */
-.gallery-item {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.gallery-item img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    transition: transform 0.2s ease-in-out;
-}
-
-.gallery-item img:hover {
-    transform: scale(1.05);
-}
-
-/* ✅ 선택된 이미지 강조 */
-.gallery-item.selected {
-    border: 3px solid #007bff;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-}
 
 /* ✅ 오른쪽 섹션 */
-.right-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	.right-section {		
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    position: sticky; /* 상단에 고정 */
+	    top: 100px; /* 네비게이션 바 아래부터 시작 */
+	    height: fit-content; /* 내용에 맞게 높이 조정 */
+	}
 
-    margin-top: 50px;
-}
-
-/* ✅ 박스 수정,연장 버튼 섹션 */
-.box-button-section {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    gap: 10px;
-    margin-bottom: 30px;
-}
+	/* ✅ 박스 수정, 연장 버튼 섹션 */
+	.box-button-section {
+	    display: flex;	    
+	    align-items: center;
+	    justify-content: space-between;
+	    gap: 20px;
+	    margin-bottom: 30px;
+	    
+	}
 
 
-/* ✅ 회원 초대 섹션 */
-.member-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    width: 260px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+	/* ✅ 회원 초대 섹션 */
+	.member-section {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    background: #f8f9fa;
+	    padding: 15px;
+	    border-radius: 10px;
+	    width: 260px;
+	    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);	
+	}
+	
+	.member-list-section {
+	    align-items: flex-start;
+	    width: 100%;
+	}
+	
+	.member-list-title {
+	    align-items: flex-start;
+	    width: 100%;
+	    text-align: center;
+	    font-size: 18px;
+	    font-weight: bold;
+	    color: #333;
+	}
 
-}
-
-.member-list-section {
-    align-items: flex-start;
-    width: 100%;
-}
-
-/* ✅ 회원 목록 스타일 */
-.member-list {
-    /*margin-top: 10px;*/
-    width: 100%;
-    max-height: 300px; /* 최대 높이 제한 */
-    overflow-y: auto; /* 세로 스크롤 허용 */
-}
-
-.member-list ul {
-    list-style: none;
-    padding: 0;
-}
-
-.member-list li {
-    font-size: 14px;
-    padding: 6px 0;
-    border-bottom: 1px solid #ddd;
-}
-
-/* ✅ 회원 초대 버튼 스타일 */
-#invite-btn {
-    background-color: #6c757d; /* 회색 */
-    color: white;
-    padding: 10px 15px;
-    font-size: 14px;
-    border-radius: 6px;
-    width: 100%;
-}
+	/* ✅ 회원 목록 스타일 */
+	.member-list {
+	    /*margin-top: 10px;*/
+	    width: 100%;
+	    max-height: 300px; /* 최대 높이 제한 */
+	    overflow-y: auto; /* 세로 스크롤 허용 */
+	}
+	
+	.member-list ul {
+	    list-style: none;
+	    padding: 0;
+	}
+	
+	.member-list li {
+	    font-size: 14px;
+	    padding: 6px 0;
+	    border-bottom: 1px solid #ddd;
+	}
+	
+	/* ✅ 회원 초대 버튼 스타일 */
+	#invite-btn {
+	    background-color: #6c757d; /* 회색 */
+	    color: white;
+	    padding: 10px 15px;
+	    font-size: 14px;
+	    border-radius: 6px;
+	    width: 100%;
+	}
 
 /* ✅ 반응형 (태블릿 & 모바일 대응) */
 @media (max-width: 768px) {
     .container {
-        flex-direction: column;
-        align-items: center;
+        grid-template-columns: 1fr; /* 모바일에서는 한 열로 */
+        justify-content: center;
+    }
+    
+    .right-section {
+        position: static; /* 모바일에서는 고정 해제 */
+        width: 100%; /* 전체 너비로 */
     }
 
     .button-group {
@@ -202,61 +237,61 @@ button:hover {
 }
 
 /* 이미지 모달 스타일 */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
-}
-
-#modalImage {
-    width: auto;
-    min-width: 400px;
-    max-width: 95vw;
-    max-height: 95vh;
-    display: block;
-    margin: 0 auto;
-}
-
-.modal-dialog {
-    max-width: none;
-    width: auto; /* 이미지 크기에 맞게 조정 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    width: auto; /* 내용물 크기에 맞춤 */
-    background: transparent;
-    border: none;
-    padding: 0;
-}
-
-.modal-header, .modal-body, .modal-footer {
-    border: none;
-}
-
-.modal-footer {
-    padding-right: 0;
-    justify-content: flex-end;
-}
-
-.modal-content {
-    position: relative;
-    background: transparent;
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    text-align: center;
-}
-
-.btn-close {
-    filter: invert(1);
-    opacity: 1;
-}
+	.modal {
+	    display: none;
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background: rgba(0, 0, 0, 0.8);
+	    justify-content: center;
+	    align-items: center;
+	}
+	
+	#modalImage {
+	    width: auto;
+	    min-width: 400px;
+	    max-width: 95vw;
+	    max-height: 95vh;
+	    display: block;
+	    margin: 0 auto;
+	}
+	
+	.modal-dialog {
+	    max-width: none;
+	    width: auto; /* 이미지 크기에 맞게 조정 */
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	}
+	
+	.modal-content {
+	    width: auto; /* 내용물 크기에 맞춤 */
+	    background: transparent;
+	    border: none;
+	    padding: 0;
+	}
+	
+	.modal-header, .modal-body, .modal-footer {
+	    border: none;
+	}
+	
+	.modal-footer {
+	    padding-right: 0;
+	    justify-content: flex-end;
+	}
+	
+	.modal-content {
+	    position: relative;
+	    background: transparent;
+	    padding: 0;
+	    border: none;
+	    box-shadow: none;
+	    text-align: center;
+	}
+	
+	.btn-close {
+	    filter: invert(1);
+	    opacity: 1;
+	}
