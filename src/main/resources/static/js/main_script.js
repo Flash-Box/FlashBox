@@ -1,6 +1,20 @@
 const JWT_ERROR_MSG = "jwt 토큰 인증 실패"
 
-document.addEventListener("DOMContentLoaded", async function getBoxes() {
+// SCRUM-69-activate-search-bar : 검색 함수
+function searchBoxes() {
+    const keyword = document.getElementById("search-input").value;
+    fetchBoxes(keyword);
+}
+
+
+// SCRUM-69-activate-search-bar : 페이지 로드 시 박스 리스트 불러오기
+document.addEventListener("DOMContentLoaded", async function () {
+    await fetchBoxes();
+});
+
+
+// SCRUM-69-activate-search-bar : 박스 리스트 가져오기 수정 2025.03.18
+async function fetchBoxes(keyword = "") {	// SCRUM-69-activate-search-bar :수정
     const token = sessionStorage.getItem("accessToken");
     if (!token) {
         alert("로그인이 필요합니다.");
@@ -15,7 +29,8 @@ document.addEventListener("DOMContentLoaded", async function getBoxes() {
 //        document.querySelector(".nickname").textContent = nickname;
 
         // 🔹 박스 리스트 가져오기
-        const boxResponse = await fetch("/api/boxes", {
+        const url = keyword ? `/api/boxes?keyword=${encodeURIComponent(keyword)}` : "/api/boxes";	// SCRUM-69-activate-search-bar :수정
+        const boxResponse = await fetch(url, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -35,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async function getBoxes() {
                 try {
                     const newToken = await refreshToken();
                     if (newToken) {
-                        await getBoxes(); // 새로운 토큰으로 재시도
+                        await fetchBoxes(keyword); // 새로운 토큰으로 재시도 수정 -> SCRUM-69-activate-search-bar
                     }
                 } catch (error) {
                     console.error("토큰 갱신 실패:", error);
@@ -48,7 +63,8 @@ document.addEventListener("DOMContentLoaded", async function getBoxes() {
         console.error("🚨 오류 발생:", error);
         alert("데이터를 불러오는 중 문제가 발생했습니다.");
     }
-});
+};
+
 
 // 🔹 박스 리스트 렌더링 함수
 async function renderBoxes(boxes) {

@@ -161,6 +161,25 @@ public class BoxService {
 	        return BoxResponse.from(box, members, images); // ✅ members 포함하여 올바르게 호출
 	    }).collect(Collectors.toList());
 	}
+
+	// SCRUM-69-activate-search-bar : 검색 기능 추가
+    public List<BoxResponse> searchBoxesByKeyword(String keyword, Long uid) {
+        List<Long> bids = boxUserRepository.findAllByUserId(uid).stream().map(boxuser -> boxuser.getBox().getBid()).toList();
+        List<Box> boxes = boxRepository.findAllById(bids);
+
+        return boxes.stream()
+                .filter(box -> box.getName().toLowerCase().contains(keyword.toLowerCase())) // 이름으로 필터링 
+                .map(box -> {
+                    List<BoxUserResponse> members = boxUserRepository.findAllByBoxBid(box.getBid()).stream()
+                            .map(BoxUserResponse::from)
+                            .collect(Collectors.toList());
+                    List<String> images = pictureRepository.findAllByBoxBid(box.getBid()).stream()
+                            .map(Picture::getImageUrl)
+                            .collect(Collectors.toList());
+                    return BoxResponse.from(box, members, images);
+                })
+                .collect(Collectors.toList());
+    }	
 	
     // 박스 조회, 수정 --------------------------------------------------------------------- SCRUM-30-view-members
 	public BoxResponse getBox(Long bid) {				
