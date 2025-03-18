@@ -63,6 +63,16 @@ public class Box extends BaseTimeEntity {
         this.boomDate = LocalDateTime.now().plusDays(7);
         this.count = 3;
     }
+
+    public Box(Long id, String name, LocalDateTime eventStartDate, LocalDateTime eventEndDate, User user) {
+        this.bid = id;
+        this.name = name;
+        this.eventStartDate = eventStartDate;
+        this.eventEndDate = eventEndDate;
+        this.user = user;
+        this.boomDate = LocalDateTime.now().plusDays(7);
+        this.count = 3;
+    }
     
     // BoxUser 추가 편의 메서드
     public void addBoxUser(User user, RoleType role) {
