@@ -132,7 +132,7 @@ public class BoxController {
 	
 	// box 생성 기능
 	@PostMapping("/box")
-  @ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
+    @ResponseBody // JSON 응답으로 변경, 특정 박스 모임원 조회 위해 특정 유저로 박스 생성 확인 작업 --------- SCRUM-30-view-members
 	public ResponseEntity<CustomResponse<BoxCreateResponse>> createBox( // String -> ResponseEntity<String>, 특정 유저로 박스 생성하여 모임원 조회 작업 ----- SCRUM-30-view-members
 			@RequestBody BoxRequest boxRequest,
 			@AuthenticationPrincipal FBUserDetails fbUserDetails

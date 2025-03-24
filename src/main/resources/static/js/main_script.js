@@ -133,7 +133,7 @@ async function renderBoxes(boxes) {
                     <h4 class="card-title">${box.name}</h4>
                     <h5 class="box-info">📅 모임 날짜: ${box.eventStartDate}</h5>
                     <h5 class="box-info">⏳ 최종 업로드: ${box.modifiedDate}</h5>
-                    <h5 class="box-info boom-date">🔥 폭파 날짜: ${box.boomDate}</h5>
+                    <h5 class="box-info boom-date">🔥 폭파 날짜: ${box.formattedBoomDate}</h5>
                 </div>
             </div>
         `;

@@ -1,6 +1,8 @@
 package com.drive.flashbox.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,8 +26,10 @@ public class BoxResponse {
 
     private LocalDate eventEndDate;
     
-    private LocalDate boomDate;
-    
+    private LocalDateTime boomDate;
+
+	private String formattedBoomDate;
+
     private LocalDate modifiedDate;
     
     private List<BoxUserResponse> members; // 모임원 리스트 추가 ------------------- SCRUM-30-view-members
@@ -38,8 +42,9 @@ public class BoxResponse {
     							box.getName(),
     							box.getEventStartDate().toLocalDate(),
     							box.getEventEndDate().toLocalDate(),
-    							box.getBoomDate() != null ? box.getBoomDate().toLocalDate() : null,	//수정 -- SCRUM-30-view-members
-    							box.getModifiedDate().toLocalDate(),
+    							box.getBoomDate() != null ? box.getBoomDate() : null,	//수정 -- SCRUM-30-view-members
+								box.getBoomDate() != null ? format(box.getBoomDate()) : null,
+								box.getModifiedDate().toLocalDate(),
     							members != null ? members : Collections.emptyList(),  // ✅ null 방지 (빈 리스트 반환)
 						        images != null ? images : Collections.emptyList()  // ✅ null 방지 (빈 리스트 반환)
 		);
@@ -50,8 +55,17 @@ public class BoxResponse {
 				box.getName(),
 				box.getEventStartDate().toLocalDate(),
 				box.getEventEndDate().toLocalDate(),
-				box.getBoomDate() != null ? box.getBoomDate().toLocalDate() : null,	//수정 -- SCRUM-30-view-members
+				box.getBoomDate() != null ? box.getBoomDate() : null,	//수정 -- SCRUM-30-view-members
+				box.getBoomDate() != null ? format(box.getBoomDate()) : null,
 				box.getModifiedDate().toLocalDate(),
 				null, null);
 	}
+
+
+	public static String format(LocalDateTime date) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		return date.format(formatter);
+	}
+
+
 }
