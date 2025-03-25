@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box 수정</title>
+    
+    <link rel="stylesheet" href="/css/box_form.css">
+    <script src="/js/edit_box.js"></script>
+    <script src="/js/auth.js"></script>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Box 수정</h1>
+        <form id="updateForm" th:data-bid="${box.bid}">
+            <div class="input-group">
+            	<label for="name">Box 이름</label>
+            	<input type="text" id="name" name="name" 
+                   		th:value="${box?.name != null ? box.name : ''}" 
+                   		placeholder="Box 이름을 입력해주세요." required>
+			</div>
+			<div class="input-group">
+            	<label>모임 개시 날짜</label>
+                <input type="date" id="eventStartDate" name="eventStartDate"
+                       th:value="${box?.eventStartDate != null ? box.eventStartDate : ''}" 
+                       required onchange="validateDates()">
+            </div> 
+            <div class="input-group">         
+				<label>모임 종료 날짜</label>
+                <input type="date" id="eventEndDate" name="eventEndDate"
+                       th:value="${box?.eventEndDate != null ? box.eventEndDate : ''}" 
+                       required onchange="validateDates()">
+            </div>
+
+            <button type="button" id="cancelButton" class="cancel-btn" onclick="window.history.back()">취소</button>
+            <button type="submit" class="update-btn">수정</button>
+
+        </form>
+    </div>
+</body>
+</html>

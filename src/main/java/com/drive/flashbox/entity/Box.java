@@ -1,15 +1,17 @@
 package com.drive.flashbox.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.annotation.LastModifiedDate;
+import com.drive.flashbox.entity.enums.RoleType;
+
+@SuperBuilder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -30,14 +32,15 @@ public class Box extends BaseTimeEntity {
     @Column(name = "event_end_date", nullable = false)
     private LocalDateTime eventEndDate;
 
-    @Column(name = "upload_date")
-    private LocalDateTime uploadDate;
-
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    @Column(name = "modified_date", nullable = false)
+    @LastModifiedDate
+    private LocalDateTime modifiedDate;
 
     @Column(name = "boom_date")
     private LocalDateTime boomDate;
+    
+    @Column(name = "count")
+    private Integer count;
 
     // Box를 만든(혹은 소유한) User
     @ManyToOne
@@ -52,4 +55,45 @@ public class Box extends BaseTimeEntity {
     @OneToMany(mappedBy = "box", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<BoxUser> boxUsers = new ArrayList<>();
     
+    public Box(String name, LocalDateTime eventStartDate, LocalDateTime eventEndDate, User user) {
+        this.name = name;
+        this.eventStartDate = eventStartDate;
+        this.eventEndDate = eventEndDate;
+        this.user = user;
+        this.boomDate = LocalDateTime.now().plusDays(7);
+        this.count = 3;
+    }
+
+    public Box(Long id, String name, LocalDateTime eventStartDate, LocalDateTime eventEndDate, User user) {
+        this.bid = id;
+        this.name = name;
+        this.eventStartDate = eventStartDate;
+        this.eventEndDate = eventEndDate;
+        this.user = user;
+        this.boomDate = LocalDateTime.now().plusDays(7);
+        this.count = 3;
+    }
+    
+    // BoxUser 추가 편의 메서드
+    public void addBoxUser(User user, RoleType role) {
+        BoxUser boxUser = BoxUser.builder()
+                .user(user)
+                .box(this)
+                .participateDate(LocalDateTime.now())
+                .role(role)
+                .build();
+        this.boxUsers.add(boxUser);
+    }
+    
+    public void editBox(String name, LocalDateTime eventStartDate, LocalDateTime eventEndDate) {
+    	this.name = name;
+    	this.eventStartDate = eventStartDate;
+    	this.eventEndDate = eventEndDate;
+    }
+    
+    // 기간 연장 + 횟수 감소
+    public void extendBoomDate() {
+    	this.boomDate = this.boomDate.plusDays(7);
+        this.count -= 1;
+    }
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/navBar.css">
+    <script src="/js/auth.js"></script>
+</head>
+<body>
+
+<div class="header" th:fragment="headerLayout">
+    <!-- 왼쪽 로고 -->
+    <div class="left-header">
+        <a href="/boxes" class="logo">(로고)</a>
+        <a href="/boxes" class="brand">FlashBox</a>
+    </div>
+    
+    <!-- 검색창 추가 및 JavaScript 연결 -->
+    <div class="search-container">
+        <input type="text" id="search-input" class="form-control" placeholder="검색어를 입력하세요">
+        <button class="search-button" onclick="searchBoxes()">🔍 검색</button>
+    </div>
+
+    <!-- 오른쪽 별명과 로그아웃 버튼 -->
+    <div class="right-header">
+        
+        <div class="nickname" th:text="'안녕하세요, ' + (${username} ?: '회원') + '님!'">안녕하세요, 회원님!</div>
+        <button class="logout-button" onclick="FBlogout()">로그아웃</button>
+    </div>
+</div>
+
+</body>
+</html>
